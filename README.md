@@ -8,14 +8,14 @@
 		
   		@num 'points'
 		
-  		@map @str     'fb_id'
+  		@map @str     'fb_id' # @map not implemented yet
   		@str          'fb_name'
   		@str          'fb_gender'
   		@str          'fb_url'
   		@private @str 'fb_token'
 		
   		# Facebook Details
-  		@map @str     'fb_id'
+  		@map @str     'fb_id' # @map not implemented yet
   		@str          'fb_name'
   		@str          'fb_gender'
   		@str          'fb_url'
