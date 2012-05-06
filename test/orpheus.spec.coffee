@@ -614,21 +614,3 @@ describe 'Validation', ->
 				expect(err[0].toString()).toBe 'Error: String should be almog'
 				
 				done()
-
-# json
-# type conversion
-# add / delete, etc
-# relation sets pleeease
-# deleteall (deleteall with relation)
-# function as last argument, executes immediately.
-# Regular Commands
-# Helper function
-# helper function that gets brand related information + regular information
-# Map
-# Validation
-# Responses
-# Errors
-# some way to attach brand and player multi commands together
-# fixme: too many sadd for relations
-# fixme for sadd relations with map (what?)
-# test for multi relations?
