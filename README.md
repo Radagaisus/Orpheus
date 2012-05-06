@@ -1,4 +1,5 @@
 # Orpheus - Redis Little Helper
+**version**: pre pre pre 0.1
 ```coffee
   class Player extends Orpheus
   	constructor: ->
