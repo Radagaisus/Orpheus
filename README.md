@@ -43,7 +43,7 @@ Expect v0.1 to be out soon.
         if 0 <= vote <= 10
           true
         else
-          message: 'Vote isn't between 0 and 10'
+          message: "Vote isn't between 0 and 10"
   
   # Instantiate them
   user = Player.create()
