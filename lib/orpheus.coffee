@@ -268,8 +268,10 @@ class OrpheusAPI
 			# orpheus:us:15:somelist
 			return "#{k}:#{key}"
 	
+	# deletes the model.
 	delete: (fn) ->
-		hdel_flag = false
+		@_commands = [] # flush commands
+		hdel_flag = false # no need to delete a hash twice
 		for key, value of @model
 			type = value.type
 			if type is 'str' or type is 'num'
@@ -284,14 +286,20 @@ class OrpheusAPI
 			.exec (err, res) =>
 				fn err, res, @id
 	
+	# get public information only
 	get: (fn) ->
 		@getall fn, true
 	
+	# get ALL the model information.
 	getall: (fn, private = false) ->
+		# Helper for determining if a value is private or not
 		not_private = -> not private or private and value.options.private isnt true
 		
-		schema = []
+		schema = [] # we use the schema to convert the response
+		            # to the appropriate value
 		
+		# It's ugly and nasty, but sometimes we want hmget
+		# and sometimes we want hgetall
 		hgetall_flag = false
 		hash_parts_are_private = false
 		hmget = []
@@ -338,6 +346,7 @@ class OrpheusAPI
 					@_errors.push err
 					Orpheus.trigger 'error', err
 				else
+					# convert the response type, based on the schmea
 					result = {}
 					for o,i in schema
 						if o is 'hash'
@@ -350,8 +359,9 @@ class OrpheusAPI
 					
 					result.id = @id
 				
-				fn err, result
+				fn err, result, @id
 	
+	# execute the multi commands
 	exec: (fn) ->
 		if @validation_errors.length
 			return fn @validation_errors, false, @id
