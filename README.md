@@ -1,85 +1,104 @@
 # Orpheus - Redis Little Helper
-**version**: pre pre pre 0.1
+Orpheus is a Redis Object Model for CoffeeScript.
+
+- Rails like models
+- Validations
+- Private properties
+- simple relations
+- transactional spirit, with multi
+- Dynamic keys
+
+Expect v0.1 to be out soon.
+
+# In Action
 ```coffee
-  class Player extends Orpheus
-  	constructor: ->
-  		@has 'brand'
-		
-  		@str 'name'
-		
-  		@num 'points'
-		
-  		@map @str     'fb_id' # @map not implemented yet
-  		@str          'fb_name'
-  		@str          'fb_gender'
-  		@str          'fb_url'
-  		@private @str 'fb_token'
-		
-  		# Facebook Details
-  		@map @str     'fb_id' # @map not implemented yet
-  		@str          'fb_name'
-  		@str          'fb_gender'
-  		@str          'fb_url'
-  		@private @str 'fb_token'
-		
-  		# Twitter Details
-  		@str          'twitter_nick'
-  		@map @str     'twitter_id'
-  		@private @str 'twitter_token'
-  		@private @str 'twitter_secret'
-  		@num          'twitter_followers'
-		
-  		# General Stats
-  		@str 'rank'
-  		@num 'points'
-  		@zset 'badges'
-  		@list 'activities'
-  			type: 'json'
-  			cap: 200
-		
-  		# @json 'something' - Not Implemented
-  		@set 'something'
-		
-  		# Special Keys
-  		@zset 'monthly_ranking'
-  		  key: ->
-  		    d = new Date()
-  		    "#{d.getFullYear()}:#{d.getMonth()+1}"
-		
-  		# Validations
-  		@validate 'name', (name) ->
-  			if name is 'bill clinton' then true else message: 'Name must be bill clinton!'
-
-  # Adding, Updating, Deleting
-  player(13)
-  	.badges.zincrby(20, 'almog')
-  	.hmset('twitter_nick', 'almog', 'heho', 'boos')
-  	.exec (err, res, id) ->
-  		# ...
+  # Let's create a couple of models
+  class User extends Orpheus
+    constructor: ->
+      @has 'book'
+      
+      @str 'fb_name'
+      @zset 'alltime_ranking'
+      @str 'about_me'
+      
+      # Private Keys
+      @private @str 'fb_secret'
+      
+      # Dynamic Keys
+      @zset 'monthly_ranking'
+        key: ->
+          d = new Date()
+          "ranking:#{d.getFullYear()}:#{d.getMonth()+1}"
   
-  # Alternatively
-  player('someplayer')
-    .set # set, add, del
-      badges: [20, 'almog']
-      twitter_nick: 'almog'
-      heho: 'boos'
-    .exec (err, res, id) -> #...
+  class Book extends Orpheus
+    constructor: ->
+      @has 'user'
+      @str 'name'
+      @num 'votes'
+      @list 'reviews'
+      @set 'authors'
+      
+      # Validations
+      @validate 'votes', (vote) ->
+        if 0 <= vote <= 10
+          true
+        else
+          message: 'Vote isn't between 0 and 10'
+  
+  # Instantiate them
+  user = Player.create()
+  book = Book.create()
+  
+  # Add information in a boring way
+  book('dune')
+    .votes.incrby(6)
+    .reviews.push('it sucked', 'it was awesome')
+    .authors.smembers()
+    .exec (err, res, id) ->
+      # ...
+  
+  # Or in a fun way
+  book('dune').add
+    votes:  6
+    reviews: ['it sucked', 'it was awesome']
+  .authors.smembers()
+  .exec (err, res, id) ->
+    # ...
+  
+  # Get information, without private properties
+  user('olga').get (err, res, id) -> #...
+  
+  # Get all the information
+  user('xss-exhibitionist').get (err, res, id) -> # ...
+
+  # Fun with relations
+  # add to the total votes for the book
+  # and to olga's votes for the book
+  # hincrby prefix:bo:catch22 votes 1
+  # hincrby prefix:bo:catch22:us:olga votes 1
+  # respectively
+  book('catch22').set
+    votes: 1
+  .user('olga').set
+    votes: 1
+  
+  # for every relation you get a free set
+  book('SICP').users.smembers (err, users) ->
+    return next err, false if err
     
+    # and a helping hand for getting details
+    book('SICP').users.get users, (err, users) ->
+      next err, users
+  
+  # We all hate configurations
+  Orpheus.configure
+    client: redis.createClient()
+    prefix: 'bookapp'
 
-  # Getting Information
-  player(15).brand(13).get (err, res, id) -> # ...
-  player(15).brand(13).getall (err, res, id) -> #...
-
-  # All errors are logged (but I don't like it)
-  Orpheus.errors.get()
-  Orpheus.errors.flush()
-
-  Orpheus.errors.subscribe (err) -> # err.message, err.type
-	
-  # Helper for retrieving model information based on an array
-  catalog('fifteen').users.smembers (err, users) ->
-  	return done err, null if err
-	
-  	Orpheus.users.get users, (err, users) ->
-  		done err, users
-```
+## Planned ##
+- `@map`
+- type and cap for lists
+- Default validations (for type)
+- Validation helpers
+- `@json` data type
+- Denormalization helpers
