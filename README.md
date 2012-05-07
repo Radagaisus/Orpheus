@@ -94,6 +94,7 @@ Expect v0.1 to be out soon.
   Orpheus.configure
     client: redis.createClient()
     prefix: 'bookapp'
+```
 
 ## Planned ##
 - `@map`
