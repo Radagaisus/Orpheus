@@ -1,0 +1,24 @@
+{
+	"name": "orpheus",
+	"description": "Rails Object Model for CoffeeScript",
+	"version": "0.1",
+	"url": "https://github.com/Radagaisus/Orpheus",
+	"author": "Almog Melamed <radagaisus@gmail.com",
+	"main": "./index",
+	"devDependencies": {
+		"jasmine-node": "lastest"
+	},
+	"bugs": {
+		"url": "http://github.com/Radagaisus/Orpheus/issues"
+	},
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "http://github.com/Radagaisus/Orpheus/raw/master/LICENSE"
+	    }
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://Radagaisus@github.com/Radagaisus/Orpheus.git"
+	}
+}
