@@ -8,7 +8,7 @@ Orpheus is a Redis Object Model for CoffeeScript.
 - transactional spirit, with multi
 - Dynamic keys
 
-Expect v0.1 to be out soon.
+npm package soon to come.
 
 # In Action
 ```coffee
