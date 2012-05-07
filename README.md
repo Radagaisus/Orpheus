@@ -73,10 +73,9 @@ Expect v0.1 to be out soon.
 
   # Fun with relations
   # add to the total votes for the book
-  # and to olga's votes for the book
   # hincrby prefix:bo:catch22 votes 1
+  # and to olga's votes for the book
   # hincrby prefix:bo:catch22:us:olga votes 1
-  # respectively
   book('catch22').add
     votes: 1
   .user('olga').add
