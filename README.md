@@ -69,7 +69,7 @@ Expect v0.1 to be out soon.
   user('olga').get (err, res, id) -> #...
   
   # Get all the information
-  user('xss-exhibitionist').get (err, res, id) -> # ...
+  user('xss-exhibitionist').getall (err, res, id) -> # ...
 
   # Fun with relations
   # add to the total votes for the book
@@ -81,6 +81,7 @@ Expect v0.1 to be out soon.
     votes: 1
   .user('olga').add
     votes: 1
+  .exec -> # ...
   
   # for every relation you get a free set
   book('SICP').users.smembers (err, users) ->
