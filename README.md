@@ -77,9 +77,9 @@ Expect v0.1 to be out soon.
   # hincrby prefix:bo:catch22 votes 1
   # hincrby prefix:bo:catch22:us:olga votes 1
   # respectively
-  book('catch22').set
+  book('catch22').add
     votes: 1
-  .user('olga').set
+  .user('olga').add
     votes: 1
   
   # for every relation you get a free set
