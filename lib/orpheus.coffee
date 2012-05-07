@@ -1,122 +1,151 @@
 # Orpheus - a small DSL for redis
 #-------------------------------------#
 
-redis = require 'redis'
-_ = require 'underscore'
-async = require 'async'
-os = require 'os'
-inflector = require './inflector'
-commands = require './commands'
-
+_ = require 'underscore'           # flatten, extend
+async = require 'async'            # until
+os = require 'os'                  # id generation
+inflector = require './inflector'  # pluralize
+commands = require './commands'    # redis commands
 command_map = commands.command_map
 
 log = console.log
 
-Orpheus = {}
-
-# 
+# Orpheus
 #-------------------------------------#
 class Orpheus
 	
 	# Configuration
 	@config:
-		prefix: 'eury'
+		prefix: 'orpheus' # redis prefix, orpheus:obj:id:prop
+		# client -       the redis client we should use
 	
 	@configure: (o) ->
 		@config = _.extend @config, o
 	
+	# easy reference to all models
 	@schema = {}
 	
 	# UniqueID counters
 	@id_counter: 0
 	@unique_id: -> @id_counter++
 	
-	# Mini pub/sub
+	# Mini pub/sub for errors
 	@topics = {}
+	
 	@trigger = (topic, o) ->
 		subs = @topics[topic]
 		return unless subs
 		(sub o for sub in subs)
+	
 	@on = (topic, f) ->
 		@topics[topic] ||= []
 		@topics[topic].push f
 	
+	# Error Handling
 	@_errors = []
 	@errors:
 		get: -> @_errors
 		flush: -> @_errors = []
 	
-	# So you won't have to call super()
-	# and we can figure out the class
-	# name and the redis qualifier
+	# Orpheus model extends the model
+	# - we can automagically detect
+	#   the model name and qualifier.
+	# - you don't need to call super()
 	@create: ->
+		
 		class OrpheusModel extends @
 			
 			constructor: (@name, @q) ->
-				
-				# Create DSL functions
 				@model = {}
 				@rels = []
 				@rels_qualifiers = []
 				@validations = []
 				
-				@fields = ['str', 'num', 'map', 'list', 'set', 'zset', 'relation']
+				@fields = [
+					'str'  # @str 'name'
+					'num'  # @num 'points'
+					'map'  # @map 'fb_id'
+					'list' # @list 'activities'
+					'set'  # @set  'uniques'
+					'zset' # @zset 'ranking'
+				]
+				
+				# Create a simple schema for all fields
 				for f in @fields
 					do (f) =>
 						@[f] = (field, options = {}) ->
+							throw new Error("Field name already taken") if @model[field]
+							
 							@model[field] =
 								type: f
 								options: options
+							
 							return field
 				
+				# Create the model
 				super()
-				
-				# Add to Orpheus Schema
-				Orpheus.schema[@name] = @model
 			
-			# Create a relationship function
+			# Add relations
 			has: (rel) ->
 				@rels.push rel
 				qualifier = rel.substr(0,2)
 				@rels_qualifiers.push qualifier
+				
+				# create a relation function,
+				# e.g. user(12).book(15)
 				@[rel] = (id) ->
 					@["#{qualifier}_id"] = id
 					return @
 			
+			# Add a validation function to a field
+			# e.g. @validate 'name', (name) ->
+			#  if name is 'jay' then true else message: 'beep!'
 			validate: (key, func) ->
 				@validations[key] ||= []
 				@validations[key].push func
 			
+			# Mark field as private
 			private: (field) ->
 				@model[field].options.private = true
 			
-			id: (id) => return new OrpheusAPI(id, this)
+			# We actually return OrpheusAPI from create()
+			id: (id) => new OrpheusAPI id, this
 		
 		# Converts class Player to 'player'
 		name = @toString().match(/function (.*)\(/)[1].toLowerCase()
-		q = name.substr(0,2) # the qualifier we use
 		
-		Orpheus.schema.models ||= {}
-		Orpheus.schema.models[name] = @
+		# Qualifier
+		q = name.substr(0,2)
+		
+		# Add to Schema
+		Orpheus.schema[name] = @
 		
 		model = new OrpheusModel(name, q)
 		return model.id
 
 
-# 
+# Orpheus API
 #-------------------------------------#
 class OrpheusAPI
 	constructor: (id, @model) ->
+		
 		_.extend @, @model
+		
+		# Redis multi commands
 		@_commands = []
-		existing_id = id
-		@id = id or @generate_id()
+		
+		@validation_errors = []
+		
 		@redis = Orpheus.config.client
 		@prefix = Orpheus.config.prefix
 		@pname = inflector.pluralize @name
-		@validation_errors = []
 		
-		# relations
+		# new or existing id
+		@id = id or @generate_id()
+		
+		# Create functions for working with the relation set
+		# e.g. user(15).books.sadd('dune') will map to sadd
+		# orpheus:us:15:books dune.
 		for rel in @rels
 			prel = inflector.pluralize rel
 			@[prel] = {}
@@ -125,16 +154,22 @@ class OrpheusAPI
 					@[prel][f] = (args..., fn) =>
 						@redis[f](["#{@prefix}:#{@q}:#{@id}:#{prel}"].concat(args), fn)
 			
-			# Helper get
+			# Extract related models information,
+			# one by one, based on an array of ids
+			# e.g. user(10).books.get ['dune', 'valis']
 			do (rel, prel) =>
-				@[prel].get = (arr, fn) =>
+				@[prel].get = (arr = [], fn) =>
 					return fn null, [] unless arr.length
 					results = []
 					
 					async.until ->
 							results.length is arr.length
+							
 						, (c) ->
-							model = Orpheus.schema.models[rel].create()
+							# create the relation model
+							model = Orpheus.schema[rel].create()
+							
+							# and get its information based on the arr id
 							model(arr[results.length]).get (err, res) ->
 								if err
 									err.time = new Date()
@@ -146,33 +181,36 @@ class OrpheusAPI
 								else
 									results.push res
 								c err
-							
-							model[results.length]
 						, (err) ->
 							fn err, results 
 		
-		# Redis Commands
+		# for every field, add all the redis commands
+		# for its corresponding type.
 		for key, value of @model
 			@[key] = {}
 			
 			for f in commands[value.type]
 				do (key, f) =>
 					@[key][f] = (args...) =>
+						# add multi command
 						@_commands.push _.flatten [f, @get_key(key), args]
 						return @
 					
-					return if f[0] isnt commands.shorthands[value.type]
-					@[key][f[1..]] = (args...) =>
-						@_commands.push _.flatten [f, @get_key(key), args]
-						return @
+					# Shorthand form, incrby instead of zincrby and hincrby is also acceptable
+					# str: h, num: h, list: l, set: s, zset: z
+					@[key][f[1..]] = @[key][f] if f[0] is commands.shorthands[value.type]
 		
-		# Add, Set, Delete commands
+		# create the add, set and del commands
+		# based on the commands map they call
+		# the respective command for the key,
+		# value they recieve.
 		@operations = ['add', 'set', 'del']
 		for f in @operations
 			do (f) =>
 				@[f] = (o) ->
 					for k, v of o
-						# validation
+						
+						# Run Validations
 						if @validations[k]
 							for valid in @validations[k]
 								msg = valid(v)
@@ -181,43 +219,54 @@ class OrpheusAPI
 									msg.type = 'validation'
 									@validation_errors.push msg 
 						
-						# command
-						unless @validation_errors.length
-							type = @model[k].type
-							command = command_map[f][type]
-							@[k][command](v)
+						# Add the Command. Note we won't actually
+						# execute any of this commands if the
+						# validation has failed.
+						type = @model[k].type
+						command = command_map[f][type]
+						@[k][command](v) # e.g. @name.hset 'abe'
+					
 					return this
 	
 	
-	# Generate a unique ID for model, inspired by MongoDB
+	# Generate a unique ID for model, similiar to MongoDB
 	# http://www.mongodb.org/display/DOCS/Object+IDs
 	generate_id: ->
-		time = "#{new Date().getTime()}"
+		time = "#{new Date().getTime()}" # we convert to a str to
+		                                 # avoid 4.3e+79 as id
 		pid = process.pid
 		host = 0; (host += s.charCodeAt(0) for s in os.hostname())
 		counter = Orpheus.unique_id()
+		
 		"#{host}#{pid}#{time}#{counter}"
 	
+	
 	get_key: (key) ->
-		
+		# Default: orpheus:pl:15
 		k = "#{@prefix}:#{@q}:#{@id}"
+		
+		# Add qualifiers, if the relation was set.
+		# e.g. orpheus:us:30:book:dune:page:13
 		for rel in @rels_qualifiers when @[rel+"_id"]
 			k += ":#{rel}:"+@[rel+"_id"]
 		
+		# delete and get just need the key for
+		# del, hmget and hgetall
 		return k unless key
 		
 		type = @model[key].type
 		
+		# generate a new key name, if it has a
+		# dynamic key function.
 		if key and @model[key].options.key
 			key = @model[key].options.key()
 		
 		if type is 'str' or type is 'num'
+			# orpheus:us:15:name somename
 			return [k, key]
 		else
-			return ["#{k}:#{key}"]
-	
-	get: (fn) ->
-		@getall fn, true
+			# orpheus:us:15:somelist
+			return "#{k}:#{key}"
 	
 	delete: (fn) ->
 		hdel_flag = false
@@ -234,6 +283,9 @@ class OrpheusAPI
 			.multi(@_commands)
 			.exec (err, res) =>
 				fn err, res, @id
+	
+	get: (fn) ->
+		@getall fn, true
 	
 	getall: (fn, private = false) ->
 		not_private = -> not private or private and value.options.private isnt true
@@ -290,7 +342,7 @@ class OrpheusAPI
 					for o,i in schema
 						if o is 'hash'
 							_.extend result, res[i]
-						else if _.isArray o
+						else if Array.isArray o
 							for prop, j in o
 								result[prop] = res[i][j]
 						else

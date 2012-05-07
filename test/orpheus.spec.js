@@ -1,5 +1,5 @@
 (function() {
-  var Orpheus, PREFIX, clean_db, commands, getWeek, log, monitor, r, redis, util,
+  var Orpheus, PREFIX, clean_db, commands, log, monitor, r, redis, util,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -24,7 +24,7 @@
 
   log = console.log;
 
-  PREFIX = "eury";
+  PREFIX = "orpheus";
 
   clean_db = function(fn) {
     return r.keys("" + PREFIX + "*", function(err, keys) {
@@ -41,32 +41,10 @@
     });
   };
 
-  getWeek = function(date) {
-    var d, daynum, m, offset, prev_offset, w, y;
-    y = date.getFullYear();
-    m = date.getMonth();
-    d = date.getDate();
-    offset = 8 - new Date(y, 0, 1).getDay();
-    if (offset === 8) offset = 1;
-    daynum = (Date.UTC(y, m, d, 0, 0, 0) - Date.UTC(y, 0, 1, 0, 0, 0)) / 86400000 + 1;
-    w = Math.floor((daynum - offset + 7) / 7);
-    if (w === 0) {
-      y--;
-      prev_offset = 7 + 1 - new Date(y, 0, 1).getDay();
-      if (prev_offset === 2 || prev_offset === 8) {
-        w = 53;
-      } else {
-        w = 52;
-      }
-    }
-    return w;
-  };
-
   clean_db();
 
   Orpheus.configure({
-    client: redis.createClient(),
-    prefix: 'eury'
+    client: redis.createClient()
   });
 
   afterEach(function(done) {
@@ -87,7 +65,7 @@
   });
 
   describe('Redis Commands', function() {
-    it('Special Keys', function(done) {
+    it('Dynamic Keys', function(done) {
       var Player, player;
       Player = (function(_super) {
 

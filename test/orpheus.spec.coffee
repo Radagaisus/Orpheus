@@ -15,7 +15,7 @@ monitor.on 'monitor', (time, args) ->
 
 log = console.log
 
-PREFIX = "eury"
+PREFIX = "orpheus"
 
 # Utility to clean the db
 clean_db = (fn) ->
@@ -29,29 +29,10 @@ clean_db = (fn) ->
 		
 		fn() if fn
 
-# Helper: Get the week number
-getWeek = (date) ->
-	y = date.getFullYear()
-	m = date.getMonth()
-	d = date.getDate()
-	offset = 8 - new Date(y, 0, 1).getDay()
-	offset = 1 if offset is 8
-	daynum = (Date.UTC(y, m, d, 0, 0, 0) - Date.UTC(y, 0, 1, 0, 0, 0)) / 86400000 + 1
-	w = Math.floor((daynum - offset + 7) / 7)
-	if w is 0
-		y--
-		prev_offset = 7 + 1 - new Date(y, 0, 1).getDay()
-		if prev_offset is 2 or prev_offset is 8
-			w = 53
-		else
-			w = 52
-	return w
-
 clean_db()
 
 Orpheus.configure
 	client: redis.createClient()
-	prefix: 'eury'
 
 afterEach (done) ->
 	runs ->
@@ -73,7 +54,7 @@ afterEach (done) ->
 
 describe 'Redis Commands', ->
 	
-	it 'Special Keys', (done) ->
+	it 'Dynamic Keys', (done) ->
 		class Player extends Orpheus
 			constructor: ->
 				@str 'name',
