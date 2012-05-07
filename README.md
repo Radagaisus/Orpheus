@@ -98,7 +98,7 @@ Expect v0.1 to be out soon.
 ```
 
 ## Planned ##
-- `@map`
+- `@map` - for one to one maps, e.g. fb_id to id
 - type and cap for lists
 - Default validations (for type)
 - Validation helpers
