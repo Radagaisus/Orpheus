@@ -105,6 +105,7 @@ an npm package will be up soon.
     
     id = if req.user then req.user.id else fb_id: fb.id
     player id, (err, player, is_new) ->
+      next err if err
       # That's it, we just handled autorization,
       # new users and authentication in one go
       player
