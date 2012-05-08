@@ -178,6 +178,7 @@ class OrpheusAPI
 					@[prel][f] = (args..., fn) =>
 						@redis[f](["#{@prefix}:#{@q}:#{@id}:#{prel}"].concat(args), fn)
 					
+					# shorthand, use add instead of sadd
 					@[prel][f[1..]] = @[prel][f]
 			
 			# Extract related models information,

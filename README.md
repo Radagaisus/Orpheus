@@ -17,9 +17,11 @@ an npm package will be up soon.
     constructor: ->
       @has 'book'
       
-      @str 'fb_name'
       @zset 'alltime_ranking'
       @str 'about_me'
+      
+      # one to one map between the id and the fb_id
+      @map @str 'fb_id'
       
       # Private Keys
       @private @str 'fb_secret'
@@ -89,6 +91,27 @@ an npm package will be up soon.
     # and a helping hand for getting details
     book('SICP').users.get users, (err, users) ->
       next err, users
+  
+  # Sweet user authentication with maps
+  # (this example uses passportjs)
+  fb_connect = (req, res, next) ->
+    fb = req.account
+    fb_details =
+      fb_id:    fb.id
+      fb_name:  fb.displayName
+      fb_token: fb.token
+      fb_gener: fb.gender
+      fb_url:   fb.profileUrl
+    
+    if req.user then req.user.id else fb_id: fb.id
+    player id, (err, player, is_new) ->
+      # That's it, we just handled autorization,
+      # new users and authentication in one go
+      player
+        .set(fb_details)
+        .exec (err, res, id) ->
+          req.session.passport.user = id if id
+          next err
   
   # We all hate configurations
   Orpheus.configure
