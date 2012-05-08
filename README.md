@@ -103,14 +103,14 @@ an npm package will be up soon.
       fb_gener: fb.gender
       fb_url:   fb.profileUrl
     
-    if req.user then req.user.id else fb_id: fb.id
+    id = if req.user then req.user.id else fb_id: fb.id
     player id, (err, player, is_new) ->
       # That's it, we just handled autorization,
       # new users and authentication in one go
       player
         .set(fb_details)
-        .exec (err, res, id) ->
-          req.session.passport.user = id if id
+        .exec (err, res, user_id) ->
+          req.session.passport.user = user_id if user_id
           next err
   
   # We all hate configurations
