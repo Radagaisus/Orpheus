@@ -4,7 +4,7 @@
 	"version": "0.1",
 	"url": "https://github.com/Radagaisus/Orpheus",
 	"author": "Almog Melamed <radagaisus@gmail.com",
-	"main": "./index",
+	"main": "./lib/orpheus",
 	"devDependencies": {
 		"jasmine-node": "lastest"
 	},
@@ -26,5 +26,5 @@
 		"url": "https://Radagaisus@github.com/Radagaisus/Orpheus.git"
 	},
 	"keywords": ["redis", "coffee script", "orm", "database"],
-	"engines": { "node": "*" }
+	"engines": { "node": "node >= 0.6.0" }
 }
