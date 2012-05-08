@@ -120,7 +120,7 @@ an npm package will be up soon.
 ```
 
 ## Planned ##
-- `@map` - for one to one maps, e.g. fb_id to id
+- `@map` - delete, setnx and minor fixes
 - type and cap for lists
 - Default validations (for type)
 - Validation helpers
