@@ -1,12 +1,12 @@
 {
 	"name": "orpheus",
 	"description": "Rails Object Model for CoffeeScript",
-	"version": "0.1",
+	"version": "0.1.0",
 	"url": "https://github.com/Radagaisus/Orpheus",
 	"author": "Almog Melamed <radagaisus@gmail.com",
-	"main": "./lib/orpheus",
+	"main": "./index",
 	"devDependencies": {
-		"jasmine-node": "lastest"
+		"jasmine-node": "latest"
 	},
 	"dependencies": {
 		"async": "0.1.18",
