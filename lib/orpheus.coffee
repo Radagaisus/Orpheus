@@ -1,7 +1,7 @@
 # Orpheus - a small DSL for redis
 #-------------------------------------#
 
-_ = require 'underscore'           # flatten, extend
+_ = require 'underscore'           # flatten, extend, isString
 async = require 'async'            # until
 os = require 'os'                  # id generation
 inflector = require './inflector'  # pluralize
@@ -56,6 +56,9 @@ class Orpheus
 		class OrpheusModel extends @
 			
 			constructor: (@name, @q) ->
+				@redis = Orpheus.config.client
+				@prefix = Orpheus.config.prefix
+				@pname = inflector.pluralize @name
 				@model = {}
 				@rels = []
 				@rels_qualifiers = []
@@ -64,7 +67,6 @@ class Orpheus
 				@fields = [
 					'str'  # @str 'name'
 					'num'  # @num 'points'
-					'map'  # @map 'fb_id'
 					'list' # @list 'activities'
 					'set'  # @set  'uniques'
 					'zset' # @zset 'ranking'
@@ -84,6 +86,11 @@ class Orpheus
 				
 				# Create the model
 				super()
+			
+			# Add mapping
+			map: (field) ->
+				throw new Error("Map only works on strings") if @model[field].type isnt 'str'
+				@model[field].options.map = true
 			
 			# Add relations
 			has: (rel) ->
@@ -108,8 +115,29 @@ class Orpheus
 			private: (field) ->
 				@model[field].options.private = true
 			
-			# We actually return OrpheusAPI from create()
-			id: (id) => new OrpheusAPI id, this
+			# return OrpheusAPI if we have the id, or it's
+			# a new id. otherwise, hget the id and then call
+			# orpheus api.
+			id: (id, fn) =>
+				if not id or _.isString(id) or _.isNumber(id)
+					if fn
+						fn null, new OrpheusAPI(id, this)
+					else
+						new OrpheusAPI(id, this)
+				else
+					for k,v of id
+						pk = inflector.pluralize k
+						@redis.hget "#{@prefix}:#{@pname}:map:#{pk}", v, (err, model_id) =>
+							return fn err, false if err
+							if model_id
+								# existing
+								fn null, new OrpheusAPI(model_id, this)
+							else
+								# new
+								model = new OrpheusAPI(null, this)
+								model.add_map pk, v
+								fn null, model, 'new user'
+					
 		
 		# Converts class Player to 'player'
 		name = @toString().match(/function (.*)\(/)[1].toLowerCase()
@@ -136,10 +164,6 @@ class OrpheusAPI
 		
 		@validation_errors = []
 		
-		@redis = Orpheus.config.client
-		@prefix = Orpheus.config.prefix
-		@pname = inflector.pluralize @name
-		
 		# new or existing id
 		@id = id or @generate_id()
 		
@@ -153,6 +177,8 @@ class OrpheusAPI
 				do (prel, f) =>
 					@[prel][f] = (args..., fn) =>
 						@redis[f](["#{@prefix}:#{@q}:#{@id}:#{prel}"].concat(args), fn)
+					
+					@[prel][f[1..]] = @[prel][f]
 			
 			# Extract related models information,
 			# one by one, based on an array of ids
@@ -194,6 +220,10 @@ class OrpheusAPI
 					@[key][f] = (args...) =>
 						# add multi command
 						@_commands.push _.flatten [f, @get_key(key), args]
+						
+						# Extra commands: mapping
+						@extra_commands(key, f, args) if @model[key].options.map
+						
 						return @
 					
 					# Shorthand form, incrby instead of zincrby and hincrby is also acceptable
@@ -268,9 +298,22 @@ class OrpheusAPI
 			# orpheus:us:15:somelist
 			return "#{k}:#{key}"
 	
+	add_map: (field, key) ->
+		@_commands.push ['hset', "#{@prefix}:#{@pname}:map:#{field}", key, @id]
+	
+	extra_commands: (key, command, args) ->
+		# Map stuff, e.g.
+		# orpheus:users:map:fb_ids
+		if @model[key].options.map and command is 'hset'
+			pkey = inflector.pluralize key
+			@add_map pkey, args[0]
+	
 	# deletes the model.
 	delete: (fn) ->
-		@_commands = [] # flush commands
+		# flush commands and validations
+		@_commands = [] 
+		@validation_errors = []
+		
 		hdel_flag = false # no need to delete a hash twice
 		for key, value of @model
 			type = value.type
@@ -281,10 +324,7 @@ class OrpheusAPI
 			else
 				@_commands.push ['del', @get_key(key)]
 		
-		@redis
-			.multi(@_commands)
-			.exec (err, res) =>
-				fn err, res, @id
+		@exec fn
 	
 	# get public information only
 	get: (fn) ->
@@ -334,32 +374,30 @@ class OrpheusAPI
 			@_commands.push ['hgetall', @get_key()]
 			schema.push 'hash'
 		
-		@redis
-			.multi(@_commands)
-			.exec (err, res) =>
-				result = false
-				if err
-					err.time = new Date()
-					err.level = 'ERROR'
-					err.type = 'Redis'
-					err.msg = 'Failed getting model'
-					@_errors.push err
-					Orpheus.trigger 'error', err
-				else
-					# convert the response type, based on the schmea
-					result = {}
-					for o,i in schema
-						if o is 'hash'
-							_.extend result, res[i]
-						else if Array.isArray o
-							for prop, j in o
-								result[prop] = res[i][j]
-						else
-							result[o] = res[i]
-					
-					result.id = @id
+		@exec (err, res, id) ->
+			result = false
+			if err
+				err.time = new Date()
+				err.level = 'ERROR'
+				err.type = 'Redis'
+				err.msg = 'Failed getting model'
+				@_errors.push err
+				Orpheus.trigger 'error', err
+			else
+				# convert the response type, based on the schmea
+				result = {}
+				for o,i in schema
+					if o is 'hash'
+						_.extend result, res[i]
+					else if Array.isArray o
+						for prop, j in o
+							result[prop] = res[i][j]
+					else
+						result[o] = res[i]
 				
-				fn err, result, @id
+				result.id = @id
+			
+			fn err, result, @id
 	
 	# execute the multi commands
 	exec: (fn) ->

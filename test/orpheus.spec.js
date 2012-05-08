@@ -792,4 +792,72 @@
     });
   });
 
+  describe('Maps', function() {
+    it('Should create a record if @map on a @str did not find a record', function(done) {
+      var Player, player;
+      Player = (function(_super) {
+
+        __extends(Player, _super);
+
+        function Player() {
+          this.map(this.str('name'));
+          this.str('color');
+        }
+
+        return Player;
+
+      })(Orpheus);
+      player = Player.create();
+      return player({
+        name: 'rada'
+      }, function(err, player, new_player) {
+        expect(err).toBe(null);
+        expect(new_player).toBe('new user');
+        return player.set({
+          color: 'red'
+        }).exec(function(err, res, id) {
+          expect(id).toBe(player.id);
+          expect(err).toBe(null);
+          expect(res[0]).toBe(1);
+          return r.hget("" + PREFIX + ":players:map:names", 'rada', function(err, res) {
+            expect(res).toBe(id);
+            return done();
+          });
+        });
+      });
+    });
+    return it('Should find a record based on a @map-ed @str', function(done) {
+      var Player, player;
+      Player = (function(_super) {
+
+        __extends(Player, _super);
+
+        function Player() {
+          this.map(this.str('name'));
+          this.str('color');
+        }
+
+        return Player;
+
+      })(Orpheus);
+      player = Player.create();
+      return player().set({
+        name: 'almog',
+        color: 'blue'
+      }).exec(function(err, res) {
+        return player({
+          name: 'almog'
+        }, function(err, player, new_player) {
+          expect(new_player).toBeUndefined();
+          return player.set({
+            color: 'pink'
+          }).exec(function(err, res) {
+            expect(res[0]).toBe(0);
+            return done();
+          });
+        });
+      });
+    });
+  });
+
 }).call(this);

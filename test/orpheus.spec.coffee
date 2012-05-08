@@ -596,3 +596,50 @@ describe 'Validation', ->
 				
 				
 				done()
+
+describe 'Maps', ->
+	it 'Should create a record if @map on a @str did not find a record', (done) ->
+		class Player extends Orpheus
+			constructor: ->
+				@map @str 'name'
+				@str 'color'
+			
+		player = Player.create()
+		player name: 'rada', (err, player, new_player) ->
+			expect(err).toBe null
+			expect(new_player).toBe 'new user'
+			
+			player.set
+				color: 'red'
+			.exec (err, res, id) ->
+				expect(id).toBe player.id
+				expect(err).toBe null
+				expect(res[0]).toBe 1
+				
+				r.hget "#{PREFIX}:players:map:names", 'rada', (err, res) ->
+					expect(res).toBe id
+					done()
+					
+	it 'Should find a record based on a @map-ed @str', (done) ->
+		class Player extends Orpheus
+			constructor: ->
+				@map @str 'name'
+				@str 'color'
+		
+		player = Player.create()
+		player().set
+			name: 'almog'
+			color: 'blue'
+		.exec (err, res) ->
+			player name: 'almog', (err, player, new_player) ->
+				expect(new_player).toBeUndefined()
+				
+				player.set
+					color: 'pink'
+				.exec (err, res) ->
+					expect(res[0]).toBe 0
+					done()
+
+
+
+
