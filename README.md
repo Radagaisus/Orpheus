@@ -1,6 +1,8 @@
 # Orpheus - Redis Little Helper
 Orpheus is a Redis Object Model for CoffeeScript.
 
+`npm install orpheus`
+
 - Rails like models
 - Validations
 - Private properties
@@ -9,7 +11,7 @@ Orpheus is a Redis Object Model for CoffeeScript.
 - Dynamic keys
 - Maps between strings and ids
 
-an npm package will be up soon.
+A stable release will be out soon
 
 # In Action
 ```coffee
