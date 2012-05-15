@@ -123,6 +123,9 @@ A stable release will be out soon
     prefix: 'bookapp'
 ```
 
+## Test ##
+`jasmine-node test/orpheus.spec.coffee --verbose --color --coffee --forceexit`
+
 ## Planned ##
 - `@map` - delete, setnx and minor fixes
 - type and cap for lists

@@ -375,7 +375,7 @@ class OrpheusAPI
 			@_commands.push ['hgetall', @get_key()]
 			schema.push 'hash'
 		
-		@exec (err, res, id) ->
+		@exec (err, res, id) =>
 			result = false
 			if err
 				err.time = new Date()

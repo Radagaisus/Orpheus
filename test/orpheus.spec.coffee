@@ -248,8 +248,10 @@ describe 'Relations', ->
 							game('diablo').players.get players, (err, players) ->
 								expect(err).toBeUndefined()
 								expect(players.length).toBe 3
-								for p in players
+								
+								for p,i in players
 									expect(p.name).toBe 'almog'
+									expect(p.id).toBe ''+ (15 + i)
 								
 								done()
 

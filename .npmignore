@@ -2,3 +2,5 @@ deps
 dist
 test
 nodelint.cfg
+*.log
+TODO.md
