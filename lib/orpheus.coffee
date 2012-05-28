@@ -344,18 +344,24 @@ class OrpheusAPI
 						hmget.push key
 					else
 						hash_parts_are_private = true
+						
 				when 'list'
 					if not_private()
 						@_commands.push ['lrange', @get_key(key), 0, -1]
-						schema.push key
+						
 				when 'set'
 					if not_private()
 						@_commands.push ['smembers', @get_key(key)]
-						schema.push key
+						
 				when 'zset'
 					if not_private()
 						@_commands.push ['zrange', @get_key(key), 0, -1, 'withscores']
-						schema.push key
+						
+				when 'hash'
+					if not_private()
+						@_commands.push ['hgetall', @get_key(key)]
+			
+			schema.push key unless type is 'str' or type is 'num'
 		
 		if hash_parts_are_private
 			if hmget.length
