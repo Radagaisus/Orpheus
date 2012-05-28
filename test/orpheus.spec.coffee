@@ -163,6 +163,7 @@ describe 'Redis Commands', ->
 				r.hgetall "#{PREFIX}:pl:abdul:progress", (err, res) ->
 					expect(res.mink).toBe 'fatigue'
 					expect(res.bing).toBe 'sting'
+					done()
 
 describe 'Get Stuff', ->
 	it 'Get All', (done) ->
