@@ -332,9 +332,9 @@ class OrpheusAPI
 		@getall fn, true
 	
 	# get ALL the model information.
-	getall: (fn, private = false) ->
+	getall: (fn, get_private = false) ->
 		# Helper for determining if a value is private or not
-		not_private = -> not private or private and value.options.private isnt true
+		not_private = -> not get_private or get_private and value.options.private isnt true
 		
 		schema = [] # we use the schema to convert the response
 		            # to the appropriate value

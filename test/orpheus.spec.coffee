@@ -403,14 +403,16 @@ describe 'Setting Records', ->
 			r.zrange "#{PREFIX}:pl:2222:badges", 0, -1, 'withscores', (err, res) ->
 				expect(err).toBe null
 				success = [ 'badge1', '5', 'badge3', '7', 'badge2', '10' ]
-				for r,i in res
-					expect(r).toBe(success[i])
+				for f ,i in res
+					expect(f).toBe(success[i])
+				
 				done()
 
 
 describe 'Adding to Records', ->
 	
 	it 'Should add strings in a record', (done) ->
+		
 		class Player extends Orpheus
 			constructor: ->
 				@str 'name'
@@ -427,7 +429,7 @@ describe 'Adding to Records', ->
 		.exec (err, res, id) ->
 			expect(err).toBe null
 			expect(id).not.toBe null
-
+			
 			r.hgetall "#{PREFIX}:pl:#{id}", (err, res) ->
 				expect(err).toBe null
 				expect(res.name).toBe 'benga'
@@ -625,6 +627,8 @@ describe 'Maps', ->
 	it 'Should find a record based on a @map-ed @str', (done) ->
 		class Player extends Orpheus
 			constructor: ->
+				@has 'brand'
+				
 				@map @str 'name'
 				@str 'color'
 		
