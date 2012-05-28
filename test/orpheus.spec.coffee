@@ -628,9 +628,9 @@ describe 'Maps', ->
 				@str 'color'
 			
 		player = Player.create()
-		player name: 'rada', (err, player, new_player) ->
+		player name: 'rada', (err, player, player_id, new_player) ->
 			expect(err).toBe null
-			expect(new_player).toBe 'new user'
+			expect(new_player).toBe true
 			
 			player.set
 				color: 'red'
@@ -656,8 +656,8 @@ describe 'Maps', ->
 			name: 'almog'
 			color: 'blue'
 		.exec (err, res) ->
-			player name: 'almog', (err, player, new_player) ->
-				expect(new_player).toBeUndefined()
+			player name: 'almog', (err, player, player_id, new_player) ->
+				expect(new_player).toBe false
 				
 				player.set
 					color: 'pink'

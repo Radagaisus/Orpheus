@@ -122,7 +122,8 @@ class Orpheus
 			id: (id, fn) =>
 				if not id or _.isString(id) or _.isNumber(id)
 					if fn
-						fn null, new OrpheusAPI(id, this)
+						new_model = new OrpheusAPI(id, this)
+						fn null, new_model, new_model.id, false
 					else
 						new OrpheusAPI(id, this)
 				else
@@ -132,12 +133,13 @@ class Orpheus
 							return fn err, false if err
 							if model_id
 								# existing
-								fn null, new OrpheusAPI(model_id, this)
+								new_model = new OrpheusAPI(model_id, this)
+								fn null, new_model, model_id, false
 							else
 								# new
 								model = new OrpheusAPI(null, this)
 								model.add_map pk, v
-								fn null, model, 'new user'
+								fn null, model, model.id, true
 					
 		
 		# Converts class Player to 'player'
