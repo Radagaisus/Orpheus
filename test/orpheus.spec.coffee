@@ -172,6 +172,7 @@ describe 'Get Stuff', ->
 				@has 'game'
 				@str 'name'
 				@list 'wins'
+				@hash 'progress'
 		
 		player = Player.create()
 		player('someplayer')
@@ -179,10 +180,10 @@ describe 'Get Stuff', ->
 				.set('almog')
 			.wins.lpush(['a','b','c'])
 			.game('skyrim')
-				.name
-					.set('mofasa')
+				.name.set('mofasa')
+				.progress.set('five', 'to the ten')
+				.progress.hmset('six', 'to the mix', 'seven', 'to the heavens')
 			.exec ->
-				done()
 				
 				player('someplayer').getall (err, res) ->
 					expect(res.name).toBe 'almog'
@@ -190,6 +191,10 @@ describe 'Get Stuff', ->
 					
 					player('someplayer').game('skyrim').getall (err, res) ->
 						expect(res.name).toBe 'mofasa'
+						expect(res.progress.five).toBe 'to the ten'
+						expect(res.progress.six).toBe 'to the mix'
+						expect(res.progress.seven).toBe 'to the heavens'
+						
 						done()
 						
 						
@@ -200,7 +205,8 @@ describe 'Get Stuff', ->
 				@private @str 'name'
 				@list 'wins'
 				@str 'hoho'
-
+				@hash 'sting'
+				
 		player = Player.create()
 		player('someplayer')
 			.name.set('almog')
@@ -208,6 +214,7 @@ describe 'Get Stuff', ->
 			.game('skyrim')
 				.name.set('mofasa')
 				.hoho.set('woo')
+				.sting.set('zing', 'bling')
 			.exec ->
 				player('someplayer').get (err, res) ->
 					expect(res.name).toBeUndefined()
@@ -216,6 +223,7 @@ describe 'Get Stuff', ->
 					player('someplayer').game('skyrim').get (err, res) ->
 						expect(res.name).toBeUndefined()
 						expect(res.hoho).toBe 'woo'
+						expect(res.sting.zing).toBe 'bling'
 						done()
 
 describe 'Relations', ->
@@ -575,11 +583,14 @@ describe 'Delete', ->
 				@str 'bingo'
 				@list 'stream'
 				@zset 'bonga'
+				@hash 'bonanza'
+				
 		player = Player.create()
 		player('id').set
 				bingo: 'pinaaa'
 				stream: [1,2,3,4,43,53,45,345,345]
 				bonga: [5, 'donga']
+			.bonanza.set('klingon', 'we hate them')
 			.exec ->
 				player('id').delete (err, res, id) ->
 					expect(err).toBe null
@@ -589,10 +600,12 @@ describe 'Delete', ->
 						.exists("#{PREFIX}:pl:id")
 						.exists("#{PREFIX}:pl:id:stream")
 						.exists("#{PREFIX}:pl:id:bonga")
+						.exists("#{PREFIX}:pl:id:bonanza")
 						.exec (err, res) ->
 							expect(res[0]).toBe 0
 							expect(res[1]).toBe 0
 							expect(res[2]).toBe 0
+							expect(res[3]).toBe 0
 							
 							done()
 
