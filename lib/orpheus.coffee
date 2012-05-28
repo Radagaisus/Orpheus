@@ -41,12 +41,6 @@ class Orpheus
 		@topics[topic] ||= []
 		@topics[topic].push f
 	
-	# Error Handling
-	@_errors = []
-	@errors:
-		get: -> @_errors
-		flush: -> @_errors = []
-	
 	# Orpheus model extends the model
 	# - we can automagically detect
 	#   the model name and qualifier.
@@ -201,14 +195,7 @@ class OrpheusAPI
 							
 							# and get its information based on the arr id
 							model(arr[results.length]).get (err, res) ->
-								if err
-									err.time = new Date()
-									err.level = 'ERROR'
-									err.type = 'Redis'
-									err.msg = 'Failed retrieving related models'
-									@_errors.push err
-									Orpheus.trigger 'error', err
-								else
+								unless err
 									results.push res
 								c err
 						, (err) ->
@@ -380,14 +367,7 @@ class OrpheusAPI
 		
 		@exec (err, res, id) =>
 			result = false
-			if err
-				err.time = new Date()
-				err.level = 'ERROR'
-				err.type = 'Redis'
-				err.msg = 'Failed getting model'
-				@_errors.push err
-				Orpheus.trigger 'error', err
-			else
+			unless err
 				# convert the response type, based on the schmea
 				result = {}
 				for o,i in schema
