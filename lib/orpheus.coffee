@@ -70,6 +70,7 @@ class Orpheus
 					'list' # @list 'activities'
 					'set'  # @set  'uniques'
 					'zset' # @zset 'ranking'
+					'hash' # @hash 'progress'
 				]
 				
 				# Create a simple schema for all fields

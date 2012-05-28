@@ -100,7 +100,7 @@ describe 'Redis Commands', ->
 			
 					done()
 	
-	it 'List commands', (done) ->
+	it 'List Commands', (done) ->
 		class Player extends Orpheus
 			constructor: ->
 				@list 'somelist'
@@ -116,7 +116,7 @@ describe 'Redis Commands', ->
 			
 				done()
 	
-	it 'Set commands', (done) ->
+	it 'Set Commands', (done) ->
 		class Player extends Orpheus
 			constructor: ->
 				@set 'badges'
@@ -131,7 +131,7 @@ describe 'Redis Commands', ->
 				expect(res[0]).toBe 3
 				done()
 	
-	it 'Zset commands', (done) ->
+	it 'Zset Commands', (done) ->
 		class Player extends Orpheus
 			constructor: ->
 				@zset 'badges'
@@ -145,6 +145,24 @@ describe 'Redis Commands', ->
 				expect(res[0]).toBe 1
 				expect(res[1]).toBe '18'
 				done()
+	
+	it 'Hash Commands', (done) ->
+		class Player extends Orpheus
+			constructor: ->
+				@hash 'progress'
+		
+		player = Player.create()
+		player('abdul')
+			.progress.set('mink', 'fatigue')
+			.progress.set('bing', 'sting')
+			.exec (err, res) ->
+				expect(err).toBe null
+				expect(res[0]).toBe 1
+				expect(res[1]).toBe 1
+				
+				r.hgetall "#{PREFIX}:pl:abdul:progress", (err, res) ->
+					expect(res.mink).toBe 'fatigue'
+					expect(res.bing).toBe 'sting'
 
 describe 'Get Stuff', ->
 	it 'Get All', (done) ->

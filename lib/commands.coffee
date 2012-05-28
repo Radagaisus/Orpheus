@@ -75,12 +75,29 @@ module.exports =
 		'zunionstore'
 	]
 	
+	hash: [
+		'hdel',
+		'hexists',
+		'hget',
+		'hgetall',
+		'hincrby',
+		'hincrbyfloat',
+		'hkeys',
+		'hlen',
+		'hmget',
+		'hmset',
+		'hset',
+		'hsetnx',
+		'hvals'
+	]
+	
 	shorthands:
 		str: 'h'
 		num: 'h'
 		list: 'l'
 		set: 's'
 		zset: 'z'
+		hash: 'h'
 	
 	command_map:
 		add:
