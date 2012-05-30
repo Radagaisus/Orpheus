@@ -132,7 +132,7 @@ class Orpheus
 							else
 								# new
 								model = new OrpheusAPI(null, this)
-								model.add_map pk, v
+								model._add_map pk, v
 								fn null, model, model.id, true
 					
 		
@@ -162,7 +162,7 @@ class OrpheusAPI
 		@validation_errors = []
 		
 		# new or existing id
-		@id = id or @generate_id()
+		@id = id or @_generate_id()
 		
 		# Create functions for working with the relation set
 		# e.g. user(15).books.sadd('dune') will map to sadd
@@ -201,8 +201,8 @@ class OrpheusAPI
 						, (err) ->
 							fn err, results 
 		
-		# for every field, add all the redis commands
-		# for its corresponding type.
+		# Add all redis commands relevant to the field and its type
+		# Example: model('id').ranking.zadd (zrank, zscore...)
 		for key, value of @model
 			@[key] = {}
 			
@@ -210,10 +210,10 @@ class OrpheusAPI
 				do (key, f) =>
 					@[key][f] = (args...) =>
 						# add multi command
-						@_commands.push _.flatten [f, @get_key(key), args]
+						@_commands.push _.flatten [f, @_get_key(key), args]
 						
 						# Extra commands: mapping
-						@extra_commands(key, f, args) if @model[key].options.map
+						@_extra_commands(key, f, args) if @model[key].options.map
 						
 						return @
 					
@@ -252,7 +252,7 @@ class OrpheusAPI
 	
 	# Generate a unique ID for model, similiar to MongoDB
 	# http://www.mongodb.org/display/DOCS/Object+IDs
-	generate_id: ->
+	_generate_id: ->
 		time = "#{new Date().getTime()}" # we convert to a str to
 		                                 # avoid 4.3e+79 as id
 		pid = process.pid
@@ -262,7 +262,7 @@ class OrpheusAPI
 		"#{host}#{pid}#{time}#{counter}"
 	
 	
-	get_key: (key) ->
+	_get_key: (key) ->
 		# Default: orpheus:pl:15
 		k = "#{@prefix}:#{@q}:#{@id}"
 		
@@ -289,15 +289,15 @@ class OrpheusAPI
 			# orpheus:us:15:somelist
 			return "#{k}:#{key}"
 	
-	add_map: (field, key) ->
+	_add_map: (field, key) ->
 		@_commands.push ['hset', "#{@prefix}:#{@pname}:map:#{field}", key, @id]
 	
-	extra_commands: (key, command, args) ->
+	_extra_commands: (key, command, args) ->
 		# Map stuff, e.g.
 		# orpheus:users:map:fb_ids
 		if @model[key].options.map and command is 'hset'
 			pkey = inflector.pluralize key
-			@add_map pkey, args[0]
+			@_add_map pkey, args[0]
 	
 	# deletes the model.
 	delete: (fn) ->
@@ -311,9 +311,9 @@ class OrpheusAPI
 			if type is 'str' or type is 'num'
 				unless hdel_flag
 					hdel_flag = true
-					@_commands.push ['del', @get_key()]
+					@_commands.push ['del', @_get_key()]
 			else
-				@_commands.push ['del', @get_key(key)]
+				@_commands.push ['del', @_get_key(key)]
 		
 		@exec fn
 	
@@ -347,28 +347,28 @@ class OrpheusAPI
 						
 				when 'list'
 					if not_private()
-						@_commands.push ['lrange', @get_key(key), 0, -1]
+						@_commands.push ['lrange', @_get_key(key), 0, -1]
 						
 				when 'set'
 					if not_private()
-						@_commands.push ['smembers', @get_key(key)]
+						@_commands.push ['smembers', @_get_key(key)]
 						
 				when 'zset'
 					if not_private()
-						@_commands.push ['zrange', @get_key(key), 0, -1, 'withscores']
+						@_commands.push ['zrange', @_get_key(key), 0, -1, 'withscores']
 						
 				when 'hash'
 					if not_private()
-						@_commands.push ['hgetall', @get_key(key)]
+						@_commands.push ['hgetall', @_get_key(key)]
 			
 			schema.push key unless type is 'str' or type is 'num'
 		
 		if hash_parts_are_private
 			if hmget.length
-				@_commands.push ['hmget', @get_key()].concat(hmget)
+				@_commands.push ['hmget', @_get_key()].concat(hmget)
 				schema.push hmget
 		else if hgetall_flag
-			@_commands.push ['hgetall', @get_key()]
+			@_commands.push ['hgetall', @_get_key()]
 			schema.push 'hash'
 		
 		@exec (err, res, id) =>
