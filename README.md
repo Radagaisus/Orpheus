@@ -146,6 +146,7 @@ player('james').set
 
 - **add**: adds an error
 - **toResponse**: returns a JSON:
+
 ```coffee
 {
   status: 400, # Bad Request
