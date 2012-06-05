@@ -7,6 +7,7 @@ os = require 'os'                  # id generation
 inflector = require './inflector'  # pluralize
 commands = require './commands'    # redis commands
 command_map = commands.command_map
+validation_map = commands.validations
 
 log = console.log
 
@@ -100,8 +101,9 @@ class Orpheus
 					return @
 			
 			# Add a validation function to a field
-			# e.g. @validate 'name', (name) ->
-			#  if name is 'jay' then true else message: 'beep!'
+			# Example:
+			# @validate 'name', (name) ->
+			#   if name is 'jay' then true else 'invalid!'
 			validate: (key, func) ->
 				@validations[key] ||= []
 				@validations[key].push func
@@ -159,7 +161,7 @@ class OrpheusAPI
 		# Redis multi commands
 		@_commands = []
 		
-		@validation_errors = []
+		@validation_errors = new OrpheusValidationErrors
 		
 		# new or existing id
 		@id = id or @_generate_id()
@@ -177,6 +179,7 @@ class OrpheusAPI
 					
 					# shorthand, use add instead of sadd
 					@[prel][f[1..]] = @[prel][f]
+			
 			
 			# Extract related models information,
 			# one by one, based on an array of ids
@@ -207,10 +210,30 @@ class OrpheusAPI
 			@[key] = {}
 			
 			for f in commands[value.type]
-				do (key, f) =>
+				type = value.type
+				do (key, f, type) =>
 					@[key][f] = (args...) =>
 						# add multi command
 						@_commands.push _.flatten [f, @_get_key(key), args]
+						
+						# Run validation, if needed
+						validation = validation_map[f]
+						if validation and @validations[key]
+							log "you should validate me"
+							if type is 'str'
+								log "you string", @validations
+								# Regular validations
+								for v in @validations[key]
+									if _.isFunction v
+										result = v args...
+									log "result: ", result
+									unless result is true
+										@validation_errors.add key,
+											msg: result
+											command: f
+											args: args
+											value: args[0]
+										return @ # no need to check the extra commands
 						
 						# Extra commands: mapping
 						@_extra_commands(key, f, args) if @model[key].options.map
@@ -221,6 +244,7 @@ class OrpheusAPI
 					# str: h, num: h, list: l, set: s, zset: z
 					@[key][f[1..]] = @[key][f] if f[0] is commands.shorthands[value.type]
 		
+		
 		# create the add, set and del commands
 		# based on the commands map they call
 		# the respective command for the key,
@@ -230,16 +254,6 @@ class OrpheusAPI
 			do (f) =>
 				@[f] = (o) ->
 					for k, v of o
-						
-						# Run Validations
-						if @validations[k]
-							for valid in @validations[k]
-								msg = valid(v)
-								unless msg is true
-									msg = new Error(msg.message)
-									msg.type = 'validation'
-									@validation_errors.push msg 
-						
 						# Add the Command. Note we won't actually
 						# execute any of this commands if the
 						# validation has failed.
@@ -303,7 +317,7 @@ class OrpheusAPI
 	delete: (fn) ->
 		# flush commands and validations
 		@_commands = [] 
-		@validation_errors = []
+		@validation_errors.empty()
 		
 		hdel_flag = false # no need to delete a hash twice
 		for key, value of @model
@@ -391,8 +405,9 @@ class OrpheusAPI
 	
 	# execute the multi commands
 	exec: (fn) ->
-		if @validation_errors.length
-			return fn @validation_errors, false, @id
+		unless @validation_errors.valid()
+			log "heyyy"
+			return fn null, @validation_errors, @id
 		
 		@redis
 			.multi(@_commands)
@@ -405,5 +420,38 @@ class OrpheusAPI
 					@_errors.push err
 					Orpheus.trigger 'error', err
 				fn err, res, @id
+
+# Orpheus Validation errors
+#-------------------------------------#
+class OrpheusValidationErrors
+	
+	constructor: ->
+		@errors = {}
+	
+	valid: ->
+		_.isEmpty @errors
+	
+	invalid: ->
+		!@valid()
+	
+	add: (field, error) ->
+		# Add date, useful for logging
+		error.date = new Date().getTime()
+		
+		@errors[field] || = []
+		@errors[field].push error
+	
+	empty: ->
+		@errors = {}
+	
+	toResponse: ->
+		# 400 is Bad Request
+		# See http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1
+		obj = {status: 400}
+		
+		# Add the validation error messages
+		for k,v of @errors
+			obj[k] = (m.msg for m in v)
+		obj
 
 module.exports = Orpheus

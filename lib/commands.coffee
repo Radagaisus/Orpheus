@@ -1,6 +1,42 @@
 # Redis Commands
 #-------------------------------------#
 module.exports = 
+	validations:
+		# String
+		hsetnx:       true
+		hset:         true
+		
+		# Number
+		hincrby:      true
+		hincrbyfloat: true
+		
+		# List
+		lpush:        true # several values, 1
+		lpushx:       true
+		rpush:        true # several values, 1
+		rpushx:       true
+		
+		# Set
+		sadd:         true # several values, 1
+		
+		# Zset
+		zadd:         true # several values, reverted, 2
+		zincrby:      true # reverted
+		
+		# Hash
+		hmset:        true # several values, 2
+		
+		# Validations does not support:
+		# - zinterstore
+		# - zunionstore
+		# - sunionstore
+		# - smove
+		# - sinterstore
+		# - sdiffstore
+		# - lset
+		# - linsert
+		# - brpoplpush and friends
+	
 	str: [
 		'hdel',
 		'hexists',
@@ -66,7 +102,7 @@ module.exports =
 		'zrangebyscore',
 		'zrank',
 		'zrem',
-		'zremreangebyrank',
+		'zremrangebyrank',
 		'zremrangebyscore',
 		'zrevrange',
 		'zrevrangebyscore',
@@ -102,7 +138,7 @@ module.exports =
 	command_map:
 		add:
 			num: 'hincrby'
-			str: 'hset' # we don't optimize with hmset
+			str: 'hset'    # we don't optimize with hmset
 			set: 'sadd'
 			zset: 'zincrby'
 			list: 'lpush'

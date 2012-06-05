@@ -615,7 +615,7 @@ describe 'Validation', ->
 		class Player extends Orpheus
 			constructor: ->
 				@str 'name'
-				@validate 'name', (s) -> if s is 'almog' then true else message: 'String should be almog'
+				@validate 'name', (s) -> if s is 'almog' then true else 'String should be almog'
 		
 		player = Player.create()
 		player('15').set
@@ -626,9 +626,7 @@ describe 'Validation', ->
 			player('15').set
 				name: 'chiko'
 			.exec (err, res, id) ->
-				
-				expect(err[0].type).toBe 'validation'
-				expect(err[0].toString()).toBe 'Error: String should be almog'
+				expect(res.toResponse().status).toBe 400
 				
 				
 				done()

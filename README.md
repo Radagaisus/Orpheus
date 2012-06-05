@@ -122,14 +122,21 @@ A stable release will be out soon
     client: redis.createClient()
     prefix: 'bookapp'
 ```
+## Validations ##
 
-## Test ##
-`jasmine-node test/orpheus.spec.coffee --verbose --color --coffee --forceexit`
 
-## Planned ##
-- `@map` - delete, setnx and minor fixes
-- type and cap for lists
-- Default validations (for type)
-- Validation helpers
-- `@json` data type
-- Denormalization helpers
+## Development ##
+### Test ###
+`cake test`
+
+### Contribute ###
+
+- `cake dev`
+- Add your tests.
+- Do your thing.
+- `cake dev`
+
+## Roadmap ##
+
+- Validations
+- Promises 
