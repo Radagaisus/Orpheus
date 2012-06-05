@@ -444,7 +444,7 @@ class OrpheusAPI
 					if err
 						err.time = new Date()
 						err.level = 'ERROR'
-						err.type = 'Redis'
+						err.type = 'redis'
 						err.msg = 'Failed Multi Execution'
 						@_errors.push err
 						Orpheus.trigger 'error', err

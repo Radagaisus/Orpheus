@@ -124,6 +124,50 @@ A stable release will be out soon
 ```
 ## Validations ##
 
+```coffee
+class User extends Orpheus
+  constructor: ->
+    @str 'name'
+    @validate 'name', (s) -> if s is 'something' then true else 'name should be "something".'
+
+player = Player.create()
+player('james').set
+  name: 'james!!!'
+.err (err) ->
+  if err.type is 'validation'
+    log err # <OrpheusValidationErrors>
+  else
+    # something is wrong with redis
+.exec (res) ->
+  # Never ever land
+```
+
+**OrpheusValidationErrors** has a few convenience functions:
+
+- **add**: adds an error
+- **toResponse**: returns a JSON:
+```coffee
+{
+  status: 400, # Bad Request
+  errors:
+    name: ['name should be "something".']
+}
+```
+
+`errors` contains the actual error objects:
+
+```coffee
+{
+  name: [
+    msg: 'name should be "something".',
+    command: 'hset',
+    args: ['james!!!'],
+    value: 'james!!!'
+  ],
+  # ...
+}
+
+
 ### Custom Validations ###
 
 ```coffee
