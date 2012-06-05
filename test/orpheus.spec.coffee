@@ -636,7 +636,7 @@ describe 'Validation', ->
 				expect(1).toBe 2 # Impossible!
 				done()
 	
-	it 'Validate Exclusion', (done) ->
+	it 'Validate Exclusion & Inclusion', (done) ->
 		###
 		- validates :subdomain, :exclusion => { :in => %w(www us ca jp),
 	      :message => "Subdomain %{value} is reserved." }
@@ -644,22 +644,29 @@ describe 'Validation', ->
 		class Player extends Orpheus
 			constructor: ->
 				@str 'subdomain'
+				@str 'size'
 				@validate 'subdomain',
 					exclusion: ['www', 'us', 'ca', 'jp']
+				@validate 'size',
+					inclusion: ['small', 'medium', 'large']
 		
 		player = Player.create()
 		player('james').add
 			subdomain: 'co'
+			size: 'small'
 		.err (err) ->
 			expect(1).toBe 2
 			done()
 		.exec (res) ->
 			expect(res[0]).toBe 1
+			expect(res[1]).toBe 1
 			
 			player('mames').add
 				subdomain: 'us'
+				size: 'penis'
 			.err (err) ->
 				expect(err.toResponse().errors.subdomain[0]).toBe "us is reserved."
+				expect(err.toResponse().errors.size[0]).toBe "penis is not included in the list."
 				done()
 			.exec (res) ->
 				expect(1).toBe 2

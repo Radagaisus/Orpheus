@@ -122,6 +122,12 @@ class Orpheus
 							if field in o.exclusion
 								return "#{field} is reserved."
 							return true
+					
+					if o.inclusion
+						@validations[key].push (field) ->
+							if field in o.inclusion
+								return true
+							return "#{field} is not included in the list."
 			
 			# Mark field as private
 			private: (field) ->

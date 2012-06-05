@@ -152,11 +152,19 @@
               }
             }
             if (o.exclusion) {
-              return this.validations[key].push(function(field) {
+              this.validations[key].push(function(field) {
                 if (__indexOf.call(o.exclusion, field) >= 0) {
                   return "" + field + " is reserved.";
                 }
                 return true;
+              });
+            }
+            if (o.inclusion) {
+              return this.validations[key].push(function(field) {
+                if (__indexOf.call(o.inclusion, field) >= 0) {
+                  return true;
+                }
+                return "" + field + " is not included in the list.";
               });
             }
           }

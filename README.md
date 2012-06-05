@@ -161,14 +161,17 @@ Options:
 - **odd**: `"#{a} must be odd."`
 - **even**: `"#{a} must be even."`
 
-### Exclusion ###
+### Exclusion and Inclusion Validations ###
 
 ```coffee
 class Site extends Orpheus
 	constructor: ->
 		@str 'subdomain'
+		@str 'size'
 		@validate 'subdomain',
 			exclusion: ['www', 'us', 'ca', 'jp']
+		@validate 'size',
+			inclusion: ['small', 'medium', 'large']
 ```
 
 ## Development ##
