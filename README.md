@@ -124,6 +124,42 @@ A stable release will be out soon
 ```
 ## Validations ##
 
+### Custom Validations ###
+
+```coffee
+class Player extends Orpheus
+	constructor: ->
+		@str 'name'
+		@validate 'name', (s) -> if s is 'babomb' then true else 'String should be almog'
+```
+
+### Number Validations ###
+
+```coffee
+class Player extends Orpheus
+	constructor: ->
+		@num 'points'
+		
+		@validate 'points',
+			numericality:
+				only_integer: true
+				greater_than: 3
+				greater_than_or_equal_to: 3
+				equal_to: 3
+				less_than_or_equal_to: 3
+				odd: true
+```
+
+Options:
+
+- **only_integer**: `"#{n} must be an integer."`
+- **greater_than**: `"#{a} must be greater than #{b}."`
+- **greater_than_or_equal_to**: `"#{a} must be greater than or equal to #{b}."`
+- **equal_to**: `"#{a} must be equal to #{b}."`
+- **less_than**: `"#{a} must be less than #{b}."`
+- **less_than_or_equal_to**: `"#{a} must be less than or equal to #{b}."`
+- **odd**: `"#{a} must be odd."`
+- **even**: `"#{a} must be even."`
 
 ## Development ##
 ### Test ###
