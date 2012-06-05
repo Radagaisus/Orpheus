@@ -162,7 +162,8 @@ player('james').set
     msg: 'name should be "something".',
     command: 'hset',
     args: ['james!!!'],
-    value: 'james!!!'
+    value: 'james!!!',
+    date: 1338936463054 # new Date().getTime()
   ],
   # ...
 }
