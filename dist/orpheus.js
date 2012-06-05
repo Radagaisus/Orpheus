@@ -4,6 +4,7 @@
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
     __slice = [].slice;
 
   _ = require('underscore');
@@ -129,7 +130,7 @@
         };
 
         OrpheusModel.prototype.validate = function(key, o) {
-          var k, v, _base, _ref, _results,
+          var k, v, _base, _fn, _ref,
             _this = this;
           (_base = this.validations)[key] || (_base[key] = []);
           if (_.isFunction(o)) {
@@ -137,19 +138,26 @@
           } else {
             if (o.numericality) {
               _ref = o.numericality;
-              _results = [];
+              _fn = function(k, v) {
+                return _this.validations[key].push(function(field) {
+                  if (!validations.num[k].fn(field, v)) {
+                    return validations.num[k].msg(field, v);
+                  }
+                  return true;
+                });
+              };
               for (k in _ref) {
                 v = _ref[k];
-                _results.push((function(k, v) {
-                  return _this.validations[key].push(function(field) {
-                    if (!validations.num[k].fn(field, v)) {
-                      return validations.num[k].msg(field, v);
-                    }
-                    return true;
-                  });
-                })(k, v));
+                _fn(k, v);
               }
-              return _results;
+            }
+            if (o.exclusion) {
+              return this.validations[key].push(function(field) {
+                if (__indexOf.call(o.exclusion, field) >= 0) {
+                  return "" + field + " is reserved.";
+                }
+                return true;
+              });
             }
           }
         };
