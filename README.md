@@ -130,7 +130,7 @@ A stable release will be out soon
 class Player extends Orpheus
 	constructor: ->
 		@str 'name'
-		@validate 'name', (s) -> if s is 'babomb' then true else 'String should be almog'
+		@validate 'name', (s) -> if s is 'babomb' then true else 'String should be babomb.'
 ```
 
 ### Number Validations ###
