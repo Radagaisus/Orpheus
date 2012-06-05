@@ -8,7 +8,7 @@ inflector = require './inflector'  # pluralize
 commands = require './commands'    # redis commands
 command_map = commands.command_map
 validation_map = commands.validations
-
+validations = require './validations'
 log = console.log
 
 # Orpheus
@@ -104,9 +104,19 @@ class Orpheus
 			# Example:
 			# @validate 'name', (name) ->
 			#   if name is 'jay' then true else 'invalid!'
-			validate: (key, func) ->
+			validate: (key, o) ->
 				@validations[key] ||= []
-				@validations[key].push func
+				
+				if _.isFunction o
+					@validations[key].push o
+				else
+					if o.numericality
+						for k,v of o.numericality
+							do (k,v) =>
+								@validations[key].push (field) ->
+									unless validations.num[k].fn(field, v)
+										return validations.num[k].msg(field, v)
+									return true
 			
 			# Mark field as private
 			private: (field) ->
@@ -219,21 +229,21 @@ class OrpheusAPI
 						# Run validation, if needed
 						validation = validation_map[f]
 						if validation and @validations[key]
-							log "you should validate me"
-							if type is 'str'
-								log "you string", @validations
+							
+							if type is 'str' or type is 'num'
 								# Regular validations
 								for v in @validations[key]
-									if _.isFunction v
-										result = v args...
-									log "result: ", result
+									result = v args...
+									
 									unless result is true
 										@validation_errors.add key,
 											msg: result
 											command: f
 											args: args
 											value: args[0]
-										return @ # no need to check the extra commands
+								
+								# no need to check the extra commands
+								return @ unless @validation_errors.valid()
 						
 						# Extra commands: mapping
 						@_extra_commands(key, f, args) if @model[key].options.map
@@ -403,29 +413,43 @@ class OrpheusAPI
 			
 			fn err, result, @id
 	
+	err: (fn) ->
+		@error_func = fn
+		return @
+	
 	# execute the multi commands
 	exec: (fn) ->
 		unless @validation_errors.valid()
-			log "heyyy"
-			return fn null, @validation_errors, @id
+			if @error_func
+				return @error_func @validation_errors, @id
+			else
+				return fn @validation_errors, false, @id
 		
 		@redis
 			.multi(@_commands)
 			.exec (err, res) =>
-				if err
-					err.time = new Date()
-					err.level = 'ERROR'
-					err.type = 'Redis'
-					err.msg = 'Failed Multi Execution'
-					@_errors.push err
-					Orpheus.trigger 'error', err
-				fn err, res, @id
+				
+				if @error_func
+					if err
+						err.time = new Date()
+						err.level = 'ERROR'
+						err.type = 'Redis'
+						err.msg = 'Failed Multi Execution'
+						@_errors.push err
+						Orpheus.trigger 'error', err
+						
+						@error_func err
+					else
+						fn res, @id
+				else
+					fn err, res, @id
 
 # Orpheus Validation errors
 #-------------------------------------#
 class OrpheusValidationErrors
 	
 	constructor: ->
+		@type = 'validation'
 		@errors = {}
 	
 	valid: ->
@@ -447,11 +471,11 @@ class OrpheusValidationErrors
 	toResponse: ->
 		# 400 is Bad Request
 		# See http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1
-		obj = {status: 400}
+		obj = {status: 400, errors: {}}
 		
 		# Add the validation error messages
 		for k,v of @errors
-			obj[k] = (m.msg for m in v)
+			obj.errors[k] = (m.msg for m in v)
 		obj
 
 module.exports = Orpheus

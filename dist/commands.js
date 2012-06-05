@@ -2,11 +2,25 @@
 (function() {
 
   module.exports = {
+    validations: {
+      hsetnx: true,
+      hset: true,
+      hincrby: true,
+      hincrbyfloat: true,
+      lpush: true,
+      lpushx: true,
+      rpush: true,
+      rpushx: true,
+      sadd: true,
+      zadd: true,
+      zincrby: true,
+      hmset: true
+    },
     str: ['hdel', 'hexists', 'hget', 'hsetnx', 'hset'],
     num: ['hdel', 'hexists', 'hget', 'hsetnx', 'hset', 'hincrby', 'hincrbyfloat'],
     list: ['blpop', 'brpop', 'brpoplpush', 'lindex', 'linsert', 'llen', 'lpop', 'lpush', 'lpushx', 'lrange', 'lrem', 'lset', 'ltrim', 'rpop', 'rpoplpush', 'rpush', 'rpushx'],
     set: ['sadd', 'scard', 'sdiff', 'sdiffstore', 'sinter', 'sinterstore', 'sismember', 'smembers', 'smove', 'spop', 'srandmember', 'srem', 'sunion', 'sunionstore'],
-    zset: ['zadd', 'zcard', 'zcount', 'zincrby', 'zinterstore', 'zrange', 'zrangebyscore', 'zrank', 'zrem', 'zremreangebyrank', 'zremrangebyscore', 'zrevrange', 'zrevrangebyscore', 'zrevrank', 'zscore', 'zunionstore'],
+    zset: ['zadd', 'zcard', 'zcount', 'zincrby', 'zinterstore', 'zrange', 'zrangebyscore', 'zrank', 'zrem', 'zremrangebyrank', 'zremrangebyscore', 'zrevrange', 'zrevrangebyscore', 'zrevrank', 'zscore', 'zunionstore'],
     hash: ['hdel', 'hexists', 'hget', 'hgetall', 'hincrby', 'hincrbyfloat', 'hkeys', 'hlen', 'hmget', 'hmset', 'hset', 'hsetnx', 'hvals'],
     shorthands: {
       str: 'h',

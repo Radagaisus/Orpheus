@@ -625,10 +625,80 @@ describe 'Validation', ->
 			
 			player('15').set
 				name: 'chiko'
-			.exec (err, res, id) ->
+			.err (res) ->
+				expect(res.type).toBe 'validation'
+				expect(res.valid()).toBe false
 				expect(res.toResponse().status).toBe 400
+				expect(res.toResponse().errors.name[0]).toBe 'String should be almog'
+				expect(res.errors.name[0].msg).toBe 'String should be almog'
+				done()
+			.exec (err, res, id) ->
+				expect(1).toBe 2 # Impossible!
+				done()
+	
+	
+	it 'Validate Numbers', (done) ->
+		class Player extends Orpheus
+			constructor: ->
+				@num 'points'
+				@num 'games_played'
+				@num 'games_won'
 				
+				@validate 'points',
+					numericality:
+						only_integer: true
 				
+				@validate 'games_played',
+					numericality:
+						only_integer: true
+						greater_than: 3
+						less_than:    7
+						odd:          true
+				
+				@validate 'games_won'
+					numericality:
+						only_integer:             true
+						greater_than_or_equal_to: 10
+						equal_to:                 10
+						less_than_or_equal_to:    10
+						even:                     true
+		
+		player = Player.create()
+		player('id').add
+			points: 20
+			games_played: 5
+			games_won: 10
+		.err (err) ->
+			expect(1).toBe 2
+			done()
+		.exec (res) ->
+			expect(res[0]).toBe 20
+			expect(res[1]).toBe 5
+			expect(res[2]).toBe 10
+			
+			player('idz').add
+				points: 50.5
+				games_played: 10
+				games_won: 11
+			.err (err) ->
+				expect(err.toResponse().errors.points[0]).toBe '50.5 must be an integer.'
+				expect(err.toResponse().errors.games_played[0]).toBe '10 must be less than 7.'
+				expect(err.toResponse().errors.games_won[0]).toBe '11 must be equal to 10.'
+				
+				player('nigz').add
+					points: 20
+					games_played: 5
+					games_won: 10.1
+				.err (err) ->
+					log err
+					expect(err.toResponse().errors.games_won[0]).toBe '10.1 must be an integer.'
+					expect(err.toResponse().errors.games_won[1]).toBe '10.1 must be equal to 10.'
+					done()
+				.exec (res) ->
+					expect(1).toBe 2
+					done()
+			.exec (res) ->
+				expect(1).toBe 2
 				done()
 
 describe 'Maps', ->
