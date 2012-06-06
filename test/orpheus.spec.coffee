@@ -636,11 +636,30 @@ describe 'Validation', ->
 				expect(1).toBe 2 # Impossible!
 				done()
 	
+	it 'Validates Format', (done) ->
+		class Player extends Orpheus
+			constructor: ->
+				@str 'legacy_code'
+				@validate 'legacy_code', format: /^[a-zA-Z]+$/
+		player = Player.create()
+		player('ido').add
+			legacy_code: 'sdfsd234'
+		.err (err) ->
+			expect(err.toResponse().errors.legacy_code[0]).toBe 'sdfsd234 is invalid.'
+			
+			player('mint').add
+				legacy_code: 'hello'
+			.err (err) ->
+				expect(3).toBe 4
+				done()
+			.exec (res) ->
+				expect(res[0]).toBe 1
+				done()
+		.exec ->
+			expect(1).toBe 2
+			done()
+	
 	it 'Validate Exclusion & Inclusion', (done) ->
-		###
-		- validates :subdomain, :exclusion => { :in => %w(www us ca jp),
-	      :message => "Subdomain %{value} is reserved." }
-		###
 		class Player extends Orpheus
 			constructor: ->
 				@str 'subdomain'
@@ -725,7 +744,6 @@ describe 'Validation', ->
 					games_played: 5
 					games_won: 10.1
 				.err (err) ->
-					log err
 					expect(err.toResponse().errors.games_won[0]).toBe '10.1 must be an integer.'
 					expect(err.toResponse().errors.games_won[1]).toBe '10.1 must be equal to 10.'
 					done()

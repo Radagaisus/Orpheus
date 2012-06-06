@@ -145,6 +145,7 @@ player('james').set
 **OrpheusValidationErrors** has a few convenience functions:
 
 - **add**: adds an error
+- **empty**: clears the errors
 - **toResponse**: returns a JSON:
 
 ```coffee
@@ -218,6 +219,15 @@ class Site extends Orpheus
 			exclusion: ['www', 'us', 'ca', 'jp']
 		@validate 'size',
 			inclusion: ['small', 'medium', 'large']
+```
+
+## Regex Validations ##
+
+```coffee
+class Player extends Orpheus
+	constructor: ->
+		@str 'legacy_code'
+		@validate 'legacy_code', format: /^[a-zA-Z]+$/
 ```
 
 ## Development ##

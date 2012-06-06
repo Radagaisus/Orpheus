@@ -128,6 +128,13 @@ class Orpheus
 							if field in o.inclusion
 								return true
 							return "#{field} is not included in the list."
+					
+					if o.format
+						@validations[key].push (field) ->
+							log o.format, field, o.format.test(field)
+							if o.format.test(field)
+								return true
+							return "#{field} is invalid."
 			
 			# Mark field as private
 			private: (field) ->

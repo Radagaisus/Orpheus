@@ -160,11 +160,20 @@
               });
             }
             if (o.inclusion) {
-              return this.validations[key].push(function(field) {
+              this.validations[key].push(function(field) {
                 if (__indexOf.call(o.inclusion, field) >= 0) {
                   return true;
                 }
                 return "" + field + " is not included in the list.";
+              });
+            }
+            if (o.format) {
+              return this.validations[key].push(function(field) {
+                log(o.format, field, o.format.test(field));
+                if (o.format.test(field)) {
+                  return true;
+                }
+                return "" + field + " is invalid.";
               });
             }
           }
@@ -521,7 +530,7 @@
           if (err) {
             err.time = new Date();
             err.level = 'ERROR';
-            err.type = 'Redis';
+            err.type = 'redis';
             err.msg = 'Failed Multi Execution';
             _this._errors.push(err);
             Orpheus.trigger('error', err);
