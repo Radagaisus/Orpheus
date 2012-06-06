@@ -864,7 +864,7 @@ describe 'Relations', ->
 						
 						game('diablo').players.smembers (err, players) ->
 							expect(err).toBe null
-							game('diablo').players.each players, (id, c, i) ->
+							game('diablo').players.map players, (id, c, i) ->
 									c(null, {id: id, i: i})
 								, (err, players) ->
 									log err, players

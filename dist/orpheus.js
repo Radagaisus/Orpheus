@@ -29,6 +29,8 @@
 
     function Orpheus() {}
 
+    Orpheus.version = "0.1.7";
+
     Orpheus.config = {
       prefix: 'orpheus'
     };
@@ -267,7 +269,7 @@
             return fn(err, results);
           });
         };
-        _this[prel].each = function(arr, iter, done) {
+        _this[prel].map = function(arr, iter, done) {
           var i;
           if (arr == null) {
             arr = [];
@@ -280,7 +282,7 @@
         _results = [];
         for (k in async) {
           v = async[k];
-          if ((_ref1 = !k) === 'each' || _ref1 === 'noConflict') {
+          if ((_ref1 = !k) === 'map' || _ref1 === 'noConflict') {
             _results.push(_this[prel][k] = v);
           }
         }

@@ -14,7 +14,7 @@ log = console.log
 # Orpheus
 #-------------------------------------#
 class Orpheus
-	@version = "0.1.6"
+	@version = "0.1.7"
 	
 	# Configuration
 	@config:
@@ -239,14 +239,14 @@ class OrpheusAPI
 				
 				# user(10).books.each
 				# Run in parallel using async
-				@[prel].each = (arr = [], iter, done) =>
+				@[prel].map = (arr = [], iter, done) =>
 					i = 0
 					async.map arr, (item, cb) ->
 							iter item, cb, i++
 						, done
 				
 				# Add all async functions.
-				for k,v of async when not k in ['each', 'noConflict']
+				for k,v of async when not k in ['map', 'noConflict']
 					@[prel][k] = v
 		
 		
