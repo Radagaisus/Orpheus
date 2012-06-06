@@ -29,7 +29,7 @@
 
     function Orpheus() {}
 
-    Orpheus.version = "0.1.7";
+    Orpheus.version = "0.1.8";
 
     Orpheus.config = {
       prefix: 'orpheus'
@@ -316,31 +316,33 @@
           _this[key][f] = function() {
             var args, result, v, validation, _l, _len3, _ref4;
             args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-            if (type === 'str') {
-              if (typeof args[0] !== 'string') {
-                if (typeof args[0] === 'number') {
-                  args[0] = args[0].toString();
-                } else {
+            if (validation_map[f]) {
+              if (type === 'str') {
+                if (typeof args[0] !== 'string') {
+                  if (typeof args[0] === 'number') {
+                    args[0] = args[0].toString();
+                  } else {
+                    _this.validation_errors.add(key, {
+                      msg: "Could not convert " + args[0] + " to string",
+                      command: f,
+                      args: args,
+                      value: args[0]
+                    });
+                  }
+                }
+              }
+              if (type === 'num') {
+                if (typeof args[0] !== 'number') {
+                  args[0] = Number(args[0]);
+                }
+                if (!isFinite(args[0]) || isNaN(args[0])) {
                   _this.validation_errors.add(key, {
-                    msg: "Could not convert " + args[0] + " to string",
+                    msg: "Malformed number",
                     command: f,
                     args: args,
                     value: args[0]
                   });
                 }
-              }
-            }
-            if (type === 'num') {
-              if (typeof args[0] !== 'number') {
-                args[0] = Number(args[0]);
-              }
-              if (!isFinite(args[0]) || isNaN(args[0])) {
-                _this.validation_errors.add(key, {
-                  msg: "Malformed number",
-                  command: f,
-                  args: args,
-                  value: args[0]
-                });
               }
             }
             _this._commands.push(_.flatten([f, _this._get_key(key), args]));

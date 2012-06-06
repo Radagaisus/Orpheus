@@ -14,7 +14,7 @@ log = console.log
 # Orpheus
 #-------------------------------------#
 class Orpheus
-	@version = "0.1.7"
+	@version = "0.1.8"
 	
 	# Configuration
 	@config:
@@ -261,26 +261,27 @@ class OrpheusAPI
 					@[key][f] = (args...) =>
 						
 						# Type Conversions
-						if type is 'str'
-							if typeof args[0] isnt 'string'
-								if typeof args[0] is 'number'
-									args[0] = args[0].toString()
-								else
+						if validation_map[f]
+							if type is 'str'
+								if typeof args[0] isnt 'string'
+									if typeof args[0] is 'number'
+										args[0] = args[0].toString()
+									else
+										@validation_errors.add key,
+											msg: "Could not convert #{args[0]} to string"
+											command: f
+											args: args
+											value: args[0]
+							
+							if type is 'num'
+								if typeof args[0] isnt 'number'
+									args[0] = Number args[0]
+								if not isFinite(args[0]) or isNaN(args[0])
 									@validation_errors.add key,
-										msg: "Could not convert #{args[0]} to string"
+										msg: "Malformed number"
 										command: f
 										args: args
 										value: args[0]
-						
-						if type is 'num'
-							if typeof args[0] isnt 'number'
-								args[0] = Number args[0]
-							if not isFinite(args[0]) or isNaN(args[0])
-								@validation_errors.add key,
-									msg: "Malformed number"
-									command: f
-									args: args
-									value: args[0]
 						
 						# Add multi command
 						@_commands.push _.flatten [f, @_get_key(key), args]
