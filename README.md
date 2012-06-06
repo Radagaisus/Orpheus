@@ -116,12 +116,25 @@ A stable release will be out soon
         .exec (err, res, user_id) ->
           req.session.passport.user = user_id if user_id
           next err
-  
-  # We all hate configurations
-  Orpheus.configure
-    client: redis.createClient()
-    prefix: 'bookapp'
 ```
+
+## Configuration ##
+
+```coffee
+Orpheus.configure
+   client: redis.createClient()
+   prefix: 'bookapp'
+```
+
+Options:
+
+- **client**: the Redis client.
+- **prefix**: optional prefix for keys. defaults to `orpheus`.
+
+## Higher Order Functions ##
+
+
+
 ## Validations ##
 
 ```coffee
