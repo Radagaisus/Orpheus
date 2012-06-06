@@ -14,6 +14,7 @@ log = console.log
 # Orpheus
 #-------------------------------------#
 class Orpheus
+	@version = "0.1.6"
 	
 	# Configuration
 	@config:
