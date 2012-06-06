@@ -610,6 +610,31 @@ describe 'Delete', ->
 							done()
 
 describe 'Validation', ->
+	it 'Validate Types', (done) ->
+		class Player extends Orpheus
+			constructor: ->
+				@str 'name'
+				@num 'points'
+		player = Player.create()
+		player('sonic').add
+			name:   15   # This will work
+			points: '20' # This will work
+		.err ->
+			expect(1).toBe 2
+			done()
+		.exec ->
+			player('sonic').add
+				name: ['sonic youth'] # This will not work
+				points: '20a'         # This will not work
+			.err (err) ->
+				expect(err.type).toBe 'validation'
+				expect(err.toResponse().errors.name[0]).toBe 'Could not convert sonic youth to string'
+				expect(err.toResponse().errors.points[0]).toBe 'Malformed number'
+				done()
+			.exec ->
+				expect(3).toBe 4
+				done()
+	
 	
 	it 'Validate Strings', (done) ->
 		class Player extends Orpheus

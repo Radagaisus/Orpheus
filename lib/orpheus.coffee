@@ -110,6 +110,9 @@ class Orpheus
 				if _.isFunction o
 					@validations[key].push o
 				else
+					# Custom validations: numericality, exclusion, inclusion
+					# format, etc. Validations are functions that recieve the
+					# field and return either true or a string as a message
 					if o.numericality
 						for k,v of o.numericality
 							do (k,v) =>
@@ -241,7 +244,30 @@ class OrpheusAPI
 				type = value.type
 				do (key, f, type) =>
 					@[key][f] = (args...) =>
-						# add multi command
+						
+						# Type Conversions
+						if type is 'str'
+							if typeof args[0] isnt 'string'
+								if typeof args[0] is 'number'
+									args[0] = args[0].toString()
+								else
+									@validation_errors.add key,
+										msg: "Could not convert #{args[0]} to string"
+										command: f
+										args: args
+										value: args[0]
+						
+						if type is 'num'
+							if typeof args[0] isnt 'number'
+								args[0] = Number args[0]
+							if not isFinite(args[0]) or isNaN(args[0])
+								@validation_errors.add key,
+									msg: "Malformed number"
+									command: f
+									args: args
+									value: args[0]
+						
+						# Add multi command
 						@_commands.push _.flatten [f, @_get_key(key), args]
 						
 						# Run validation, if needed
