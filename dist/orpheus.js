@@ -243,7 +243,8 @@
       this.id = id || this._generate_id();
       _ref = this.rels;
       _fn = function(rel, prel) {
-        return _this[prel].get = function(arr, fn) {
+        var k, v, _ref1, _results;
+        _this[prel].get = function(arr, fn) {
           var results;
           if (arr == null) {
             arr = [];
@@ -266,6 +267,24 @@
             return fn(err, results);
           });
         };
+        _this[prel].each = function(arr, iter, done) {
+          var i;
+          if (arr == null) {
+            arr = [];
+          }
+          i = 0;
+          return async.map(arr, function(item, cb) {
+            return iter(item, cb, i++);
+          }, done);
+        };
+        _results = [];
+        for (k in async) {
+          v = async[k];
+          if ((_ref1 = !k) === 'each' || _ref1 === 'noConflict') {
+            _results.push(_this[prel][k] = v);
+          }
+        }
+        return _results;
       };
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         rel = _ref[_i];
@@ -295,6 +314,33 @@
           _this[key][f] = function() {
             var args, result, v, validation, _l, _len3, _ref4;
             args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+            if (type === 'str') {
+              if (typeof args[0] !== 'string') {
+                if (typeof args[0] === 'number') {
+                  args[0] = args[0].toString();
+                } else {
+                  _this.validation_errors.add(key, {
+                    msg: "Could not convert " + args[0] + " to string",
+                    command: f,
+                    args: args,
+                    value: args[0]
+                  });
+                }
+              }
+            }
+            if (type === 'num') {
+              if (typeof args[0] !== 'number') {
+                args[0] = Number(args[0]);
+              }
+              if (!isFinite(args[0]) || isNaN(args[0])) {
+                _this.validation_errors.add(key, {
+                  msg: "Malformed number",
+                  command: f,
+                  args: args,
+                  value: args[0]
+                });
+              }
+            }
             _this._commands.push(_.flatten([f, _this._get_key(key), args]));
             validation = validation_map[f];
             if (validation && _this.validations[key]) {

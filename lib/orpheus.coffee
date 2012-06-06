@@ -212,9 +212,9 @@ class OrpheusAPI
 					@[prel][f[1..]] = @[prel][f]
 			
 			
+			# user(10).books.get ['dune', 'valis']
 			# Extract related models information,
 			# one by one, based on an array of ids
-			# e.g. user(10).books.get ['dune', 'valis']
 			do (rel, prel) =>
 				@[prel].get = (arr = [], fn) =>
 					return fn null, [] unless arr.length
@@ -233,7 +233,21 @@ class OrpheusAPI
 									results.push res
 								c err
 						, (err) ->
-							fn err, results 
+							fn err, results
+				
+				
+				# user(10).books.each
+				# Run in parallel using async
+				@[prel].each = (arr = [], iter, done) =>
+					i = 0
+					async.map arr, (item, cb) ->
+							iter item, cb, i++
+						, done
+				
+				# Add all async functions.
+				for k,v of async when not k in ['each', 'noConflict']
+					@[prel][k] = v
+		
 		
 		# Add all redis commands relevant to the field and its type
 		# Example: model('id').ranking.zadd (zrank, zscore...)
