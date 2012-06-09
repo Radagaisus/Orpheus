@@ -15,7 +15,6 @@ A stable release will be out soon
 
 # In Action
 ```coffee
-  # Let's create a couple of models
   class User extends Orpheus
     constructor: ->
       @has 'book'
@@ -28,12 +27,6 @@ A stable release will be out soon
       
       # Private Keys
       @private @str 'fb_secret'
-      
-      # Dynamic Keys
-      @zset 'monthly_ranking'
-        key: ->
-          d = new Date()
-          "ranking:#{d.getFullYear()}:#{d.getMonth()+1}"
   
   class Book extends Orpheus
     constructor: ->
@@ -94,28 +87,6 @@ A stable release will be out soon
     # and a helping hand for getting details
     book('SICP').users.get users, (err, users) ->
       next err, users
-  
-  # Sweet user authentication with maps
-  # (this example uses passportjs)
-  fb_connect = (req, res, next) ->
-    fb = req.account
-    fb_details =
-      fb_id:    fb.id
-      fb_name:  fb.displayName
-      fb_token: fb.token
-      fb_gener: fb.gender
-      fb_url:   fb.profileUrl
-    
-    id = if req.user then req.user.id else fb_id: fb.id
-    player id, (err, player, is_new) ->
-      next err if err
-      # That's it, we just handled autorization,
-      # new users and authentication in one go
-      player
-        .set(fb_details)
-        .exec (err, res, user_id) ->
-          req.session.passport.user = user_id if user_id
-          next err
 ```
 
 ## Configuration ##
@@ -131,6 +102,64 @@ Options:
 - **client**: the Redis client.
 - **prefix**: optional prefix for keys. defaults to `orpheus`.
 
+
+# Dynamic Keys
+
+```
+class User extends Orpheus
+  constructor: ->
+    @zset 'monthly_ranking'
+      key: ->
+        d = new Date()
+        # prefix:user:id:ranking:2012:5
+        "ranking:#{d.getFullYear()}:#{d.getMonth()+1}"
+
+user = User.create()
+user('jackson')
+  .monthly_ranking.incrby(1, 'Midnight Oil - The Dead Heart')
+  .err ->
+    res.json status: 400
+  .exec ->
+    res.json status: 200
+```
+
+# One to One Maps
+
+Maps are used to map between a unique attribute of the model and the model ID.
+
+Internally maps use a hash `prefix:users:map:fb_ids`.
+
+This example uses the excellent [PassportJS](passportjs.org).
+
+```coffee
+fb_connect = (req, res, next) ->
+  fb = req.account
+  fb_details =
+    fb_id:    fb.id
+    fb_name:  fb.displayName
+    fb_token: fb.token
+    fb_gener: fb.gender
+    fb_url:   fb.profileUrl
+  
+  id = if req.user then req.user.id else fb_id: fb.id
+  player id, (err, player, is_new) ->
+    next err if err
+    # That's it, we just handled autorization,
+    # new users and authentication in one go
+    player
+      .set(fb_details)
+      .exec (err, res, user_id) ->
+        req.session.passport.user = user_id if user_id
+        next err
+```
+
+#### What Just Happened?
+
+There are two scenarios:
+
+1. **Authentication**: `req.user` is undefined, so the user is not logged in. We create an object `{fb_id: fb.id}` to use in the map. Orpheus requests `hget prefix:users:map:fb_ids fb_id`. If a match is found we continue as usual. Otherwise a new user is created.
+
+2. **Authorization**: `req.user` is defined. The anonymous function is automatically called, and the user's Facebook information is updated.
 
 ## Validations ##
 
