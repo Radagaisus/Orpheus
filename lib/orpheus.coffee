@@ -1,11 +1,12 @@
 # Orpheus - a small DSL for redis
 #-------------------------------------#
 
-_ = require 'underscore'           # flatten, extend, isString
-async = require 'async'            # until
+_ = require 'underscore'           
+async = require 'async'            
 os = require 'os'                  # id generation
-inflector = require './inflector'  # pluralize
+inflector = require './inflector'  
 commands = require './commands'    # redis commands
+EventEmitter = require('events').EventEmitter
 command_map = commands.command_map
 validation_map = commands.validations
 validations = require './validations'
@@ -13,7 +14,7 @@ log = console.log
 
 # Orpheus
 #-------------------------------------#
-class Orpheus
+class Orpheus extends EventEmitter
 	@version = "0.1.8"
 	
 	# Configuration
@@ -30,18 +31,6 @@ class Orpheus
 	# UniqueID counters
 	@id_counter: 0
 	@unique_id: -> @id_counter++
-	
-	# Mini pub/sub for errors
-	@topics = {}
-	
-	@trigger = (topic, o) ->
-		subs = @topics[topic]
-		return unless subs
-		(sub o for sub in subs)
-	
-	@on = (topic, f) ->
-		@topics[topic] ||= []
-		@topics[topic].push f
 	
 	# Orpheus model extends the model
 	# - we can automagically detect
@@ -496,7 +485,7 @@ class OrpheusAPI
 						err.type = 'redis'
 						err.msg = 'Failed Multi Execution'
 						@_errors.push err
-						Orpheus.trigger 'error', err
+						Orpheus.emit 'error', err
 						
 						@error_func err
 					else
