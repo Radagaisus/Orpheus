@@ -157,9 +157,9 @@ fb_connect = (req, res, next) ->
 
 There are two scenarios:
 
-1. **Authentication**: `req.user` is undefined, so the user is not logged in. We create an object `{fb_id: fb.id}` to use in the map. Orpheus requests `hget prefix:users:map:fb_ids fb_id`. If a match is found we continue as usual. Otherwise a new user is created.
+1. **Authentication**: `req.user` is undefined, so the user is not logged in. We create an object `{fb_id: fb.id}` to use in the map. Orpheus requests `hget prefix:users:map:fb_ids fb_id`. If a match is found we continue as usual. Otherwise a new user is created. In both cases, the user's Facebook information is updated.
 
-2. **Authorization**: `req.user` is defined. The anonymous function is automatically called, and the user's Facebook information is updated.
+2. **Authorization**: `req.user` is defined. The anonymous function is called right away and the user's Facebook information is updated.
 
 ## Validations ##
 
