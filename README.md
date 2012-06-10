@@ -13,7 +13,7 @@ Orpheus is a Redis Object Model for CoffeeScript.
 
 A stable release will be out soon
 
-# In Action
+## In Action
 ```coffee
   class User extends Orpheus
     constructor: ->
@@ -103,7 +103,7 @@ Options:
 - **prefix**: optional prefix for keys. defaults to `orpheus`.
 
 
-# Dynamic Keys
+## Dynamic Keys
 
 ```
 class User extends Orpheus
@@ -123,7 +123,7 @@ user('jackson')
     res.json status: 200
 ```
 
-# One to One Maps
+## One to One Maps
 
 Maps are used to map between a unique attribute of the model and the model ID.
 
