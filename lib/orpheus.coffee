@@ -145,7 +145,6 @@ class Orpheus extends EventEmitter
 									return if k is 'tokenizer'
 									@validations[key].push (field) ->
 										len = tokenizer field
-										log k, field, len, v
 										unless validations.size[k].fn(len, v)
 											return validations.size[k].msg(field, len, v)
 										return true
