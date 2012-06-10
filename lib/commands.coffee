@@ -38,7 +38,6 @@ module.exports =
 		# - brpoplpush and friends
 	
 	getters: [
-		# Missing: scard, zrank, zcard, score, zcount, blocking, sdiff, zinter, hkeys, hlen, hvals
 		# String, Number
 		'hget',
 		

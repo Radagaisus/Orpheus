@@ -875,56 +875,9 @@ describe 'Relations', ->
 						expect(res[0]).toBe 'almog'
 						expect(res[1]).toBe 'mofasa'
 						done()
-
-	it 'Should get relation information', (done) ->
-		class Player extends Orpheus
-			constructor: ->
-				@has 'game'
-				@str 'name'
-
-		class Game extends Orpheus
-			constructor: ->
-				@has 'player'
-
-		game = Game.create()
-		player = Player.create()
-		game('diablo').players.sadd '15', '16', '17', ->
-			player('15').name.set('almog').exec ->
-				player('16').name.set('almog').exec ->
-					player('17').name.set('almog').exec ->
-
-						game('diablo').players.smembers (err, players) ->
-							expect(err).toBe null
-
-							game('diablo').players.get players, (err, players) ->
-								expect(err).toBeUndefined()
-								expect(players.length).toBe 3
-								
-								for p,i in players
-									expect(p.name).toBe 'almog'
-									expect(p.id).toBe ''+ (15 + i)
-									
-								done()
+						
 	
 	it 'Each', (done) ->
-		### Not Implemented in Orpheus yet.
-		brand(brand_id).players.each top_players, (c, id, i) =>
-				player(id).get_with_brand brand_id, (err, p) =>
-					p.position = ranks[i]
-					c(err, p)
-			, (err, players) =>
-				
-				# Get current player ranking
-				brand(brand_id)[leaderboard]
-					.zrevrank(player_id)
-					.exec (err, rank = []) =>
-						if err then return @ack status: 400
-						
-						@ack
-							status: 200
-							players: players
-							player_rank: rank[0]+
-		###
 		
 		class Player extends Orpheus
 			constructor: ->

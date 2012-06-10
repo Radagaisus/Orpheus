@@ -9,6 +9,7 @@ commands = require './commands'    # redis commands
 EventEmitter = require('events').EventEmitter
 command_map = commands.command_map
 validation_map = commands.validations
+getters = commands.getters
 validations = require './validations'
 log = console.log
 
@@ -48,6 +49,9 @@ class Orpheus extends EventEmitter
 				@rels = []
 				@rels_qualifiers = []
 				@validations = []
+				
+				# Used when retrieving information from redis
+				# This schema tells us how to convert the reponse
 				@res_schema = []
 				
 				@fields = [
@@ -225,29 +229,8 @@ class OrpheusAPI
 					@[prel][f[1..]] = @[prel][f]
 			
 			
-			# user(10).books.get ['dune', 'valis']
-			# Extract related models information,
-			# one by one, based on an array of ids
+			# Async functions for handling relations
 			do (rel, prel) =>
-				@[prel].get = (arr = [], fn) =>
-					return fn null, [] unless arr.length
-					results = []
-					
-					async.until ->
-							results.length is arr.length
-							
-						, (c) ->
-							# create the relation model
-							model = Orpheus.schema[rel].create()
-							
-							# and get its information based on the arr id
-							model(arr[results.length]).get (err, res) ->
-								unless err
-									results.push res
-								c err
-						, (err) ->
-							fn err, results
-				
 				
 				# user(10).books.each
 				# Run in parallel using async
@@ -298,9 +281,15 @@ class OrpheusAPI
 						# Add multi command
 						@_commands.push _.flatten [f, @_get_key(key), args]
 						
+						# Adjust the response schema, if needed
+						if f in getters
+							@res_schema.push
+								position: @_commands.length - 1
+								type: type
+								name: key
+						
 						# Run validation, if needed
-						validation = validation_map[f]
-						if validation and @validations[key]
+						if validation_map[f] and @validations[key]
 							
 							if type in ['str', 'num']
 								# Regular validations
@@ -399,12 +388,12 @@ class OrpheusAPI
 	flush: ->
 		@_commands = []
 		@validation_errors.empty()
+		@res_schema = []
 	
 	# deletes the model.
 	delete: (fn) ->
 		# flush commands and validations
-		@_commands = [] 
-		@validation_errors.empty()
+		@flush()
 		
 		hdel_flag = false # no need to delete a hash twice
 		for key, value of @model
@@ -508,6 +497,15 @@ class OrpheusAPI
 			.multi(@_commands)
 			.exec (err, res) =>
 				
+				# Convert the response based on the schema, if needed
+				if @res_schema.length and not err
+					new_res = {}
+					for s in @res_schema
+						new_res[s.name] = res[s.position]
+				
+				# Check whether we should call the error or function
+				# or the execute function, and if we call the execute
+				# function with which parameters.
 				if @error_func
 					if err
 						err.time = new Date()

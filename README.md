@@ -176,7 +176,31 @@ user('mgmt')
     -> # ...
   .exec ->
     # ...
-``` 
+```
+
+### Relations
+
+```coffee
+class User extends Orpheus
+  constructor: ->
+    @has 'book'
+
+class Book extends Orpheus
+  constructor: ->
+    @has 'user'
+
+user = User.create()
+book = Book.create()
+
+# Every relation means a set for that relation
+user('chaplin').books.smembers (err, book_ids) ->
+  
+  # With async functions for fun and profit
+  user('chaplin').books.map book_ids, (id, cb, i) ->
+      book(id).get cb
+    (err, books) ->
+      # What? Did we just retrieved all the books from Redis?
+```
 
 ## Dynamic Keys
 
