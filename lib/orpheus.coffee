@@ -373,6 +373,11 @@ class OrpheusAPI
 			pkey = inflector.pluralize key
 			@_add_map pkey, args[0]
 	
+	# Empties the object to be reused
+	flush: ->
+		@_commands = []
+		@validation_errors.empty()
+	
 	# deletes the model.
 	delete: (fn) ->
 		# flush commands and validations

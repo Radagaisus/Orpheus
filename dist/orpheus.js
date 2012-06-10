@@ -436,6 +436,11 @@
       }
     };
 
+    OrpheusAPI.prototype.flush = function() {
+      this._commands = [];
+      return this.validation_errors.empty();
+    };
+
     OrpheusAPI.prototype["delete"] = function(fn) {
       var hdel_flag, key, type, value, _ref;
       this._commands = [];
