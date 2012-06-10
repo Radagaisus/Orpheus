@@ -211,6 +211,15 @@ player('james').set
   # ...
 }
 
+### Customizing Message
+
+```coffee
+@validate 'legacy_code',
+	format: /^[a-zA-Z]+$/
+	message: (val) -> "#{val} must be only A-Za-z"
+```
+
+Will do the trick. Number validations do not support customized messages yet.
 
 ### Custom Validations ###
 

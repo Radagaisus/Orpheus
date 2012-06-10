@@ -125,6 +125,9 @@
             if (o.numericality) {
               _ref = o.numericality;
               _fn = function(k, v) {
+                if (k === 'message') {
+                  return;
+                }
                 return _this.validations[key].push(function(field) {
                   if (!validations.num[k].fn(field, v)) {
                     return validations.num[k].msg(field, v);
@@ -140,7 +143,11 @@
             if (o.exclusion) {
               this.validations[key].push(function(field) {
                 if (__indexOf.call(o.exclusion, field) >= 0) {
-                  return "" + field + " is reserved.";
+                  if (o.message) {
+                    return o.message(field);
+                  } else {
+                    return "" + field + " is reserved.";
+                  }
                 }
                 return true;
               });
@@ -150,7 +157,11 @@
                 if (__indexOf.call(o.inclusion, field) >= 0) {
                   return true;
                 }
-                return "" + field + " is not included in the list.";
+                if (o.message) {
+                  return o.message(field);
+                } else {
+                  return "" + field + " is not included in the list.";
+                }
               });
             }
             if (o.format) {
@@ -159,7 +170,11 @@
                 if (o.format.test(field)) {
                   return true;
                 }
-                return "" + field + " is invalid.";
+                if (o.message) {
+                  return o.message(field);
+                } else {
+                  return "" + field + " is invalid.";
+                }
               });
             }
           }

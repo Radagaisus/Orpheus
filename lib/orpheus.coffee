@@ -106,28 +106,39 @@ class Orpheus extends EventEmitter
 					if o.numericality
 						for k,v of o.numericality
 							do (k,v) =>
+								return if k is 'message'
 								@validations[key].push (field) ->
 									unless validations.num[k].fn(field, v)
 										return validations.num[k].msg(field, v)
 									return true
+					
 					if o.exclusion
 						@validations[key].push (field) ->
 							if field in o.exclusion
-								return "#{field} is reserved."
+								if o.message
+									return o.message field
+								else
+									return "#{field} is reserved."
 							return true
 					
 					if o.inclusion
 						@validations[key].push (field) ->
 							if field in o.inclusion
 								return true
-							return "#{field} is not included in the list."
+							if o.message
+								return o.message field
+							else
+								return "#{field} is not included in the list."
 					
 					if o.format
 						@validations[key].push (field) ->
 							log o.format, field, o.format.test(field)
 							if o.format.test(field)
 								return true
-							return "#{field} is invalid."
+							if o.message
+								return o.message field
+							else
+								return "#{field} is invalid."
 			
 			# Mark field as private
 			private: (field) ->

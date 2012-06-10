@@ -622,12 +622,14 @@ describe 'Validation', ->
 		class Player extends Orpheus
 			constructor: ->
 				@str 'legacy_code'
-				@validate 'legacy_code', format: /^[a-zA-Z]+$/
+				@validate 'legacy_code',
+					format: /^[a-zA-Z]+$/
+					message: (val) -> "#{val} must be only A-Za-z"
 		player = Player.create()
 		player('ido').add
 			legacy_code: 'sdfsd234'
 		.err (err) ->
-			expect(err.toResponse().errors.legacy_code[0]).toBe 'sdfsd234 is invalid.'
+			expect(err.toResponse().errors.legacy_code[0]).toBe 'sdfsd234 must be only A-Za-z'
 			
 			player('mint').add
 				legacy_code: 'hello'
