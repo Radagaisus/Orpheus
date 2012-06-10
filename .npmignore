@@ -3,3 +3,4 @@ test
 nodelint.cfg
 *.log
 TODO.md
+npm-debug.log
