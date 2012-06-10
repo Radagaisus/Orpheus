@@ -48,6 +48,7 @@ class Orpheus extends EventEmitter
 				@rels = []
 				@rels_qualifiers = []
 				@validations = []
+				@res_schema = []
 				
 				@fields = [
 					'str'  # @str 'name'

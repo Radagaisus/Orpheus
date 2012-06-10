@@ -16,6 +16,7 @@
       zincrby: true,
       hmset: true
     },
+    getters: ['hget', 'lrange', 'smembers', 'zrange', 'zrangebyscore', 'zrevrange', 'zrevrangebyscore', 'hget', 'hgetall', 'hmget'],
     str: ['hdel', 'hexists', 'hget', 'hsetnx', 'hset'],
     num: ['hdel', 'hexists', 'hget', 'hsetnx', 'hset', 'hincrby', 'hincrbyfloat'],
     list: ['blpop', 'brpop', 'brpoplpush', 'lindex', 'linsert', 'llen', 'lpop', 'lpush', 'lpushx', 'lrange', 'lrem', 'lset', 'ltrim', 'rpop', 'rpoplpush', 'rpush', 'rpushx'],

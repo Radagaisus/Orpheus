@@ -102,6 +102,51 @@ Options:
 - **client**: the Redis client.
 - **prefix**: optional prefix for keys. defaults to `orpheus`.
 
+## Working with the API
+
+Orpheus uses the `.err()` function for handling validation and unexpected errors. If `.err()` is not set
+
+```coffee
+user('sonic youth')
+  .add
+    name: 'modest mouse'
+    points: 50
+  .err (err) ->
+    if err.type is 'validation'
+      # phew, it's just a validation error
+      res.json err.toResponse()
+    else
+      # Redis Error, or a horrendous
+      # bug in Orpheus
+      log "Wake the sysadmins! #{err}"
+      res.json status: 500
+  .exec (res, id) ->
+    # fun!
+```
+
+**Without Err**:
+
+```coffee
+user('putin')
+  .add
+    name: 'putout'
+  .exec (err, res, id) ->
+    # err is the first parameter
+    # everything else as usual
+```
+
+### Separate Callbacks
+
+Just like with the `multi` command you can supply a separate callback for specific commands.
+
+```coffee
+user('mgmt')
+  .pokemons.push('pikachu', 'charizard', redis.print)
+  .err
+    -> # ...
+  .exec ->
+    # ...
+``` 
 
 ## Dynamic Keys
 

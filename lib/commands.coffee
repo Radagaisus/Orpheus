@@ -37,6 +37,30 @@ module.exports =
 		# - linsert
 		# - brpoplpush and friends
 	
+	getters: [
+		# Missing: scard, zrank, zcard, score, zcount, blocking, sdiff, zinter, hkeys, hlen, hvals
+		# String, Number
+		'hget',
+		
+		# List
+		# - blpop and friends
+		'lrange',
+		
+		# Set
+		'smembers',
+		
+		# Zset
+		'zrange',
+		'zrangebyscore',
+		'zrevrange',
+		'zrevrangebyscore'
+		
+		# Hash
+		'hget',
+		'hgetall',
+		'hmget',
+	]
+	
 	str: [
 		'hdel',
 		'hexists',

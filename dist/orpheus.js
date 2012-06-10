@@ -73,6 +73,7 @@
           this.rels = [];
           this.rels_qualifiers = [];
           this.validations = [];
+          this.res_schema = [];
           this.fields = ['str', 'num', 'list', 'set', 'zset', 'hash'];
           _ref = this.fields;
           _fn = function(f) {
