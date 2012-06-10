@@ -463,11 +463,13 @@ class OrpheusAPI
 			fn err, result, @id
 	
 	err: (fn) ->
-		@error_func = fn
+		@error_func = fn || -> #noop
 		return @
 	
 	# execute the multi commands
 	exec: (fn) ->
+		fn ||= -> # noop
+		
 		unless @validation_errors.valid()
 			if @error_func
 				return @error_func @validation_errors, @id

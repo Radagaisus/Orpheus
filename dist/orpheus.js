@@ -546,12 +546,13 @@
     };
 
     OrpheusAPI.prototype.err = function(fn) {
-      this.error_func = fn;
+      this.error_func = fn || function() {};
       return this;
     };
 
     OrpheusAPI.prototype.exec = function(fn) {
       var _this = this;
+      fn || (fn = function() {});
       if (!this.validation_errors.valid()) {
         if (this.error_func) {
           return this.error_func(this.validation_errors, this.id);
