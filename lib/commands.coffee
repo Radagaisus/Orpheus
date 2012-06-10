@@ -58,7 +58,7 @@ module.exports =
 		# Hash
 		'hget',
 		'hgetall',
-		'hmget',
+		'hmget'
 	]
 	
 	str: [
