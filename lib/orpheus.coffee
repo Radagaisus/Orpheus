@@ -224,6 +224,7 @@ class OrpheusAPI
 				do (prel, f) =>
 					@[prel][f] = (args..., fn) =>
 						@redis[f](["#{@prefix}:#{@q}:#{@id}:#{prel}"].concat(args), fn)
+						return this
 					
 					# shorthand, use add instead of sadd
 					@[prel][f[1..]] = @[prel][f]
