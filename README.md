@@ -104,7 +104,7 @@ Options:
 
 ## Working with the API
 
-Orpheus uses the `.err()` function for handling validation and unexpected errors. If `.err()` is not set
+Orpheus uses the `.err()` function for handling validation and unexpected errors. If `.err()` is not set the `.exec()` command receives errors as the first parameter.
 
 ```coffee
 user('sonic youth')
