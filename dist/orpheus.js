@@ -75,7 +75,6 @@
           this.rels = [];
           this.rels_qualifiers = [];
           this.validations = [];
-          this._res_schema = [];
           this.fields = ['str', 'num', 'list', 'set', 'zset', 'hash'];
           _ref = this.fields;
           _fn = function(f) {
@@ -264,6 +263,7 @@
       _.extend(this, this.model);
       this._commands = [];
       this.validation_errors = new OrpheusValidationErrors;
+      this._res_schema = [];
       this.id = id || this._generate_id();
       _ref = this.rels;
       _fn = function(rel, prel) {
@@ -489,87 +489,38 @@
     };
 
     OrpheusAPI.prototype.getall = function(fn, get_private) {
-      var hash_parts_are_private, hgetall_flag, hmget, key, not_private, schema, type, value, _ref,
-        _this = this;
+      var key, not_private, type, value, _ref;
       if (get_private == null) {
         get_private = false;
       }
       not_private = function() {
         return !get_private || get_private && value.options["private"] !== true;
       };
-      schema = [];
-      hgetall_flag = false;
-      hash_parts_are_private = false;
-      hmget = [];
       _ref = this.model;
       for (key in _ref) {
         value = _ref[key];
         type = value.type;
-        switch (type) {
-          case 'str':
-          case 'num':
-            hgetall_flag = true;
-            if (not_private()) {
-              hmget.push(key);
-            } else {
-              hash_parts_are_private = true;
-            }
-            break;
-          case 'list':
-            if (not_private()) {
-              this._commands.push(['lrange', this._get_key(key), 0, -1]);
-            }
-            break;
-          case 'set':
-            if (not_private()) {
-              this._commands.push(['smembers', this._get_key(key)]);
-            }
-            break;
-          case 'zset':
-            if (not_private()) {
-              this._commands.push(['zrange', this._get_key(key), 0, -1, 'withscores']);
-            }
-            break;
-          case 'hash':
-            if (not_private()) {
-              this._commands.push(['hgetall', this._get_key(key)]);
-            }
-        }
-        if (!(type === 'str' || type === 'num')) {
-          schema.push(key);
-        }
-      }
-      if (hash_parts_are_private) {
-        if (hmget.length) {
-          this._commands.push(['hmget', this._get_key()].concat(hmget));
-          schema.push(hmget);
-        }
-      } else if (hgetall_flag) {
-        this._commands.push(['hgetall', this._get_key()]);
-        schema.push('hash');
-      }
-      return this.exec(function(err, res, id) {
-        var i, j, o, prop, result, _i, _j, _len, _len1;
-        result = false;
-        if (!err) {
-          result = {};
-          for (i = _i = 0, _len = schema.length; _i < _len; i = ++_i) {
-            o = schema[i];
-            if (o === 'hash') {
-              _.extend(result, res[i]);
-            } else if (Array.isArray(o)) {
-              for (j = _j = 0, _len1 = o.length; _j < _len1; j = ++_j) {
-                prop = o[j];
-                result[prop] = res[i][j];
-              }
-            } else {
-              result[o] = res[i];
-            }
+        if (not_private()) {
+          switch (type) {
+            case 'str':
+            case 'num':
+              this[key].get();
+              break;
+            case 'list':
+              this[key].range(0, -1);
+              break;
+            case 'set':
+              this[key].members();
+              break;
+            case 'zset':
+              this[key].range(0, -1, 'withscores');
+              break;
+            case 'hash':
+              this[key].hgetall();
           }
-          result.id = _this.id;
         }
-        return fn(err, result, _this.id);
-      });
+      }
+      return this.exec(fn);
     };
 
     OrpheusAPI.prototype.err = function(fn) {
@@ -588,7 +539,8 @@
         }
       }
       return this.redis.multi(this._commands).exec(function(err, res) {
-        var index, member, new_res, s, _i, _j, _len, _len1, _ref, _ref1, _step;
+        var index, member, new_res, s, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _step;
+        log(err, _this._res_schema.length, _this._commands.length, _this._res_schema);
         if (_this._res_schema.length && !err) {
           if (_this._res_schema.length === _this._commands.length) {
             new_res = {};
@@ -597,12 +549,20 @@
               s = _ref[_i];
               if (s.type === 'num') {
                 new_res[s.name] = Number(res[s.position]);
-              } else if (s.type === 'zset' && s.with_scores) {
+              } else if (s.type === 'zset') {
                 new_res[s.name] = {};
-                _ref1 = res[s.position];
-                for (index = _j = 0, _len1 = _ref1.length, _step = 2; _j < _len1; index = _j += _step) {
-                  member = _ref1[index];
-                  new_res[s.name][member] = Number(res[s.position][index + 1]);
+                if (s.with_scores) {
+                  _ref1 = res[s.position];
+                  for (index = _j = 0, _len1 = _ref1.length, _step = 2; _j < _len1; index = _j += _step) {
+                    member = _ref1[index];
+                    new_res[s.name][member] = Number(res[s.position][index + 1]);
+                  }
+                } else {
+                  _ref2 = res[s.position];
+                  for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+                    member = _ref2[_k];
+                    new_res[s.name][member] = false;
+                  }
                 }
               } else {
                 new_res[s.name] = res[s.position];

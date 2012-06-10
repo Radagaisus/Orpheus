@@ -50,10 +50,6 @@ class Orpheus extends EventEmitter
 				@rels_qualifiers = []
 				@validations = []
 				
-				# Used when retrieving information from redis
-				# This schema tells us how to convert the reponse
-				@_res_schema = []
-				
 				@fields = [
 					'str'  # @str 'name'
 					'num'  # @num 'points'
@@ -210,6 +206,10 @@ class OrpheusAPI
 		@_commands = []
 		
 		@validation_errors = new OrpheusValidationErrors
+		
+		# Used when retrieving information from redis
+		# This schema tells us how to convert the reponse
+		@_res_schema = []
 		
 		# new or existing id
 		@id = id or @_generate_id()
@@ -417,68 +417,22 @@ class OrpheusAPI
 		# Helper for determining if a value is private or not
 		not_private = -> not get_private or get_private and value.options.private isnt true
 		
-		schema = [] # we use the schema to convert the response
-		            # to the appropriate value
-		
-		# It's ugly and nasty, but sometimes we want hmget
-		# and sometimes we want hgetall
-		hgetall_flag = false
-		hash_parts_are_private = false
-		hmget = []
-		
 		for key, value of @model
 			type = value.type
-			switch type
-				when 'str', 'num'
-					hgetall_flag = true
-					if not_private()
-						hmget.push key
-					else
-						hash_parts_are_private = true
-						
-				when 'list'
-					if not_private()
-						@_commands.push ['lrange', @_get_key(key), 0, -1]
-						
-				when 'set'
-					if not_private()
-						@_commands.push ['smembers', @_get_key(key)]
-						
-				when 'zset'
-					if not_private()
-						@_commands.push ['zrange', @_get_key(key), 0, -1, 'withscores']
-						
-				when 'hash'
-					if not_private()
-						@_commands.push ['hgetall', @_get_key(key)]
-			
-			schema.push key unless type is 'str' or type is 'num'
+			if not_private()
+				switch type
+					when 'str', 'num'
+						@[key].get()
+					when 'list'
+						@[key].range 0, -1
+					when 'set'
+						@[key].members()
+					when 'zset'
+						@[key].range 0, -1, 'withscores'
+					when 'hash'
+						@[key].hgetall()
 		
-		if hash_parts_are_private
-			if hmget.length
-				@_commands.push ['hmget', @_get_key()].concat(hmget)
-				schema.push hmget
-		else if hgetall_flag
-			@_commands.push ['hgetall', @_get_key()]
-			schema.push 'hash'
-		
-		@exec (err, res, id) =>
-			result = false
-			unless err
-				# convert the response type, based on the schmea
-				result = {}
-				for o,i in schema
-					if o is 'hash'
-						_.extend result, res[i]
-					else if Array.isArray o
-						for prop, j in o
-							result[prop] = res[i][j]
-					else
-						result[o] = res[i]
-				
-				result.id = @id
-			
-			fn err, result, @id
+		@exec fn
 	
 	err: (fn) ->
 		@error_func = fn || -> #noop
@@ -499,6 +453,7 @@ class OrpheusAPI
 			.exec (err, res) =>
 				
 				# Convert the response based on the schema, if needed
+				log err, @_res_schema.length, @_commands.length, @_res_schema
 				if @_res_schema.length and not err
 					if @_res_schema.length is @_commands.length
 						new_res = {}
@@ -512,7 +467,7 @@ class OrpheusAPI
 										new_res[s.name][member] = Number res[s.position][index+1]
 								else
 									for member in res[s.position]
-										new_res[s.name][member] = 0
+										new_res[s.name][member] = false
 							else
 								new_res[s.name] = res[s.position]
 						res = new_res

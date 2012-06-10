@@ -202,6 +202,7 @@ describe 'Get', ->
 					expect(res.wins[0]).toBe 'c'
 					
 					player('someplayer').game('skyrim').getall (err, res) ->
+						log res
 						expect(res.name).toBe 'mofasa'
 						expect(res.progress.five).toBe 'to the ten'
 						expect(res.progress.six).toBe 'to the mix'
@@ -210,7 +211,7 @@ describe 'Get', ->
 						done()
 						
 						
-	it 'Get without private', (done) ->
+	it 'Get Without Private', (done) ->
 		class Player extends Orpheus
 			constructor: ->
 				@has 'game'
