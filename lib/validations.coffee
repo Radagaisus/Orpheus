@@ -23,3 +23,17 @@
 	only_integer:
 		fn: (n) -> typeof n is 'number' and parseFloat(n) is parseInt(n,10) and not isNaN(n) and isFinite(n)
 		msg: (n) -> "#{n} must be an integer."
+
+@size =
+	minimum:
+		fn: (len, min) -> console.log('heyy!!', len, min); len >= min
+		msg: (field, len, min) -> "'#{field}' length is #{len}. Must be bigger than #{min}."
+	maximum:
+		fn: (len, max) -> len <= max
+		msg: (field, len, max) -> "'#{field}' length is #{len}. Must be smaller than #{max}."
+	in:
+		fn: (len, range) -> range[0] <= len <= range[1]
+		msg: (field, len, range) -> "'#{field}' length is #{len}. Must be between #{range[0]} and #{range[1]}."
+	is:
+		fn: (len1, len2) -> len1 is len2
+		msg: (field, len1, len2) -> "'#{field}' length is #{len1}. Must be #{len2}."

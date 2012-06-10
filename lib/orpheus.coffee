@@ -106,12 +106,11 @@ class Orpheus extends EventEmitter
 					if o.numericality
 						for k,v of o.numericality
 							do (k,v) =>
-								return if k is 'message'
 								@validations[key].push (field) ->
 									unless validations.num[k].fn(field, v)
 										return validations.num[k].msg(field, v)
 									return true
-					
+									
 					if o.exclusion
 						@validations[key].push (field) ->
 							if field in o.exclusion
@@ -132,13 +131,25 @@ class Orpheus extends EventEmitter
 					
 					if o.format
 						@validations[key].push (field) ->
-							log o.format, field, o.format.test(field)
 							if o.format.test(field)
 								return true
 							if o.message
 								return o.message field
 							else
 								return "#{field} is invalid."
+					
+					if o.size
+							tokenizer = o.size.tokenizer or (field) -> field.length
+							for k,v of o.size
+								do (k,v) =>
+									return if k is 'tokenizer'
+									@validations[key].push (field) ->
+										len = tokenizer field
+										log k, field, len, v
+										unless validations.size[k].fn(len, v)
+											return validations.size[k].msg(field, len, v)
+										return true
+							
 			
 			# Mark field as private
 			private: (field) ->
@@ -291,7 +302,7 @@ class OrpheusAPI
 						validation = validation_map[f]
 						if validation and @validations[key]
 							
-							if type is 'str' or type is 'num'
+							if type in ['str', 'num']
 								# Regular validations
 								for v in @validations[key]
 									result = v args...

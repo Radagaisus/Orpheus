@@ -233,18 +233,16 @@ class Player extends Orpheus
 ### Number Validations ###
 
 ```coffee
-class Player extends Orpheus
-	constructor: ->
-		@num 'points'
-		
-		@validate 'points',
-			numericality:
-				only_integer: true
-				greater_than: 3
-				greater_than_or_equal_to: 3
-				equal_to: 3
-				less_than_or_equal_to: 3
-				odd: true
+@num 'points'
+
+@validate 'points',
+	numericality:
+		only_integer: true
+		greater_than: 3
+		greater_than_or_equal_to: 3
+		equal_to: 3
+		less_than_or_equal_to: 3
+		odd: true
 ```
 
 Options:
@@ -261,15 +259,34 @@ Options:
 ### Exclusion and Inclusion Validations ###
 
 ```coffee
-class Site extends Orpheus
-	constructor: ->
-		@str 'subdomain'
-		@str 'size'
-		@validate 'subdomain',
-			exclusion: ['www', 'us', 'ca', 'jp']
-		@validate 'size',
-			inclusion: ['small', 'medium', 'large']
+@str 'subdomain'
+@str 'size'
+@validate 'subdomain',
+	exclusion: ['www', 'us', 'ca', 'jp']
+@validate 'size',
+	inclusion: ['small', 'medium', 'large']
 ```
+
+### Size ###
+
+```coffee
+@str 'content'
+@validate 'content'
+	size:
+		tokenizer: (s) -> s.match(/\w+/g).length
+		is: 5
+		minimum: 5
+		maximum: 5
+		in: [1,5]
+```
+
+Options:
+
+- **minimum**: `"'#{field}' length is #{len}. Must be bigger than #{min}.`
+- **maximum**: `"'#{field}' length is #{len}. Must be smaller than #{max}."`
+- **in**: `"'#{field}' length is #{len}. Must be between #{range[0]} and #{range[1]}."`
+- **is**: `"'#{field}' length is #{len1}. Must be #{len2}."`
+- **tokenizer**: useful for splitting the field in different ways. The default is `field.length`.
 
 ## Regex Validations ##
 

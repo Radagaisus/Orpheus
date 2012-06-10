@@ -116,7 +116,7 @@
         };
 
         OrpheusModel.prototype.validate = function(key, o) {
-          var k, v, _base, _fn, _ref,
+          var k, tokenizer, v, _base, _fn, _ref, _ref1, _results,
             _this = this;
           (_base = this.validations)[key] || (_base[key] = []);
           if (_.isFunction(o)) {
@@ -125,9 +125,6 @@
             if (o.numericality) {
               _ref = o.numericality;
               _fn = function(k, v) {
-                if (k === 'message') {
-                  return;
-                }
                 return _this.validations[key].push(function(field) {
                   if (!validations.num[k].fn(field, v)) {
                     return validations.num[k].msg(field, v);
@@ -165,8 +162,7 @@
               });
             }
             if (o.format) {
-              return this.validations[key].push(function(field) {
-                log(o.format, field, o.format.test(field));
+              this.validations[key].push(function(field) {
                 if (o.format.test(field)) {
                   return true;
                 }
@@ -176,6 +172,31 @@
                   return "" + field + " is invalid.";
                 }
               });
+            }
+            if (o.size) {
+              tokenizer = o.size.tokenizer || function(field) {
+                return field.length;
+              };
+              _ref1 = o.size;
+              _results = [];
+              for (k in _ref1) {
+                v = _ref1[k];
+                _results.push((function(k, v) {
+                  if (k === 'tokenizer') {
+                    return;
+                  }
+                  return _this.validations[key].push(function(field) {
+                    var len;
+                    len = tokenizer(field);
+                    log(k, field, len, v);
+                    if (!validations.size[k].fn(len, v)) {
+                      return validations.size[k].msg(field, len, v);
+                    }
+                    return true;
+                  });
+                })(k, v));
+              }
+              return _results;
             }
           }
         };

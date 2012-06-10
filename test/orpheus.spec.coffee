@@ -643,6 +643,71 @@ describe 'Validation', ->
 			expect(1).toBe 2
 			done()
 	
+	it 'Validates Size', (done) ->
+		class Player extends Orpheus
+			constructor: ->
+				@str 'name'
+				@validate 'name',
+					size:
+						minimum: 2
+				
+				@str 'bio'
+				@validate 'bio',
+					size:
+						maximum: 5
+				
+				@str 'password'
+				@validate 'password'
+					size:
+						in: [6,25]
+				
+				@str 'registration_number'
+				@validate 'registration_number'
+					size:
+						is: 6
+				
+				@str 'content'
+				@validate 'content'
+					size:
+						tokenizer: (s) -> s.match(/\w+/g).length
+						is: 5
+		
+		player = Player.create()
+		player('tyrion').add
+			name: 'clear'
+			bio: 'beep'
+			password: 'Wraith Pinned to the Mist'
+			registration_number: 'sixsix'
+			content: 'five words yeah five words'
+		.err (err) ->
+			log err.errors
+			expect(1).toBe 2
+			done()
+		.exec (res) ->
+			expect(res[0]).toBe 1
+			expect(res[1]).toBe 1
+			expect(res[2]).toBe 1
+			expect(res[3]).toBe 1
+			expect(res[4]).toBe 1
+			
+			player('beirut').add
+				name: 'i'
+				bio: 'long stuff is long'
+				password: 'no'
+				registration_number: 'haha'
+				content: 'four words it is'
+			.err (err) ->
+				expect(err.toResponse().errors.name[0]).toBe "'i' length is 1. Must be bigger than 2."
+				expect(err.toResponse().errors.bio[0]).toBe "'long stuff is long' length is 18. Must be smaller than 5."
+				expect(err.toResponse().errors.password[0]).toBe "'no' length is 2. Must be between 6 and 25."
+				expect(err.toResponse().errors.registration_number[0]).toBe "'haha' length is 4. Must be 6."
+				expect(err.toResponse().errors.content[0]).toBe "'four words it is' length is 4. Must be 5."
+				
+				done()
+			.exec ->
+				expect(3).toBe 4
+				done()
+	
 	it 'Validate Exclusion & Inclusion', (done) ->
 		class Player extends Orpheus
 			constructor: ->
@@ -882,7 +947,6 @@ describe 'Relations', ->
 							game('diablo').players.map players, (id, c, i) ->
 									c(null, {id: id, i: i})
 								, (err, players) ->
-									log err, players
 									expect(err).toBeUndefined()
 									for p,i in players
 										expect(p.i).toBe i

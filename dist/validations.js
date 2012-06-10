@@ -68,4 +68,40 @@
     }
   };
 
+  this.size = {
+    minimum: {
+      fn: function(len, min) {
+        console.log('heyy!!', len, min);
+        return len >= min;
+      },
+      msg: function(field, len, min) {
+        return "'" + field + "' length is " + len + ". Must be bigger than " + min + ".";
+      }
+    },
+    maximum: {
+      fn: function(len, max) {
+        return len <= max;
+      },
+      msg: function(field, len, max) {
+        return "'" + field + "' length is " + len + ". Must be smaller than " + max + ".";
+      }
+    },
+    "in": {
+      fn: function(len, range) {
+        return (range[0] <= len && len <= range[1]);
+      },
+      msg: function(field, len, range) {
+        return "'" + field + "' length is " + len + ". Must be between " + range[0] + " and " + range[1] + ".";
+      }
+    },
+    is: {
+      fn: function(len1, len2) {
+        return len1 === len2;
+      },
+      msg: function(field, len1, len2) {
+        return "'" + field + "' length is " + len1 + ". Must be " + len2 + ".";
+      }
+    }
+  };
+
 }).call(this);
