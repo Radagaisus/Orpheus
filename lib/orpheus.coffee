@@ -505,10 +505,14 @@ class OrpheusAPI
 						for s in @_res_schema
 							if s.type is 'num'
 								new_res[s.name] = Number res[s.position]
-							else if s.type is 'zset' and s.with_scores
+							else if s.type is 'zset'
 								new_res[s.name] = {}
-								for member,index in res[s.position] by 2
-									new_res[s.name][member] = Number res[s.position][index+1]
+								if s.with_scores
+									for member,index in res[s.position] by 2
+										new_res[s.name][member] = Number res[s.position][index+1]
+								else
+									for member in res[s.position]
+										new_res[s.name][member] = 0
 							else
 								new_res[s.name] = res[s.position]
 						res = new_res
