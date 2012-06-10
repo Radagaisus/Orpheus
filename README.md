@@ -264,6 +264,8 @@ There are two scenarios:
 
 Validations are based on the input, not on the object itself. For example, `hincrby 5` will validate the number 5 itself, not the accumulated value in the object.
 
+Validations run synchronously.
+
 ```coffee
 class User extends Orpheus
   constructor: ->
