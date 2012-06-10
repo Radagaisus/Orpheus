@@ -164,6 +164,19 @@ describe 'Redis Commands', ->
 					expect(res.mink).toBe 'fatigue'
 					expect(res.bing).toBe 'sting'
 					done()
+	
+	it 'Multi Commands with separate callback', (done) ->
+		class Player extends Orpheus
+			constructor: ->
+				@str 'name'
+		player = Player.create()
+		player('sam')
+			.name.set 'abe', (err, res) ->
+				expect(err).toBe null
+				expect(res).toBe 1
+				done()
+			.name.set('greg')
+			.exec()
 
 describe 'Get Stuff', ->
 	it 'Get All', (done) ->

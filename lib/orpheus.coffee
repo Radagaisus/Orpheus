@@ -133,6 +133,7 @@ class Orpheus extends EventEmitter
 			private: (field) ->
 				@model[field].options.private = true
 			
+			
 			# return OrpheusAPI if we have the id, or it's
 			# a new id. otherwise, hget the id and then call
 			# orpheus api.
