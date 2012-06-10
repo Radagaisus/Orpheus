@@ -97,7 +97,6 @@ describe 'Redis Commands', ->
 				.exec (err, res) ->
 					expect(res[0]).toBe 'almog'
 					expect(res[1]).toBe '15'
-			
 					done()
 	
 	it 'List Commands', (done) ->
@@ -178,7 +177,7 @@ describe 'Redis Commands', ->
 			.name.set('greg')
 			.exec()
 
-describe 'Get Stuff', ->
+describe 'Get', ->
 	it 'Get All', (done) ->
 		class Player extends Orpheus
 			constructor: ->
@@ -238,6 +237,42 @@ describe 'Get Stuff', ->
 						expect(res.hoho).toBe 'woo'
 						expect(res.sting.zing).toBe 'bling'
 						done()
+	
+	it 'Get Specific Stuff', (done) ->
+		class Player extends Orpheus
+			constructor: ->
+				@str 'str'
+				@num 'num'
+				@set 'set1'
+				@list 'list'
+				@zset 'zset'
+				@hash 'hash'
+		
+		player = Player.create()
+		player('15').add
+			str: 'str'
+			num: 2
+			set1: 'set'
+			list: 'list'
+			zset: [1, 'zset',]
+		.hash.set('m', 'd')
+		.exec ->
+			player('15')
+				.str.get()
+				.num.get()
+				.set1.members()
+				.list.range(0, -1)
+				.zset.range(0, -1, 'withscores')
+				.err ->
+					expect(1).toBe 2
+				.exec (res) ->
+					expect(res.str).toBe 'str'
+					expect(res.num).toBe 2
+					expect(res.set1[0]).toBe 'set'
+					expect(res.list[0]).toBe 'list'
+					expect(res.zset.zset).toBe 1
+					
+					done()
 
 describe 'Setting Records', ->
 	

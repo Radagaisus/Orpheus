@@ -52,7 +52,7 @@ class Orpheus extends EventEmitter
 				
 				# Used when retrieving information from redis
 				# This schema tells us how to convert the reponse
-				@res_schema = []
+				@_res_schema = []
 				
 				@fields = [
 					'str'  # @str 'name'
@@ -283,10 +283,11 @@ class OrpheusAPI
 						
 						# Adjust the response schema, if needed
 						if f in getters
-							@res_schema.push
+							@_res_schema.push
 								position: @_commands.length - 1
 								type: type
 								name: key
+								with_scores: type is 'zset' and 'withscores' in args
 						
 						# Run validation, if needed
 						if validation_map[f] and @validations[key]
@@ -388,7 +389,7 @@ class OrpheusAPI
 	flush: ->
 		@_commands = []
 		@validation_errors.empty()
-		@res_schema = []
+		@_res_schema = []
 	
 	# deletes the model.
 	delete: (fn) ->
@@ -498,10 +499,19 @@ class OrpheusAPI
 			.exec (err, res) =>
 				
 				# Convert the response based on the schema, if needed
-				if @res_schema.length and not err
-					new_res = {}
-					for s in @res_schema
-						new_res[s.name] = res[s.position]
+				if @_res_schema.length and not err
+					if @_res_schema.length is @_commands.length
+						new_res = {}
+						for s in @_res_schema
+							if s.type is 'num'
+								new_res[s.name] = Number res[s.position]
+							else if s.type is 'zset' and s.with_scores
+								new_res[s.name] = {}
+								for member,index in res[s.position] by 2
+									new_res[s.name][member] = Number res[s.position][index+1]
+							else
+								new_res[s.name] = res[s.position]
+						res = new_res
 				
 				# Check whether we should call the error or function
 				# or the execute function, and if we call the execute
