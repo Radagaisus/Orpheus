@@ -296,7 +296,8 @@
           _this[prel][f] = function() {
             var args, fn, _k;
             args = 2 <= arguments.length ? __slice.call(arguments, 0, _k = arguments.length - 1) : (_k = 0, []), fn = arguments[_k++];
-            return _this.redis[f](["" + _this.prefix + ":" + _this.q + ":" + _this.id + ":" + prel].concat(args), fn);
+            _this.redis[f](["" + _this.prefix + ":" + _this.q + ":" + _this.id + ":" + prel].concat(args), fn);
+            return _this;
           };
           return _this[prel][f.slice(1)] = _this[prel][f];
         };
