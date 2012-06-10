@@ -380,8 +380,12 @@
             return _this;
           };
           if (f[0] === commands.shorthands[value.type]) {
-            return _this[key][f.slice(1)] = _this[key][f];
+            _this[key][f.slice(1)] = _this[key][f];
           }
+          return _this.when = function(fn) {
+            (fn.bind(_this))();
+            return _this;
+          };
         };
         for (_k = 0, _len2 = _ref3.length; _k < _len2; _k++) {
           f = _ref3[_k];

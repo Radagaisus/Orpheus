@@ -316,6 +316,12 @@ class OrpheusAPI
 					# Shorthand form, incrby instead of zincrby and hincrby is also acceptable
 					# str: h, num: h, list: l, set: s, zset: z
 					@[key][f[1..]] = @[key][f] if f[0] is commands.shorthands[value.type]
+					
+					# If and Unless are used to discard changes
+					# unless certain conditions are met
+					@when = (fn) =>
+						(fn.bind(this))()
+						return this
 		
 		
 		# create the add, set and del commands

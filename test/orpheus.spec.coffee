@@ -176,6 +176,30 @@ describe 'Redis Commands', ->
 				done()
 			.name.set('greg')
 			.exec()
+	
+	it 'When', (done) ->
+		class Player extends Orpheus
+			constructor: ->
+				@str 'name'
+		player = Player.create()
+		i = 5
+		player('sammy')
+			.name.set('hello')
+			.when(->
+				if i is 6
+					@name.set('bent')
+			).exec (err, res) ->
+				expect(err).toBe null
+				expect(res[0]).toBe 1
+				r.hget "#{PREFIX}:pl:sammy", 'name', (err, res) ->
+					expect(res).toBe 'hello'
+					
+					player('danny').when( ->
+						if i is 5
+							@name.set('boy')
+					).err().exec (res) ->
+						expect(res[0]).toBe 1
+						done()
 
 describe 'Get', ->
 	it 'Get All', (done) ->

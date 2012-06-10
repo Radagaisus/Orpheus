@@ -178,6 +178,18 @@ user('mgmt')
     # ...
 ```
 
+### Conditional Commands
+
+Sometimes you'll want to only issue specific commands based on a condition. If you don't want to break the chaining and clutter the code, use `.when(fn)`. `When` executes `fn` immediately, with the context set to the model context.
+
+```coffee
+info = get_mission_critical_information()
+player('danny').when( ->
+	if info is 'nah, never mind' then @name.set('oh YEAHH')
+).points.incrby(5) # Business as usual
+.exec()
+```
+
 ### Relations
 
 ```coffee
