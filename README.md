@@ -180,7 +180,7 @@ user('mgmt')
 
 ### Conditional Commands
 
-Sometimes you'll want to only issue specific commands based on a condition. If you don't want to break the chaining and clutter the code, use `.when(fn)`. `When` executes `fn` immediately, with the context set to the model context.
+Sometimes you'll want to only issue specific commands based on a condition. If you don't want to break the chaining and clutter the code, use `.when(fn)`. `When` executes `fn` immediately, with the context set to the model context. `Only` is an alias for `when`.
 
 ```coffee
 info = get_mission_critical_information()

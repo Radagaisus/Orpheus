@@ -382,7 +382,7 @@
           if (f[0] === commands.shorthands[value.type]) {
             _this[key][f.slice(1)] = _this[key][f];
           }
-          return _this.when = function(fn) {
+          return _this.only = _this.when = function(fn) {
             (fn.bind(_this))();
             return _this;
           };

@@ -319,7 +319,7 @@ class OrpheusAPI
 					
 					# If and Unless are used to discard changes
 					# unless certain conditions are met
-					@when = (fn) =>
+					@only = @when = (fn) =>
 						(fn.bind(this))()
 						return this
 		
