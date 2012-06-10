@@ -188,7 +188,6 @@
                   return _this.validations[key].push(function(field) {
                     var len;
                     len = tokenizer(field);
-                    log(k, field, len, v);
                     if (!validations.size[k].fn(len, v)) {
                       return validations.size[k].msg(field, len, v);
                     }
