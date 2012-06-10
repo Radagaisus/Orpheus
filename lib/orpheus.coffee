@@ -453,7 +453,6 @@ class OrpheusAPI
 			.exec (err, res) =>
 				
 				# Convert the response based on the schema, if needed
-				log err, @_res_schema.length, @_commands.length, @_res_schema
 				if @_res_schema.length and not err
 					if @_res_schema.length is @_commands.length
 						new_res = {}
@@ -470,6 +469,11 @@ class OrpheusAPI
 										new_res[s.name][member] = false
 							else
 								new_res[s.name] = res[s.position]
+							
+							# Remove Empty values: null, undefined and []
+							if not new_res[s.name] or (_.isEmpty(new_res[s.name]) and _.isObject(new_res[s.name]))
+								delete new_res[s.name]
+						
 						res = new_res
 				
 				# Check whether we should call the error or function

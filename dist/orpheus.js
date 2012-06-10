@@ -540,7 +540,6 @@
       }
       return this.redis.multi(this._commands).exec(function(err, res) {
         var index, member, new_res, s, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _step;
-        log(err, _this._res_schema.length, _this._commands.length, _this._res_schema);
         if (_this._res_schema.length && !err) {
           if (_this._res_schema.length === _this._commands.length) {
             new_res = {};
@@ -566,6 +565,9 @@
                 }
               } else {
                 new_res[s.name] = res[s.position];
+              }
+              if (!new_res[s.name] || (_.isEmpty(new_res[s.name]) && _.isObject(new_res[s.name]))) {
+                delete new_res[s.name];
               }
             }
             res = new_res;
