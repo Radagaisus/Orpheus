@@ -104,6 +104,36 @@ Options:
 
 ## Working with the API
 
+### Add, Set
+
+```coffee
+user('dune')
+  .add
+    points: 20
+    ranking: [1, 'best book ever!']
+  .set
+    name: 'sequel'
+  .exec()
+```
+
+```
+add:
+	num:  'hincrby'
+	str:  'hset'
+	set:  'sadd'
+	zset: 'zincrby'
+	list: 'lpush'
+
+set:
+	num:  'hset'
+	str:  'hset'
+	set:  'sadd'
+	zset: 'zadd'
+	list: 'lpush'
+```
+
+### Err and Exec
+
 Orpheus uses the `.err()` function for handling validation and unexpected errors. If `.err()` is not set the `.exec()` command receives errors as the first parameter.
 
 ```coffee
