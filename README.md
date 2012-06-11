@@ -323,6 +323,7 @@ player('james').set
   ],
   # ...
 }
+```
 
 ### Customizing Message
 
