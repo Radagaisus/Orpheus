@@ -3,6 +3,7 @@
 
 _ = require 'underscore'           
 async = require 'async'            
+hooks = require 'hooks'
 os = require 'os'                  # id generation
 inflector = require './inflector'  
 commands = require './commands'    # redis commands
@@ -49,6 +50,10 @@ class Orpheus extends EventEmitter
 				@rels = []
 				@rels_qualifiers = []
 				@validations = []
+				
+				# Add hooks methods: hook, pre and post
+				for k of hooks
+					@[k] = hooks[k]
 				
 				@fields = [
 					'str'  # @str 'name'
@@ -226,6 +231,11 @@ class OrpheusAPI
 		for rel in @rels
 			prel = inflector.pluralize rel
 			@[prel] = {}
+			
+			# Add hooks methods: hook, pre and post
+			for k in hooks
+				@[prel][k] = hooks[k]
+			
 			for f in commands.set
 				do (prel, f) =>
 					@[prel][f] = (args..., fn) =>
@@ -256,6 +266,10 @@ class OrpheusAPI
 		# Example: model('id').ranking.zadd (zrank, zscore...)
 		for key, value of @model
 			@[key] = {}
+			
+			# Add hooks methods: hook, pre and post
+			for k in hooks
+				@[key][k] = hooks[k]
 			
 			for f in commands[value.type]
 				type = value.type

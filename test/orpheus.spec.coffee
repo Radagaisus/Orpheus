@@ -54,6 +54,16 @@ afterEach (done) ->
 
 describe 'Redis Commands', ->
 	
+	###
+	it 'Hooks', (done) ->
+		class Player extends Orpheus
+			constructor: ->
+				@str 'name'
+		
+		player = Player.create()
+		player('nevermind').exec()
+	###
+	
 	it 'Dynamic Keys', (done) ->
 		class Player extends Orpheus
 			constructor: ->

@@ -10,7 +10,8 @@
 	},
 	"dependencies": {
 		"async": "0.1.18",
-		"underscore": "1.3.3"
+		"underscore": "1.3.3",
+		"hooks": "0.2.1"
 	},
 	"bugs": {
 		"url": "http://github.com/Radagaisus/Orpheus/issues"
