@@ -37,7 +37,7 @@
       return Orpheus.__super__.constructor.apply(this, arguments);
     }
 
-    Orpheus.version = "0.1.8";
+    Orpheus.version = "0.1.9";
 
     Orpheus.config = {
       prefix: 'orpheus'
@@ -265,6 +265,10 @@
       this.validation_errors = new OrpheusValidationErrors;
       this._res_schema = [];
       this.id = id || this._generate_id();
+      this.only = this.when = function(fn) {
+        (fn.bind(_this))();
+        return _this;
+      };
       _ref = this.rels;
       _fn = function(rel, prel) {
         var k, v, _ref1, _results;
@@ -380,12 +384,8 @@
             return _this;
           };
           if (f[0] === commands.shorthands[value.type]) {
-            _this[key][f.slice(1)] = _this[key][f];
+            return _this[key][f.slice(1)] = _this[key][f];
           }
-          return _this.only = _this.when = function(fn) {
-            (fn.bind(_this))();
-            return _this;
-          };
         };
         for (_k = 0, _len2 = _ref3.length; _k < _len2; _k++) {
           f = _ref3[_k];
@@ -544,7 +544,7 @@
         }
       }
       return this.redis.multi(this._commands).exec(function(err, res) {
-        var index, member, new_res, s, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _step;
+        var index, member, new_res, s, _i, _j, _len, _len1, _ref, _ref1, _step;
         if (_this._res_schema.length && !err) {
           if (_this._res_schema.length === _this._commands.length) {
             new_res = {};
@@ -553,20 +553,12 @@
               s = _ref[_i];
               if (s.type === 'num') {
                 new_res[s.name] = Number(res[s.position]);
-              } else if (s.type === 'zset') {
+              } else if (s.type === 'zset' && s.with_scores) {
                 new_res[s.name] = {};
-                if (s.with_scores) {
-                  _ref1 = res[s.position];
-                  for (index = _j = 0, _len1 = _ref1.length, _step = 2; _j < _len1; index = _j += _step) {
-                    member = _ref1[index];
-                    new_res[s.name][member] = Number(res[s.position][index + 1]);
-                  }
-                } else {
-                  _ref2 = res[s.position];
-                  for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
-                    member = _ref2[_k];
-                    new_res[s.name][member] = false;
-                  }
+                _ref1 = res[s.position];
+                for (index = _j = 0, _len1 = _ref1.length, _step = 2; _j < _len1; index = _j += _step) {
+                  member = _ref1[index];
+                  new_res[s.name][member] = Number(res[s.position][index + 1]);
                 }
               } else {
                 new_res[s.name] = res[s.position];
