@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Orpheus : A Small CoffeeScript Object Model for Redis" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Orpheus</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/Radagaisus/Orpheus">View on GitHub</a>
+
+          <h1 id="project_title">Orpheus</h1>
+          <h2 id="project_tagline">A Small CoffeeScript Object Model for Redis</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/Radagaisus/Orpheus/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/Radagaisus/Orpheus/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>Orpheus - Redis Little Helper</h1>
+
+<p>Orpheus is a Redis Object Model for CoffeeScript.</p>
+
+<p><code>npm install orpheus</code></p>
+
+<ul>
+<li>Rails like models</li>
+<li>Validations</li>
+<li>Private properties</li>
+<li>simple relations</li>
+<li>transactional spirit, with multi</li>
+<li>Dynamic keys</li>
+<li>Maps between strings and ids</li>
+</ul><p>A stable release will be out soon</p>
+
+<h2>In Action</h2>
+
+<div class="highlight">
+<pre>  <span class="k">class</span> <span class="nx">User</span> <span class="k">extends</span> <span class="nx">Orpheus</span>
+    <span class="nv">constructor: </span><span class="o">-&gt;</span>
+      <span class="nx">@has</span> <span class="s">'book'</span>
+
+      <span class="nx">@zset</span> <span class="s">'alltime_ranking'</span>
+      <span class="nx">@str</span> <span class="s">'about_me'</span>
+
+      <span class="c1"># one to one map between the id and the fb_id</span>
+      <span class="nx">@map</span> <span class="nx">@str</span> <span class="s">'fb_id'</span>
+
+      <span class="c1"># Private Keys</span>
+      <span class="nx">@private</span> <span class="nx">@str</span> <span class="s">'fb_secret'</span>
+
+  <span class="k">class</span> <span class="nx">Book</span> <span class="k">extends</span> <span class="nx">Orpheus</span>
+    <span class="nv">constructor: </span><span class="o">-&gt;</span>
+      <span class="nx">@has</span> <span class="s">'user'</span>
+      <span class="nx">@str</span> <span class="s">'name'</span>
+      <span class="nx">@num</span> <span class="s">'votes'</span>
+      <span class="nx">@list</span> <span class="s">'reviews'</span>
+      <span class="nx">@set</span> <span class="s">'authors'</span>
+
+      <span class="c1"># Validations</span>
+      <span class="nx">@validate</span> <span class="s">'votes'</span><span class="p">,</span> <span class="nf">(vote) -&gt;</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="nx">vote</span> <span class="o">&lt;=</span> <span class="mi">10</span>
+          <span class="kc">true</span>
+        <span class="k">else</span>
+          <span class="nv">message: </span><span class="s">"Vote isn't between 0 and 10"</span>
+
+  <span class="c1"># Instantiate them</span>
+  <span class="nv">user = </span><span class="nx">Player</span><span class="p">.</span><span class="nx">create</span><span class="p">()</span>
+  <span class="nv">book = </span><span class="nx">Book</span><span class="p">.</span><span class="nx">create</span><span class="p">()</span>
+
+  <span class="c1"># Add information in a boring way</span>
+  <span class="nx">book</span><span class="p">(</span><span class="s">'dune'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">votes</span><span class="p">.</span><span class="nx">incrby</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">reviews</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s">'it sucked'</span><span class="p">,</span> <span class="s">'it was awesome'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">authors</span><span class="p">.</span><span class="nx">smembers</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">exec</span> <span class="nf">(err, res, id) -&gt;</span>
+      <span class="c1"># ...</span>
+
+  <span class="c1"># Or in a fun way</span>
+  <span class="nx">book</span><span class="p">(</span><span class="s">'dune'</span><span class="p">).</span><span class="nx">add</span>
+    <span class="nv">votes: </span> <span class="mi">6</span>
+    <span class="nv">reviews: </span><span class="p">[</span><span class="s">'it sucked'</span><span class="p">,</span> <span class="s">'it was awesome'</span><span class="p">]</span>
+  <span class="p">.</span><span class="nx">authors</span><span class="p">.</span><span class="nx">smembers</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">exec</span> <span class="nf">(err, res, id) -&gt;</span>
+    <span class="c1"># ...</span>
+
+  <span class="c1"># Get information, without private properties</span>
+  <span class="nx">user</span><span class="p">(</span><span class="s">'olga'</span><span class="p">).</span><span class="nx">get</span> <span class="nf">(err, res, id) -&gt;</span> <span class="c1">#...</span>
+
+  <span class="c1"># Get all the information</span>
+  <span class="nx">user</span><span class="p">(</span><span class="s">'xss-exhibitionist'</span><span class="p">).</span><span class="nx">getall</span> <span class="nf">(err, res, id) -&gt;</span> <span class="c1"># ...</span>
+
+  <span class="c1"># Fun with relations</span>
+  <span class="c1"># add to the total votes for the book</span>
+  <span class="c1"># hincrby prefix:bo:catch22 votes 1</span>
+  <span class="c1"># and to olga's votes for the book</span>
+  <span class="c1"># hincrby prefix:bo:catch22:us:olga votes 1</span>
+  <span class="nx">book</span><span class="p">(</span><span class="s">'catch22'</span><span class="p">).</span><span class="nx">add</span>
+    <span class="nv">votes: </span><span class="mi">1</span>
+  <span class="p">.</span><span class="nx">user</span><span class="p">(</span><span class="s">'olga'</span><span class="p">).</span><span class="nx">add</span>
+    <span class="nv">votes: </span><span class="mi">1</span>
+  <span class="p">.</span><span class="nx">exec</span> <span class="o">-&gt;</span> <span class="c1"># ...</span>
+
+  <span class="c1"># for every relation you get a free set</span>
+  <span class="nx">book</span><span class="p">(</span><span class="s">'SICP'</span><span class="p">).</span><span class="nx">users</span><span class="p">.</span><span class="nx">smembers</span> <span class="nf">(err, users) -&gt;</span>
+    <span class="k">return</span> <span class="nx">next</span> <span class="nx">err</span><span class="p">,</span> <span class="kc">false</span> <span class="k">if</span> <span class="nx">err</span>
+
+    <span class="c1"># and a helping hand for getting details</span>
+    <span class="nx">book</span><span class="p">(</span><span class="s">'SICP'</span><span class="p">).</span><span class="nx">users</span><span class="p">.</span><span class="nx">get</span> <span class="nx">users</span><span class="p">,</span> <span class="nf">(err, users) -&gt;</span>
+      <span class="nx">next</span> <span class="nx">err</span><span class="p">,</span> <span class="nx">users</span>
+</pre>
+</div>
+
+
+<h2>Configuration</h2>
+
+<div class="highlight">
+<pre><span class="nx">Orpheus</span><span class="p">.</span><span class="nx">configure</span>
+   <span class="nv">client: </span><span class="nx">redis</span><span class="p">.</span><span class="nx">createClient</span><span class="p">()</span>
+   <span class="nv">prefix: </span><span class="s">'bookapp'</span>
+</pre>
+</div>
+
+
+<p>Options:</p>
+
+<ul>
+<li>
+<strong>client</strong>: the Redis client.</li>
+<li>
+<strong>prefix</strong>: optional prefix for keys. defaults to <code>orpheus</code>.</li>
+</ul><h2>Working with the API</h2>
+
+<h3>Add, Set</h3>
+
+<div class="highlight">
+<pre><span class="nx">user</span><span class="p">(</span><span class="s">'dune'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">add</span>
+    <span class="nv">points: </span><span class="mi">20</span>
+    <span class="nv">ranking: </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s">'best book ever!'</span><span class="p">]</span>
+  <span class="p">.</span><span class="nx">set</span>
+    <span class="nv">name: </span><span class="s">'sequel'</span>
+  <span class="p">.</span><span class="nx">exec</span><span class="p">()</span>
+</pre>
+</div>
+
+
+<pre><code>add:
+    num:  'hincrby'
+    str:  'hset'
+    set:  'sadd'
+    zset: 'zincrby'
+    list: 'lpush'
+
+set:
+    num:  'hset'
+    str:  'hset'
+    set:  'sadd'
+    zset: 'zadd'
+    list: 'lpush'
+</code></pre>
+
+<h3>Err and Exec</h3>
+
+<p>Orpheus uses the <code>.err()</code> function for handling validation and unexpected errors. If <code>.err()</code> is not set the <code>.exec()</code> command receives errors as the first parameter.</p>
+
+<div class="highlight">
+<pre><span class="nx">user</span><span class="p">(</span><span class="s">'sonic youth'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">add</span>
+    <span class="nv">name: </span><span class="s">'modest mouse'</span>
+    <span class="nv">points: </span><span class="mi">50</span>
+  <span class="p">.</span><span class="nx">err</span> <span class="nf">(err) -&gt;</span>
+    <span class="k">if</span> <span class="nx">err</span><span class="p">.</span><span class="nx">type</span> <span class="o">is</span> <span class="s">'validation'</span>
+      <span class="c1"># phew, it's just a validation error</span>
+      <span class="nx">res</span><span class="p">.</span><span class="nx">json</span> <span class="nx">err</span><span class="p">.</span><span class="nx">toResponse</span><span class="p">()</span>
+    <span class="k">else</span>
+      <span class="c1"># Redis Error, or a horrendous</span>
+      <span class="c1"># bug in Orpheus</span>
+      <span class="nx">log</span> <span class="s">"Wake the sysadmins! </span><span class="si">#{</span><span class="nx">err</span><span class="si">}</span><span class="s">"</span>
+      <span class="nx">res</span><span class="p">.</span><span class="nx">json</span> <span class="nv">status: </span><span class="mi">500</span>
+  <span class="p">.</span><span class="nx">exec</span> <span class="nf">(res, id) -&gt;</span>
+    <span class="c1"># fun!</span>
+</pre>
+</div>
+
+
+<p><strong>Without Err</strong>:</p>
+
+<div class="highlight">
+<pre><span class="nx">user</span><span class="p">(</span><span class="s">'putin'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">add</span>
+    <span class="nv">name: </span><span class="s">'putout'</span>
+  <span class="p">.</span><span class="nx">exec</span> <span class="nf">(err, res, id) -&gt;</span>
+    <span class="c1"># err is the first parameter</span>
+    <span class="c1"># everything else as usual</span>
+</pre>
+</div>
+
+
+<h3>Separate Callbacks</h3>
+
+<p>Just like with the <code>multi</code> command you can supply a separate callback for specific commands.</p>
+
+<div class="highlight">
+<pre><span class="nx">user</span><span class="p">(</span><span class="s">'mgmt'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">pokemons</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s">'pikachu'</span><span class="p">,</span> <span class="s">'charizard'</span><span class="p">,</span> <span class="nx">redis</span><span class="p">.</span><span class="nx">print</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">err</span>
+    <span class="o">-&gt;</span> <span class="c1"># ...</span>
+  <span class="p">.</span><span class="nx">exec</span> <span class="o">-&gt;</span>
+    <span class="c1"># ...</span>
+</pre>
+</div>
+
+
+<h3>Conditional Commands</h3>
+
+<p>Sometimes you'll want to only issue specific commands based on a condition. If you don't want to break the chaining and clutter the code, use <code>.when(fn)</code>. <code>When</code> executes <code>fn</code> immediately, with the context set to the model context. <code>Only</code> is an alias for <code>when</code>.</p>
+
+<div class="highlight">
+<pre><span class="nv">info = </span><span class="nx">get_mission_critical_information</span><span class="p">()</span>
+<span class="nx">player</span><span class="p">(</span><span class="s">'danny'</span><span class="p">).</span><span class="k">when</span><span class="p">(</span> <span class="o">-&gt;</span>
+    <span class="k">if</span> <span class="nx">info</span> <span class="o">is</span> <span class="s">'nah, never mind'</span> <span class="k">then</span> <span class="nx">@name</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s">'oh YEAHH'</span><span class="p">)</span>
+<span class="p">).</span><span class="nx">points</span><span class="p">.</span><span class="nx">incrby</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="c1"># Business as usual</span>
+<span class="p">.</span><span class="nx">exec</span><span class="p">()</span>
+</pre>
+</div>
+
+
+<h3>Relations</h3>
+
+<div class="highlight">
+<pre><span class="k">class</span> <span class="nx">User</span> <span class="k">extends</span> <span class="nx">Orpheus</span>
+  <span class="nv">constructor: </span><span class="o">-&gt;</span>
+    <span class="nx">@has</span> <span class="s">'book'</span>
+
+<span class="k">class</span> <span class="nx">Book</span> <span class="k">extends</span> <span class="nx">Orpheus</span>
+  <span class="nv">constructor: </span><span class="o">-&gt;</span>
+    <span class="nx">@has</span> <span class="s">'user'</span>
+
+<span class="nv">user = </span><span class="nx">User</span><span class="p">.</span><span class="nx">create</span><span class="p">()</span>
+<span class="nv">book = </span><span class="nx">Book</span><span class="p">.</span><span class="nx">create</span><span class="p">()</span>
+
+<span class="c1"># Every relation means a set for that relation</span>
+<span class="nx">user</span><span class="p">(</span><span class="s">'chaplin'</span><span class="p">).</span><span class="nx">books</span><span class="p">.</span><span class="nx">smembers</span> <span class="nf">(err, book_ids) -&gt;</span>
+
+  <span class="c1"># With async functions for fun and profit</span>
+  <span class="nx">user</span><span class="p">(</span><span class="s">'chaplin'</span><span class="p">).</span><span class="nx">books</span><span class="p">.</span><span class="nx">map</span> <span class="nx">book_ids</span><span class="p">,</span> <span class="nf">(id, cb, i) -&gt;</span>
+      <span class="nx">book</span><span class="p">(</span><span class="nx">id</span><span class="p">).</span><span class="nx">get</span> <span class="nx">cb</span>
+    <span class="nf">(err, books) -&gt;</span>
+      <span class="c1"># What? Did we just retrieved all the books from Redis?</span>
+</pre>
+</div>
+
+
+<h2>Dynamic Keys</h2>
+
+<pre><code>class User extends Orpheus
+  constructor: -&gt;
+    @zset 'monthly_ranking'
+      key: -&gt;
+        d = new Date()
+        # prefix:user:id:ranking:2012:5
+        "ranking:#{d.getFullYear()}:#{d.getMonth()+1}"
+
+user = User.create()
+user('jackson')
+  .monthly_ranking.incrby(1, 'Midnight Oil - The Dead Heart')
+  .err -&gt;
+    res.json status: 400
+  .exec -&gt;
+    res.json status: 200
+</code></pre>
+
+<h2>One to One Maps</h2>
+
+<p>Maps are used to map between a unique attribute of the model and the model ID.</p>
+
+<p>Internally maps use a hash <code>prefix:users:map:fb_ids</code>.</p>
+
+<p>This example uses the excellent <a href="passportjs.org">PassportJS</a>.</p>
+
+<div class="highlight">
+<pre><span class="nv">fb_connect = </span><span class="nf">(req, res, next) -&gt;</span>
+  <span class="nv">fb = </span><span class="nx">req</span><span class="p">.</span><span class="nx">account</span>
+  <span class="nv">fb_details =</span>
+    <span class="nv">fb_id: </span>   <span class="nx">fb</span><span class="p">.</span><span class="nx">id</span>
+    <span class="nv">fb_name: </span> <span class="nx">fb</span><span class="p">.</span><span class="nx">displayName</span>
+    <span class="nv">fb_token: </span><span class="nx">fb</span><span class="p">.</span><span class="nx">token</span>
+    <span class="nv">fb_gener: </span><span class="nx">fb</span><span class="p">.</span><span class="nx">gender</span>
+    <span class="nv">fb_url: </span>  <span class="nx">fb</span><span class="p">.</span><span class="nx">profileUrl</span>
+
+  <span class="nv">id = </span><span class="k">if</span> <span class="nx">req</span><span class="p">.</span><span class="nx">user</span> <span class="k">then</span> <span class="nx">req</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">id</span> <span class="k">else</span> <span class="nv">fb_id: </span><span class="nx">fb</span><span class="p">.</span><span class="nx">id</span>
+  <span class="nx">player</span> <span class="nx">id</span><span class="p">,</span> <span class="nf">(err, player, is_new) -&gt;</span>
+    <span class="nx">next</span> <span class="nx">err</span> <span class="k">if</span> <span class="nx">err</span>
+    <span class="c1"># That's it, we just handled autorization,</span>
+    <span class="c1"># new users and authentication in one go</span>
+    <span class="nx">player</span>
+      <span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">fb_details</span><span class="p">)</span>
+      <span class="p">.</span><span class="nx">exec</span> <span class="nf">(err, res, user_id) -&gt;</span>
+        <span class="nv">req.session.passport.user = </span><span class="nx">user_id</span> <span class="k">if</span> <span class="nx">user_id</span>
+        <span class="nx">next</span> <span class="nx">err</span>
+</pre>
+</div>
+
+
+<h4>What Just Happened?</h4>
+
+<p>There are two scenarios:</p>
+
+<ol>
+<li><p><strong>Authentication</strong>: <code>req.user</code> is undefined, so the user is not logged in. We create an object <code>{fb_id: fb.id}</code> to use in the map. Orpheus requests <code>hget prefix:users:map:fb_ids fb_id</code>. If a match is found we continue as usual. Otherwise a new user is created. In both cases, the user's Facebook information is updated.</p></li>
+<li><p><strong>Authorization</strong>: <code>req.user</code> is defined. The anonymous function is called right away and the user's Facebook information is updated.</p></li>
+</ol><h2>Validations</h2>
+
+<p>Validations are based on the input, not on the object itself. For example, <code>hincrby 5</code> will validate the number 5 itself, not the accumulated value in the object.</p>
+
+<p>Validations run synchronously.</p>
+
+<div class="highlight">
+<pre><span class="k">class</span> <span class="nx">User</span> <span class="k">extends</span> <span class="nx">Orpheus</span>
+  <span class="nv">constructor: </span><span class="o">-&gt;</span>
+    <span class="nx">@str</span> <span class="s">'name'</span>
+    <span class="nx">@validate</span> <span class="s">'name'</span><span class="p">,</span> <span class="nf">(s) -&gt;</span> <span class="k">if</span> <span class="nx">s</span> <span class="o">is</span> <span class="s">'something'</span> <span class="k">then</span> <span class="kc">true</span> <span class="k">else</span> <span class="s">'name should be "something".'</span>
+
+<span class="nv">player = </span><span class="nx">Player</span><span class="p">.</span><span class="nx">create</span><span class="p">()</span>
+<span class="nx">player</span><span class="p">(</span><span class="s">'james'</span><span class="p">).</span><span class="nx">set</span>
+  <span class="nv">name: </span><span class="s">'james!!!'</span>
+<span class="p">.</span><span class="nx">err</span> <span class="nf">(err) -&gt;</span>
+  <span class="k">if</span> <span class="nx">err</span><span class="p">.</span><span class="nx">type</span> <span class="o">is</span> <span class="s">'validation'</span>
+    <span class="nx">log</span> <span class="nx">err</span> <span class="c1"># &lt;OrpheusValidationErrors&gt;</span>
+  <span class="k">else</span>
+    <span class="c1"># something is wrong with redis</span>
+<span class="p">.</span><span class="nx">exec</span> <span class="nf">(res) -&gt;</span>
+  <span class="c1"># Never ever land</span>
+</pre>
+</div>
+
+
+<p><strong>OrpheusValidationErrors</strong> has a few convenience functions:</p>
+
+<ul>
+<li>
+<strong>add</strong>: adds an error</li>
+<li>
+<strong>empty</strong>: clears the errors</li>
+<li>
+<strong>toResponse</strong>: returns a JSON:</li>
+</ul><div class="highlight">
+<pre><span class="p">{</span>
+  <span class="nv">status: </span><span class="mi">400</span><span class="p">,</span> <span class="c1"># Bad Request</span>
+  <span class="nv">errors:</span>
+    <span class="nv">name: </span><span class="p">[</span><span class="s">'name should be "something".'</span><span class="p">]</span>
+<span class="p">}</span>
+</pre>
+</div>
+
+
+<p><code>errors</code> contains the actual error objects:</p>
+
+<div class="highlight">
+<pre><span class="p">{</span>
+  <span class="nv">name: </span><span class="p">[</span>
+    <span class="nv">msg: </span><span class="s">'name should be "something".'</span><span class="p">,</span>
+    <span class="nv">command: </span><span class="s">'hset'</span><span class="p">,</span>
+    <span class="nv">args: </span><span class="p">[</span><span class="s">'james!!!'</span><span class="p">],</span>
+    <span class="nv">value: </span><span class="s">'james!!!'</span><span class="p">,</span>
+    <span class="nv">date: </span><span class="mi">1338936463054</span> <span class="c1"># new Date().getTime()</span>
+  <span class="p">],</span>
+  <span class="c1"># ...</span>
+<span class="p">}</span>
+</pre>
+</div>
+
+
+<h3>Customizing Message</h3>
+
+<div class="highlight">
+<pre><span class="nx">@validate</span> <span class="s">'legacy_code'</span><span class="p">,</span>
+    <span class="nv">format: </span><span class="sr">/^[a-zA-Z]+$/</span>
+    <span class="nv">message: </span><span class="nf">(val) -&gt;</span> <span class="s">"</span><span class="si">#{</span><span class="nx">val</span><span class="si">}</span><span class="s"> must be only A-Za-z"</span>
+</pre>
+</div>
+
+
+<p>Will do the trick. Number validations do not support customized messages yet.</p>
+
+<h3>Custom Validations</h3>
+
+<div class="highlight">
+<pre><span class="k">class</span> <span class="nx">Player</span> <span class="k">extends</span> <span class="nx">Orpheus</span>
+    <span class="nv">constructor: </span><span class="o">-&gt;</span>
+        <span class="nx">@str</span> <span class="s">'name'</span>
+        <span class="nx">@validate</span> <span class="s">'name'</span><span class="p">,</span> <span class="nf">(s) -&gt;</span> <span class="k">if</span> <span class="nx">s</span> <span class="o">is</span> <span class="s">'babomb'</span> <span class="k">then</span> <span class="kc">true</span> <span class="k">else</span> <span class="s">'String should be babomb.'</span>
+</pre>
+</div>
+
+
+<h3>Number Validations</h3>
+
+<div class="highlight">
+<pre><span class="nx">@num</span> <span class="s">'points'</span>
+
+<span class="nx">@validate</span> <span class="s">'points'</span><span class="p">,</span>
+    <span class="nv">numericality:</span>
+        <span class="nv">only_integer: </span><span class="kc">true</span>
+        <span class="nv">greater_than: </span><span class="mi">3</span>
+        <span class="nv">greater_than_or_equal_to: </span><span class="mi">3</span>
+        <span class="nv">equal_to: </span><span class="mi">3</span>
+        <span class="nv">less_than_or_equal_to: </span><span class="mi">3</span>
+        <span class="nv">odd: </span><span class="kc">true</span>
+</pre>
+</div>
+
+
+<p>Options:</p>
+
+<ul>
+<li>
+<strong>only_integer</strong>: <code>"#{n} must be an integer."</code>
+</li>
+<li>
+<strong>greater_than</strong>: <code>"#{a} must be greater than #{b}."</code>
+</li>
+<li>
+<strong>greater_than_or_equal_to</strong>: <code>"#{a} must be greater than or equal to #{b}."</code>
+</li>
+<li>
+<strong>equal_to</strong>: <code>"#{a} must be equal to #{b}."</code>
+</li>
+<li>
+<strong>less_than</strong>: <code>"#{a} must be less than #{b}."</code>
+</li>
+<li>
+<strong>less_than_or_equal_to</strong>: <code>"#{a} must be less than or equal to #{b}."</code>
+</li>
+<li>
+<strong>odd</strong>: <code>"#{a} must be odd."</code>
+</li>
+<li>
+<strong>even</strong>: <code>"#{a} must be even."</code>
+</li>
+</ul><h3>Exclusion and Inclusion Validations</h3>
+
+<div class="highlight">
+<pre><span class="nx">@str</span> <span class="s">'subdomain'</span>
+<span class="nx">@str</span> <span class="s">'size'</span>
+<span class="nx">@validate</span> <span class="s">'subdomain'</span><span class="p">,</span>
+    <span class="nv">exclusion: </span><span class="p">[</span><span class="s">'www'</span><span class="p">,</span> <span class="s">'us'</span><span class="p">,</span> <span class="s">'ca'</span><span class="p">,</span> <span class="s">'jp'</span><span class="p">]</span>
+<span class="nx">@validate</span> <span class="s">'size'</span><span class="p">,</span>
+    <span class="nv">inclusion: </span><span class="p">[</span><span class="s">'small'</span><span class="p">,</span> <span class="s">'medium'</span><span class="p">,</span> <span class="s">'large'</span><span class="p">]</span>
+</pre>
+</div>
+
+
+<h3>Size</h3>
+
+<div class="highlight">
+<pre><span class="nx">@str</span> <span class="s">'content'</span>
+<span class="nx">@validate</span> <span class="s">'content'</span>
+    <span class="nv">size:</span>
+        <span class="nv">tokenizer: </span><span class="nf">(s) -&gt;</span> <span class="nx">s</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/\w+/g</span><span class="p">).</span><span class="nx">length</span>
+        <span class="o">is:</span> <span class="mi">5</span>
+        <span class="nv">minimum: </span><span class="mi">5</span>
+        <span class="nv">maximum: </span><span class="mi">5</span>
+        <span class="k">in</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">]</span>
+</pre>
+</div>
+
+
+<p>Options:</p>
+
+<ul>
+<li>
+<strong>minimum</strong>: <code>"'#{field}' length is #{len}. Must be bigger than #{min}.</code>
+</li>
+<li>
+<strong>maximum</strong>: <code>"'#{field}' length is #{len}. Must be smaller than #{max}."</code>
+</li>
+<li>
+<strong>in</strong>: <code>"'#{field}' length is #{len}. Must be between #{range[0]} and #{range[1]}."</code>
+</li>
+<li>
+<strong>is</strong>: <code>"'#{field}' length is #{len1}. Must be #{len2}."</code>
+</li>
+<li>
+<strong>tokenizer</strong>: useful for splitting the field in different ways. The default is <code>field.length</code>.</li>
+</ul><h2>Regex Validations</h2>
+
+<div class="highlight">
+<pre><span class="k">class</span> <span class="nx">Player</span> <span class="k">extends</span> <span class="nx">Orpheus</span>
+    <span class="nv">constructor: </span><span class="o">-&gt;</span>
+        <span class="nx">@str</span> <span class="s">'legacy_code'</span>
+        <span class="nx">@validate</span> <span class="s">'legacy_code'</span><span class="p">,</span> <span class="nv">format: </span><span class="sr">/^[a-zA-Z]+$/</span>
+</pre>
+</div>
+
+
+<h2>Development</h2>
+
+<h3>Test</h3>
+
+<p><code>cake test</code></p>
+
+<h3>Contribute</h3>
+
+<ul>
+<li><code>cake dev</code></li>
+<li>Add your tests.</li>
+<li>Do your thing.</li>
+<li><code>cake dev</code></li>
+</ul><h2>Roadmap</h2>
+
+<ul>
+<li>Validations</li>
+<li>Promises </li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Orpheus maintained by <a href="https://github.com/Radagaisus">Radagaisus</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
