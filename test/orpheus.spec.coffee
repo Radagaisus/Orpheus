@@ -22,7 +22,7 @@ clean_db = (fn) ->
 	r.keys "#{PREFIX}*", (err, keys) ->
 		if err
 			log "problem cleaning test db"
-			process.exit
+			process.exit 1
 		
 		for k,i in keys
 			r.del keys[i]
