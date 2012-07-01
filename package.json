@@ -6,7 +6,9 @@
 	"author": "Almog Melamed <radagaisus@gmail.com",
 	"main": "./index",
 	"devDependencies": {
-		"jasmine-node": "latest"
+		"jasmine-node": "latest",
+		"metrics": "0.1.6",
+		"redis": "latest"
 	},
 	"dependencies": {
 		"async": "0.1.18",
