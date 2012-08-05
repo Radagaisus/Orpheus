@@ -63,23 +63,25 @@ class Orpheus extends EventEmitter
 				]
 				
 				# Create a simple schema for all fields
-				for f in @fields
-					do (f) =>
-						@[f] = (field, options = {}) ->
-							throw new Error("Field name already taken") if @model[field]
-							
-							@model[field] =
-								type: f
-								options: options
-							
-							return field
+				@create_field f for f in @fields
 				
 				# Create the model
 				super()
 			
+			create_field: (f) ->
+				@[f] = (field, options = {}) ->
+					throw new Error("Field name already taken") if @model[field]
+					
+					@model[field] =
+						type: f
+						options: options
+					
+					return field
+
 			# Add mapping
 			map: (field) ->
-				throw new Error("Map only works on strings") if @model[field].type isnt 'str'
+				if @model[field].type isnt 'str'
+					throw new Error("Map only works on strings")
 				@model[field].options.map = true
 			
 			# Add relations
@@ -354,7 +356,8 @@ class OrpheusAPI
 		pid = process.pid
 		host = 0; (host += s.charCodeAt(0) for s in os.hostname())
 		counter = Orpheus.unique_id()
-		"#{host}#{pid}#{time}#{counter}"
+		random = Math.round(Math.random() * 1000)
+		"#{host}#{pid}#{time}#{counter}#{random}"
 	
 	
 	_get_key: (key) ->
