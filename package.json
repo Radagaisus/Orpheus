@@ -31,6 +31,6 @@
 	"keywords": ["redis", "coffee script", "orm", "database"],
 	"engines": { "node": "node >= 0.6.0" },
 	"scripts": {
-	  "test": "jasmine-node test/orpheus.spec.coffee --verbose --color --forceexit --coffee"
+	  "test": "cake test"
 	}
 }

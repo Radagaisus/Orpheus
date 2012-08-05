@@ -1,17 +1,19 @@
 # Orpheus - a small DSL for redis
 #-------------------------------------#
 
-_ = require 'underscore'           
-async = require 'async'            
-hooks = require 'hooks'
-os = require 'os'                  # id generation
-inflector = require './inflector'  
-commands = require './commands'    # redis commands
+_            = require 'underscore'           
+async        = require 'async'            
+hooks        = require 'hooks'
+os           = require 'os'                    # ID Generation
 EventEmitter = require('events').EventEmitter
+
+inflector    = require './inflector'   # Inflection
+commands     = require './commands'    # redis commands
+validations  = require './validations' # Validations
+
 command_map = commands.command_map
 validation_map = commands.validations
 getters = commands.getters
-validations = require './validations'
 log = console.log
 
 # Orpheus
@@ -360,12 +362,10 @@ class OrpheusAPI
 	# Generate a unique ID for model, similiar to MongoDB
 	# http://www.mongodb.org/display/DOCS/Object+IDs
 	_generate_id: ->
-		time = "#{new Date().getTime()}" # we convert to a str to
-		                                 # avoid 4.3e+79 as id
+		time = "#{new Date().getTime()}"
 		pid = process.pid
 		host = 0; (host += s.charCodeAt(0) for s in os.hostname())
 		counter = Orpheus.unique_id()
-		
 		"#{host}#{pid}#{time}#{counter}"
 	
 	
@@ -536,7 +536,7 @@ class OrpheusValidationErrors
 		@errors = {}
 	
 	toResponse: ->
-		# 400 is Bad Request
+		# 400 - Bad Request
 		# See http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1
 		obj = {status: 400, errors: {}}
 		

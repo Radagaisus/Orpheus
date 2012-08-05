@@ -26,7 +26,7 @@
 
 @size =
 	minimum:
-		fn: (len, min) -> console.log('heyy!!', len, min); len >= min
+		fn: (len, min) -> len >= min
 		msg: (field, len, min) -> "'#{field}' length is #{len}. Must be bigger than #{min}."
 	maximum:
 		fn: (len, max) -> len <= max

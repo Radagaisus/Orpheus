@@ -158,10 +158,14 @@ module.exports =
 		zset: 'z'
 		hash: 'h'
 	
+	# This maps commands for the add(),
+	# set() and delete() functions.
+	# Adding in a set results in sadd,
+	# deleting a num is hdel, etc.
 	command_map:
 		add:
 			num: 'hincrby'
-			str: 'hset'    # we don't optimize with hmset
+			str: 'hset'      # we don't 'optimize' with hmset
 			set: 'sadd'
 			zset: 'zincrby'
 			list: 'lpush'
