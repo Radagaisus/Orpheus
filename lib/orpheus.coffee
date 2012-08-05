@@ -3,7 +3,6 @@
 
 _            = require 'underscore'           
 async        = require 'async'            
-hooks        = require 'hooks'
 os           = require 'os'                    # ID Generation
 EventEmitter = require('events').EventEmitter
 
@@ -11,9 +10,10 @@ inflector    = require './inflector'   # Inflection
 commands     = require './commands'    # redis commands
 validations  = require './validations' # Validations
 
-command_map = commands.command_map
+command_map    = commands.command_map
 validation_map = commands.validations
-getters = commands.getters
+getters        = commands.getters
+
 log = console.log
 
 # Orpheus
@@ -24,7 +24,7 @@ class Orpheus extends EventEmitter
 	# Configuration
 	@config:
 		prefix: 'orpheus' # redis prefix, orpheus:obj:id:prop
-		# client -       the redis client we should use
+		# client -        # redis client
 	
 	@configure: (o) ->
 		@config = _.extend @config, o
@@ -52,10 +52,6 @@ class Orpheus extends EventEmitter
 				@rels = []
 				@rels_qualifiers = []
 				@validations = []
-				
-				# Add hooks methods: hook, pre and post
-				for k of hooks
-					@[k] = hooks[k]
 				
 				@fields = [
 					'str'  # @str 'name'
@@ -234,10 +230,6 @@ class OrpheusAPI
 			prel = inflector.pluralize rel
 			@[prel] = {}
 			
-			# Add hooks methods: hook, pre and post
-			for k in hooks
-				@[prel][k] = hooks[k]
-			
 			for f in commands.set
 				do (prel, f) =>
 					@[prel][f] = (args..., fn) =>
@@ -268,10 +260,6 @@ class OrpheusAPI
 		# Example: model('id').ranking.zadd (zrank, zscore...)
 		for key, value of @model
 			@[key] = {}
-			
-			# Add hooks methods: hook, pre and post
-			for k in hooks
-				@[key][k] = hooks[k]
 			
 			for f in commands[value.type]
 				type = value.type
