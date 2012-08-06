@@ -93,7 +93,7 @@ class Orpheus extends EventEmitter
 				# create a relation function,
 				# e.g. user(12).book(15)
 				@[rel] = (id) ->
-					@["#{qualifier}_id"] = id
+					@["#{qualifier}_id"] = @["#{rel}_id"]= id
 					return @
 			
 			# Add a validation function to a field
