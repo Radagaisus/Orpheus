@@ -3,6 +3,8 @@ Orpheus is a Redis Object Model for CoffeeScript.
 
 `npm install orpheus`
 
+**Important**: Right now Orpheus is my kingdom to bend wherever I please for my product. If you are using Orpheus, please ping me on [Twitter](http://twitter.com/#!/radagaisus) or on [EngineZombie](http://enginezombie.com/), so I would not come crashing down and break everything up for you. The next release will be the last release without a Changelog.
+
 - Rails like models
 - Validations
 - Private properties
