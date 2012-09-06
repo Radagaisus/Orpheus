@@ -20,6 +20,7 @@ Orpheus is a Redis Object Model for CoffeeScript.
       
       @str 'about_me'
       @num 'points'
+      @set 'likes'
       @zset 'ranking'
       
       @map @str 'fb_id'
