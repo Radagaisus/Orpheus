@@ -52,6 +52,27 @@ afterEach (done) ->
 		clean_db done
 
 
+describe 'Error Handling', ->
+	it 'Throws Error on Undefined Model Attributes', (done) ->
+		class User extends Orpheus
+			constructor: ->
+				@str 'hi'
+		
+		try
+			User.create()('id').add
+					hi: 'hello'
+					hello: 'nope'
+			.exec()
+		catch e
+			return done()
+
+
+		# Fails if it gets here,
+		# Jasmine .toThrow() is shit.
+		expect('To Catch an Error').toBe true
+		done()
+
+
 describe 'Redis Commands', ->
 	
 	it 'Dynamic Keys', (done) ->

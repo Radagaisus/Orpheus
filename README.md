@@ -361,6 +361,10 @@ class Player extends Orpheus
 		@validate 'legacy_code', format: /^[a-zA-Z]+$/
 ```
 
+## Error Handling ##
+
+- **Undefined Attributes**: Using `set`, `add` and `del` on undefined attributes will throw an error `"Orpheus :: No Such Model Attribute: #{k}"`. Trying to `no_such_attribute.incrby(1)` will result in `TypeError: Object #<Object> has no method 'incrby'`. The call stack will directly tell you where the misbehaving attributes sits.
+
 ## Development ##
 ### Test ###
 `cake test`

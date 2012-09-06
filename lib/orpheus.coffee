@@ -339,6 +339,11 @@ class OrpheusAPI
 			do (f) =>
 				@[f] = (o) ->
 					for k, v of o
+
+						# Throw error on undefined attributes
+						if typeof @model[k] is 'undefined'
+							throw new Error "Orpheus :: No Such Model Attribute: #{k}"
+
 						# Add the Command. Note we won't actually
 						# execute any of this commands if the
 						# validation has failed.
@@ -347,7 +352,6 @@ class OrpheusAPI
 						@[k][command](v) # e.g. @name.hset 'abe'
 					
 					return this
-	
 	
 	# Generate a unique ID for model, similiar to MongoDB
 	# http://www.mongodb.org/display/DOCS/Object+IDs
