@@ -71,7 +71,6 @@
   this.size = {
     minimum: {
       fn: function(len, min) {
-        console.log('heyy!!', len, min);
         return len >= min;
       },
       msg: function(field, len, min) {
