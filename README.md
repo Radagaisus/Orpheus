@@ -285,7 +285,7 @@ Using arguments in dyanmic keys is easy:
 
 # later on, in a far away place...
 user('bean')
-  .monthly_ranking.incrby(1, 'Stoned Jesus - I'm The Mountain', key: [2012, 12])
+  .monthly_ranking.incrby(1, 'Stoned Jesus - Im The Mountain', key: [2012, 12])
 ```
 
 Everything inside `key` will be passed to the dynamic key function.
