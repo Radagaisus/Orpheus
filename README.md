@@ -260,7 +260,7 @@ user('chaplin').books.smembers (err, book_ids) ->
 
 ## Dynamic Keys
 
-```
+```coffee
 class User extends Orpheus
   constructor: ->
     @zset 'monthly_ranking'
