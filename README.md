@@ -138,7 +138,7 @@ switch type
 Specific queries for getting stuff will also convert the response to an object, provided all the commands issued are for getting stuff (no incrby or lpush somewhere in the query).
 
 ```coffee
-get_player: (fn) ->
+get_user: (fn) ->
       @name.get()
       @fb_id.get()
       @fb_friends.get()
