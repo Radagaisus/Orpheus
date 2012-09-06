@@ -233,7 +233,7 @@ class OrpheusAPI
 
 			for f in commands.set
 				do (prel, f) =>
-					
+
 					@[prel][f] = (args..., fn) =>
 						@redis[f](["#{@prefix}:#{@q}:#{@id}:#{prel}"].concat(args), fn)
 						return this
@@ -313,7 +313,6 @@ class OrpheusAPI
 			# If the command is a get command
 			if f in getters
 				@_res_schema.push
-					position: @_commands.length - 1
 					type: type
 					name: key
 					with_scores: type is 'zset' and 'withscores' in args
@@ -463,21 +462,21 @@ class OrpheusAPI
 	_create_getter_object: (res) ->
 		new_res = {}
 
-		for s in @_res_schema
+		for s,i in @_res_schema
 			# Convert numbers from their string representation
 			if s.type is 'num'
-				new_res[s.name] = Number res[s.position]
+				new_res[s.name] = Number res[i]
 
 			# Convert zsets with scores to a key->value hash
 			else if s.type is 'zset' and s.with_scores
 				new_res[s.name] = {}
 
-				for member,index in res[s.position] by 2
-					new_res[s.name][member] = Number res[s.position][index+1]
+				for member,index in res[i] by 2
+					new_res[s.name][member] = Number res[i][index+1]
 
 			# Add everything else as attributes
 			else
-				new_res[s.name] = res[s.position]
+				new_res[s.name] = res[i]
 			
 			# Remove Empty values: null, undefined and []
 			if not new_res[s.name] or (_.isEmpty(new_res[s.name]) and _.isObject(new_res[s.name]))
