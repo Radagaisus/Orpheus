@@ -211,6 +211,18 @@ user('putin')
     # everything else as usual
 ```
 
+### Getting the Model ID
+Only when new models are created `exec()` receives the model ID as the last argument.
+
+```coffee
+user()
+  .name.set('zappa')
+  .exec (err, res, user_id) ->
+    user(user_id)
+      .name.set('turing')
+      .exec()
+```
+
 ### Separate Callbacks
 
 Just like with the `multi` command you can supply a separate callback for specific commands.

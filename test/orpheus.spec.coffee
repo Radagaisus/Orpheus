@@ -110,7 +110,7 @@ describe 'Redis Commands', ->
 					user('hiho')
 						.name.set('shalom', key: ['what', 'is'])
 						.exec ->
-							
+
 							r.hget "#{PREFIX}:us:hiho", "what:is", (err, res) ->
 								expect(res).toBe 'shalom'
 								done()
@@ -332,9 +332,8 @@ describe 'Setting Records', ->
 			favourite_color: 'stingy'
 		.exec (err, res, id) ->
 			expect(err).toBe null
-			expect(id).not.toBe null
 
-			r.hgetall "#{PREFIX}:pl:#{id}", (err, res) ->
+			r.hgetall "#{PREFIX}:pl:15", (err, res) ->
 				expect(err).toBe null
 				expect(res.name).toBe 'benga'
 				expect(res.wassum).toBe 'finger'
@@ -416,9 +415,8 @@ describe 'Setting Records', ->
 		player = Player.create()
 		player(15).set
 			badges: 'badge'
-		.exec (err, res, id) ->
+		.exec (err, res) ->
 			expect(err).toBe null
-			expect(id).toBe 15
 
 			r.smembers "#{PREFIX}:pl:15:badges", (err, res) ->
 				expect(res[0]).toBe 'badge'
@@ -431,9 +429,8 @@ describe 'Setting Records', ->
 		player = Player.create()
 		player(15).set
 			badges: ['badge1', 'badge2', 'badge3', 'badge3']
-		.exec (err, res, id) ->
+		.exec (err, res) ->
 			expect(err).toBe null
-			expect(id).toBe 15
 
 			r.smembers "#{PREFIX}:pl:15:badges", (err, res) ->
 				expect(res).not.toBe null
@@ -515,14 +512,14 @@ describe 'Adding to Records', ->
 		.exec (err, res, id) ->
 			expect(err).toBe null
 			expect(id).not.toBe null
-
+			
 			r.hgetall "#{PREFIX}:pl:#{id}", (err, res) ->
 				expect(err).toBe null
 				expect(res.bingo).toBe '5'
 				expect(res.mexico).toBe '7'
 				expect(res.points).toBe '15'
 				expect(res.nicaragua).toBe '234345'
-
+				_id = id
 				player(id).add
 					bingo: 45
 					mexico: 63
@@ -530,16 +527,16 @@ describe 'Adding to Records', ->
 					nicaragua: 1
 				.exec (err, res, id) ->
 					expect(err).toBe null
-					expect(id).not.toBe null
+					expect(id).toBeUndefined()
 
-					r.hgetall "#{PREFIX}:pl:#{id}", (err, res) ->
+					r.hgetall "#{PREFIX}:pl:#{_id}", (err, res) ->
 						expect(err).toBe null
 						expect(res.bingo).toBe '50'
 						expect(res.mexico).toBe '70'
 						expect(res.points).toBe '25'
 						expect(res.nicaragua).toBe '234346'
 
-				done()
+						done()
 
 	it 'Should add lists in a record (with an array)', (done) ->
 		class Player extends Orpheus
@@ -594,9 +591,9 @@ describe 'Substracting from Records', ->
 					mexico: -2
 					points: -3
 					nicaragua: -4
-				.exec (err, res, id) ->
+				.exec (err, res, _id) ->
 					expect(err).toBe null
-					expect(id).not.toBe null
+					expect(_id).toBeUndefined()
 					
 					r.hgetall "#{PREFIX}:pl:#{id}", (err, res) ->
 						expect(err).toBe null
@@ -626,7 +623,7 @@ describe 'Delete', ->
 			.exec ->
 				player('id').delete (err, res, id) ->
 					expect(err).toBe null
-					expect(id).toBe 'id'
+					expect(id).toBeUndefined()
 					
 					r.multi()
 						.exists("#{PREFIX}:pl:id")

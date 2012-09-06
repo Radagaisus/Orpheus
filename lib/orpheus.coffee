@@ -371,6 +371,7 @@ class OrpheusAPI
 	# Generate a unique ID for model, similiar to MongoDB
 	# http://www.mongodb.org/display/DOCS/Object+IDs
 	_generate_id: ->
+		@_new_id = true
 		time = "#{new Date().getTime()}"
 		pid = process.pid
 		host = 0; (host += s.charCodeAt(0) for s in os.hostname())
@@ -528,9 +529,11 @@ class OrpheusAPI
 						
 						@error_func err
 					else
-						fn res, @id
+						if @_new_id then fn res, @id
+						else fn res
 				else
-					fn err, res, @id
+					if @_new_id then fn err, res, @id
+					else fn err, res
 
 # Orpheus Validation errors
 #-------------------------------------#

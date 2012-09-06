@@ -3,6 +3,7 @@
 # 0.1.11
 
 - zscore and zrank added for getting stuff
+- removed returning the user_id for existing models.
 
 # 0.1.10
 
