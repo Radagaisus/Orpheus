@@ -135,23 +135,15 @@ switch type
     @[key].hgetall()
 ```
 
-Specific queries for getting stuff will also convert the response to an object, provided all the commands issued are for getting stuff.
+Specific queries for getting stuff will also convert the response to an object, provided all the commands issued are for getting stuff (no incrby or lpush somewhere in the query).
 
 ```coffee
 get_player: (fn) ->
+      @name.get()
       @fb_id.get()
-      .fb_name.get()
-      .fb_gender.get()
-      .fb_url.get()
-      .twitter_id.get()
-      .twitter_nick.get()
-      .twitter_name.get()
-      .points.get()
-      .fb_friends.get()
-      .twitter_followers.get()
-      .member_since.get()
-      .badges.members()
-      .exec fn
+      @fb_friends.get()
+      @member_since.get()
+      @exec fn
 ```
 
 Converting to object supports this commands:
@@ -180,6 +172,8 @@ getters: [
   'hmget'
 ]
 ```
+
+Getting stuff while updating stuff in the same query will return the results in an array, the same way a Redis multi() command will return the results.
 
 ### Err and Exec
 
