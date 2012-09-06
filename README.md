@@ -38,6 +38,10 @@ Orpheus is a Redis Object Model for CoffeeScript.
       # woho!
 ```
 
+## Types ##
+
+Orpheus supports all the basic types of Redis: `@num`, `@str`, `@list`, `@set`, `@zset` and `@hash`. Note that strings and numbers are stored inside the model hash. See the wiki for [supported commands and key names for each type](https://github.com/Radagaisus/Orpheus/wiki).
+
 ## Configuration ##
 
 ```coffee
@@ -51,9 +55,11 @@ Options:
 - **client**: the Redis client.
 - **prefix**: optional prefix for keys. defaults to `orpheus`.
 
-## Working with the API
+## Issuing Commands with Orpheus
 
-### Add, Set
+### The Straightforward Way
+
+### Adding, Setting, Deleting
 
 ```coffee
 user('dune')
@@ -374,8 +380,3 @@ class Player extends Orpheus
 - Add your tests.
 - Do your thing.
 - `cake dev`
-
-## Roadmap ##
-
-- Validations
-- Promises 
