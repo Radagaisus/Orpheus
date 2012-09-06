@@ -1,5 +1,9 @@
 # Changelog
 
+# 0.1.11
+
+- zscore and zrank added for getting stuff
+
 # 0.1.10
 
 - Removed the @private property. Undocumented `getall` function removed as well. Use customized getters or remove the private properties in your controllers.

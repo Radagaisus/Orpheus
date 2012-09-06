@@ -165,7 +165,9 @@ getters: [
   'zrange',
   'zrangebyscore',
   'zrevrange',
-  'zrevrangebyscore'
+  'zrevrangebyscore',
+  'zscore',
+  'zrank',
   
   # Hash
   'hget',
