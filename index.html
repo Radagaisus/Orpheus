@@ -3,51 +3,48 @@
   <head>
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
     <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
     <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+
     <title>Orpheus by Radagaisus</title>
   </head>
 
   <body>
-    <div id="container">
-      <div class="inner">
 
-        <header>
-          <h1>Orpheus</h1>
-          <h2>A Small CoffeeScript Object Model for Redis</h2>
-        </header>
+    <header>
+      <div class="container">
+        <h1>Orpheus</h1>
+        <h2>A Small CoffeeScript Object Model for Redis</h2>
 
-        <section id="downloads" class="clearfix">
-          <a href="https://github.com/Radagaisus/Orpheus/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
-          <a href="https://github.com/Radagaisus/Orpheus/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
-          <a href="https://github.com/Radagaisus/Orpheus" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        <section id="downloads">
+          <a href="https://github.com/Radagaisus/Orpheus/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/Radagaisus/Orpheus/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/Radagaisus/Orpheus" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
         </section>
+      </div>
+    </header>
 
-        <hr>
-
-        <section id="main_content">
-          <h1>Orpheus - Redis Little Helper</h1>
+    <div class="container">
+      <section id="main_content">
+        <h1>Orpheus - Redis Little Helper</h1>
 
 <p>Orpheus is a Redis Object Model for CoffeeScript.</p>
 
 <p><code>npm install orpheus</code></p>
 
-<p><strong>Important</strong>: Right now, afaik, Orpheus is only used by our team. If you are using orpheus please ping me on <a href="http://twitter.com/#!/radagaisus">Twitter</a> or on <a href="http://enginezombie.com/">EngineZombie</a>, so I will know not to come crashing down and add too many breaking changes. The next release will be the last to appear without a Changelog and will be considered stable.</p>
-
 <ul>
 <li>Rails like models</li>
-<li>Validations</li>
-<li>Private properties</li>
+<li>Sexy DSL</li>
 <li>simple relations</li>
 <li>transactional spirit, with multi</li>
 <li>Dynamic keys</li>
 <li>Maps between strings and ids</li>
-</ul><h2>A Small Taste</h2>
+<li>Validations</li>
+</ul><p>If you are using Orpheus please ping me on <a href="http://twitter.com/#!/radagaisus">Twitter</a> or <a href="http://enginezombie.com/">EngineZombie</a>. It will make me happy.</p>
+
+<h2>A Small Taste</h2>
 
 <div class="highlight"><pre>  <span class="k">class</span> <span class="nx">User</span> <span class="k">extends</span> <span class="nx">Orpheus</span>
     <span class="nv">constructor: </span><span class="o">-&gt;</span>
@@ -55,10 +52,11 @@
 
       <span class="nx">@str</span> <span class="s">'about_me'</span>
       <span class="nx">@num</span> <span class="s">'points'</span>
+      <span class="nx">@set</span> <span class="s">'likes'</span>
       <span class="nx">@zset</span> <span class="s">'ranking'</span>
 
       <span class="nx">@map</span> <span class="nx">@str</span> <span class="s">'fb_id'</span>
-      <span class="nx">@private</span> <span class="nx">@str</span> <span class="s">'fb_secret'</span>
+      <span class="nx">@str</span> <span class="s">'fb_secret'</span>
 
   <span class="nv">user = </span><span class="nx">Player</span><span class="p">.</span><span class="nx">create</span><span class="p">()</span>
 
@@ -72,6 +70,10 @@
     <span class="p">.</span><span class="nx">exec</span> <span class="o">-&gt;</span>
       <span class="c1"># woho!</span>
 </pre></div>
+
+<h2>Types</h2>
+
+<p>Orpheus supports all the basic types of Redis: <code>@num</code>, <code>@str</code>, <code>@list</code>, <code>@set</code>, <code>@zset</code> and <code>@hash</code>. Note that strings and numbers are stored inside the model hash. See the wiki for <a href="https://github.com/Radagaisus/Orpheus/wiki">supported commands and key names for each type</a>.</p>
 
 <h2>Configuration</h2>
 
@@ -87,9 +89,31 @@
 <strong>client</strong>: the Redis client.</li>
 <li>
 <strong>prefix</strong>: optional prefix for keys. defaults to <code>orpheus</code>.</li>
-</ul><h2>Working with the API</h2>
+</ul><h2>Issuing Commands with Orpheus</h2>
 
-<h3>Add, Set</h3>
+<h3>The Straightforward Way</h3>
+
+<div class="highlight"><pre>  <span class="nx">user</span><span class="p">(</span><span class="s">'rada'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">hset</span><span class="p">(</span><span class="s">'radagaisus'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">points</span><span class="p">.</span><span class="nx">hincrby</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">points_by_time</span><span class="p">.</span><span class="nx">zincrby</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTime</span><span class="p">())</span>
+    <span class="p">.</span><span class="nx">books</span><span class="p">.</span><span class="nx">sadd</span><span class="p">(</span><span class="s">'dune'</span><span class="p">)</span>
+</pre></div>
+
+<p>Note you don't need to add the command prefix in this cases:</p>
+
+<div class="highlight"><pre><span class="nv">shorthands:</span>
+  <span class="nv">str: </span><span class="s">'h'</span>
+  <span class="nv">num: </span><span class="s">'h'</span>
+  <span class="nv">list: </span><span class="s">'l'</span>
+  <span class="nv">set: </span><span class="s">'s'</span>
+  <span class="nv">zset: </span><span class="s">'z'</span>
+  <span class="nv">hash: </span><span class="s">'h'</span>
+</pre></div>
+
+<p>So the commands above could have been just <code>set</code>, <code>incrby</code> and <code>add</code>.</p>
+
+<h3>Adding, Setting, Deleting</h3>
 
 <div class="highlight"><pre><span class="nx">user</span><span class="p">(</span><span class="s">'dune'</span><span class="p">)</span>
   <span class="p">.</span><span class="nx">add</span>
@@ -114,6 +138,67 @@ set:
     zset: 'zadd'
     list: 'lpush'
 </code></pre>
+
+<h3>Getting Stuff</h3>
+
+<p>Getting the entire model in Orpheus is pretty easy:</p>
+
+<div class="highlight"><pre><span class="nx">user</span><span class="p">.</span><span class="nx">get</span> <span class="nf">(err, user) -&gt;</span>
+  <span class="nx">res</span><span class="p">.</span><span class="nx">json</span> <span class="nx">user</span>
+</pre></div>
+
+<p>Here's how get asks for different types:</p>
+
+<div class="highlight"><pre><span class="k">switch</span> <span class="nx">type</span>
+  <span class="k">when</span> <span class="s">'str'</span><span class="p">,</span> <span class="s">'num'</span>
+    <span class="nx">@</span><span class="p">[</span><span class="nx">key</span><span class="p">].</span><span class="nx">get</span><span class="p">()</span>
+  <span class="k">when</span> <span class="s">'list'</span>
+    <span class="nx">@</span><span class="p">[</span><span class="nx">key</span><span class="p">].</span><span class="nx">range</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
+  <span class="k">when</span> <span class="s">'set'</span>
+    <span class="nx">@</span><span class="p">[</span><span class="nx">key</span><span class="p">].</span><span class="nx">members</span><span class="p">()</span>
+  <span class="k">when</span> <span class="s">'zset'</span>
+    <span class="nx">@</span><span class="p">[</span><span class="nx">key</span><span class="p">].</span><span class="nx">range</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s">'withscores'</span>
+  <span class="k">when</span> <span class="s">'hash'</span>
+    <span class="nx">@</span><span class="p">[</span><span class="nx">key</span><span class="p">].</span><span class="nx">hgetall</span><span class="p">()</span>
+</pre></div>
+
+<p>Specific queries for getting stuff will also convert the response to an object, provided all the commands issued are for getting stuff (no incrby or lpush somewhere in the query).</p>
+
+<div class="highlight"><pre><span class="nv">get_user: </span><span class="nf">(fn) -&gt;</span>
+      <span class="nx">@name</span><span class="p">.</span><span class="nx">get</span><span class="p">()</span>
+      <span class="nx">@fb_id</span><span class="p">.</span><span class="nx">get</span><span class="p">()</span>
+      <span class="nx">@fb_friends</span><span class="p">.</span><span class="nx">get</span><span class="p">()</span>
+      <span class="nx">@member_since</span><span class="p">.</span><span class="nx">get</span><span class="p">()</span>
+      <span class="nx">@exec</span> <span class="nx">fn</span>
+</pre></div>
+
+<p>Converting to object supports this commands:</p>
+
+<div class="highlight"><pre><span class="nv">getters: </span><span class="p">[</span>
+  <span class="c1"># String, Number</span>
+  <span class="s">'hget'</span><span class="p">,</span>
+
+  <span class="c1"># List</span>
+  <span class="s">'lrange'</span><span class="p">,</span>
+
+  <span class="c1"># Set</span>
+  <span class="s">'smembers'</span><span class="p">,</span>
+  <span class="s">'scard'</span><span class="p">,</span>
+
+  <span class="c1"># Zset</span>
+  <span class="s">'zrange'</span><span class="p">,</span>
+  <span class="s">'zrangebyscore'</span><span class="p">,</span>
+  <span class="s">'zrevrange'</span><span class="p">,</span>
+  <span class="s">'zrevrangebyscore'</span>
+
+  <span class="c1"># Hash</span>
+  <span class="s">'hget'</span><span class="p">,</span>
+  <span class="s">'hgetall'</span><span class="p">,</span>
+  <span class="s">'hmget'</span>
+<span class="p">]</span>
+</pre></div>
+
+<p>Getting stuff while updating stuff in the same query will return the results in an array, the same way a Redis multi() command will return the results.</p>
 
 <h3>Err and Exec</h3>
 
@@ -160,7 +245,7 @@ set:
 
 <h3>Conditional Commands</h3>
 
-<p>Sometimes you'll want to only issue specific commands based on a condition. If you don't want to break the chaining and clutter the code, use <code>.when(fn)</code>. <code>When</code> executes <code>fn</code> immediately, with the context set to the model context. <code>Only</code> is an alias for <code>when</code>.</p>
+<p>Sometimes you'll want to only issue specific commands based on a condition. If you don't want to break the chaining and clutter the code, use <code>.when(fn)</code>. <code>When</code> executes <code>fn</code> immediately, with the context set to the model context. <code>only</code> is an alias for <code>when</code>.</p>
 
 <div class="highlight"><pre><span class="nv">info = </span><span class="nx">get_mission_critical_information</span><span class="p">()</span>
 <span class="nx">player</span><span class="p">(</span><span class="s">'danny'</span><span class="p">).</span><span class="k">when</span><span class="p">(</span> <span class="o">-&gt;</span>
@@ -194,22 +279,33 @@ set:
 
 <h2>Dynamic Keys</h2>
 
-<pre><code>class User extends Orpheus
-  constructor: -&gt;
-    @zset 'monthly_ranking'
-      key: -&gt;
-        d = new Date()
-        # prefix:user:id:ranking:2012:5
-        "ranking:#{d.getFullYear()}:#{d.getMonth()+1}"
+<div class="highlight"><pre><span class="k">class</span> <span class="nx">User</span> <span class="k">extends</span> <span class="nx">Orpheus</span>
+  <span class="nv">constructor: </span><span class="o">-&gt;</span>
+    <span class="nx">@zset</span> <span class="s">'monthly_ranking'</span>
+      <span class="nv">key: </span><span class="o">-&gt;</span>
+        <span class="nv">d = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">()</span>
+        <span class="c1"># prefix:user:id:ranking:2012:5</span>
+        <span class="s">"ranking:</span><span class="si">#{</span><span class="nx">d</span><span class="p">.</span><span class="nx">getFullYear</span><span class="p">()</span><span class="si">}</span><span class="s">:</span><span class="si">#{</span><span class="nx">d</span><span class="p">.</span><span class="nx">getMonth</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s">"</span>
 
-user = User.create()
-user('jackson')
-  .monthly_ranking.incrby(1, 'Midnight Oil - The Dead Heart')
-  .err -&gt;
-    res.json status: 400
-  .exec -&gt;
-    res.json status: 200
-</code></pre>
+<span class="nv">user = </span><span class="nx">User</span><span class="p">.</span><span class="nx">create</span><span class="p">()</span>
+<span class="nx">user</span><span class="p">(</span><span class="s">'jackson'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">monthly_ranking</span><span class="p">.</span><span class="nx">incrby</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">'Midnight Oil - The Dead Heart'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">exec</span> <span class="o">-&gt;</span>
+    <span class="nx">res</span><span class="p">.</span><span class="nx">json</span> <span class="nv">status: </span><span class="mi">200</span>
+</pre></div>
+
+<p>Using arguments in dyanmic keys is easy:</p>
+
+<div class="highlight"><pre><span class="nx">@zset</span> <span class="s">'monthly_ranking'</span>
+  <span class="nv">key: </span><span class="nf">(year, month) -&gt;</span>
+    <span class="s">"ranking:</span><span class="si">#{</span><span class="nx">year</span> <span class="o">||</span> <span class="nx">d</span><span class="p">.</span><span class="nx">getFullYear</span><span class="p">()</span><span class="si">}</span><span class="s">:</span><span class="si">#{</span><span class="nx">month</span> <span class="o">||</span> <span class="nx">d</span><span class="p">.</span><span class="nx">getMonth</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s">"</span>
+
+<span class="c1"># later on, in a far away place...</span>
+<span class="nx">user</span><span class="p">(</span><span class="s">'bean'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">monthly_ranking</span><span class="p">.</span><span class="nx">incrby</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">'Stoned Jesus - I'</span><span class="nx">m</span> <span class="nx">The</span> <span class="nx">Mountain</span><span class="s">', key: [2012, 12])</span>
+</pre></div>
+
+<p>Everything inside <code>key</code> will be passed to the dynamic key function.</p>
 
 <h2>One to One Maps</h2>
 
@@ -405,6 +501,42 @@ user('jackson')
         <span class="nx">@validate</span> <span class="s">'legacy_code'</span><span class="p">,</span> <span class="nv">format: </span><span class="sr">/^[a-zA-Z]+$/</span>
 </pre></div>
 
+<h2>Error Handling</h2>
+
+<ul>
+<li>
+<strong>Undefined Attributes</strong>: Using <code>set</code>, <code>add</code> and <code>del</code> on undefined attributes will throw an error <code>"Orpheus :: No Such Model Attribute: #{k}"</code>. Trying to <code>no_such_attribute.incrby(1)</code> will result in <code>TypeError: Object #&lt;Object&gt; has no method 'incrby'</code>. The call stack will directly tell you where the misbehaving attribute sits.</li>
+</ul><h2>Remove a Relationship</h2>
+
+<p>A dynamic function, called <code>"un#{relationship}"()</code>, is available for removing already declared relationships. For example, a user with a books relationship will have an <code>unbook()</code> function available.</p>
+
+<p>This is helpful when trying to abstract away common queries that happen in a lot of requests and denormalize data across relations. Think: points, counters.</p>
+
+<div class="highlight"><pre><span class="k">class</span> <span class="nx">User</span> <span class="k">extends</span> <span class="nx">Orpheus</span>
+      <span class="nv">constructor: </span><span class="o">-&gt;</span>
+        <span class="nx">@has</span> <span class="s">'issue'</span>
+        <span class="nx">@num</span> <span class="s">'comments'</span>
+        <span class="nx">@num</span> <span class="s">'email_replies'</span>
+
+      <span class="nv">add_comment: </span><span class="nf">(issue_id) -&gt;</span>
+        <span class="nx">@comments</span><span class="p">.</span><span class="nx">incrby</span> <span class="mi">1</span>
+        <span class="nx">@issue</span><span class="p">(</span><span class="nx">issue_id</span><span class="p">)</span>
+        <span class="nx">@comments</span><span class="p">.</span><span class="nx">incrby</span> <span class="mi">1</span>
+        <span class="nx">@unissue</span><span class="p">()</span>
+
+
+      <span class="nv">add_email_reply: </span><span class="nf">(issue_id, fn) -&gt;</span>
+        <span class="nx">@add_comment</span> <span class="nx">issue_id</span>
+        <span class="nx">@email_replies</span><span class="p">.</span><span class="nx">incrby</span> <span class="mi">1</span>
+        <span class="nx">@issue</span><span class="p">(</span><span class="nx">issue_id</span><span class="p">)</span>
+        <span class="nx">@email_replies</span><span class="p">.</span><span class="nx">incrby</span> <span class="mi">1</span>
+        <span class="nx">@exec</span> <span class="nx">fn</span>
+
+    <span class="nv">user = </span><span class="nx">User</span><span class="p">.</span><span class="nx">create</span><span class="p">()</span>
+    <span class="nx">user</span><span class="p">(</span><span class="s">'rada'</span><span class="p">).</span><span class="nx">add_email_reply</span> <span class="s">'#142'</span><span class="p">,</span> <span class="o">-&gt;</span>
+      <span class="c1"># everything went better than expected...</span>
+</pre></div>
+
 <h2>Development</h2>
 
 <h3>Test</h3>
@@ -418,20 +550,11 @@ user('jackson')
 <li>Add your tests.</li>
 <li>Do your thing.</li>
 <li><code>cake dev</code></li>
-</ul><h2>Roadmap</h2>
-
-<ul>
-<li>Validations</li>
-<li>Promises </li>
 </ul>
-        </section>
+      </section>
+    </div>
 
-        <footer>
-          Orpheus is maintained by <a href="https://github.com/Radagaisus">Radagaisus</a><br>
-          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.
-        </footer>
-
-                  <script type="text/javascript">
+              <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
@@ -442,7 +565,5 @@ user('jackson')
             } catch(err) {}
           </script>
 
-      </div>
-    </div>
   </body>
 </html>
