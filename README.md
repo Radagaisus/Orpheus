@@ -393,6 +393,38 @@ class Player extends Orpheus
 
 - **Undefined Attributes**: Using `set`, `add` and `del` on undefined attributes will throw an error `"Orpheus :: No Such Model Attribute: #{k}"`. Trying to `no_such_attribute.incrby(1)` will result in `TypeError: Object #<Object> has no method 'incrby'`. The call stack will directly tell you where the misbehaving attribute sits.
 
+## Remove a Relationship ##
+A dynamic function, called `"un#{relationship}"()`, is available for removing already declared relationships. For example, a user with a books relationship will have an `unbook()` function available.
+
+This is helpful when trying to abstract away common queries that happen in a lot of requests and denormalize data across relations. Think: points, counters.
+
+```coffee
+class User extends Orpheus
+      constructor: ->
+        @has 'issue'
+        @num 'comments'
+        @num 'email_replies'
+
+      add_comment: (issue_id) ->
+        @comments.incrby 1
+        @issue(issue_id)
+        @comments.incrby 1
+        @unissue()
+
+
+      add_email_reply: (issue_id, fn) ->
+        @add_comment issue_id
+        @email_replies.incrby 1
+        @issue(issue_id)
+        @email_replies.incrby 1
+        @exec fn
+
+    user = User.create()
+    user('rada').add_email_reply '#142', ->
+      # everything went better than expected...
+```
+
+
 ## Development ##
 ### Test ###
 `cake test`

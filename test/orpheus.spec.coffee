@@ -925,8 +925,7 @@ describe 'Relations', ->
 					.exec (err, res) ->
 						expect(res[0]).toBe 'almog'
 						expect(res[1]).toBe 'mofasa'
-						done()
-						
+						done()				
 	
 	it 'Each', (done) ->
 		
@@ -956,4 +955,29 @@ describe 'Relations', ->
 										expect(p.i).toBe i
 										expect(p.id).toBe ''+(15+i)
 									done()
+
+	it 'Removes a Relationship', (done) ->
+		class User extends Orpheus
+		  constructor: ->
+		    @has 'issue'
+		    @num 'comments'
+		    @num 'email_replies'
+
+		  add_comment: (issue_id) ->
+		    @comments.incrby 1
+		    @issue(issue_id)
+		    @comments.incrby 1
+		    @unissue()
+
+
+		  add_email_reply: (issue_id, fn) ->
+		    @add_comment issue_id
+		    @email_replies.incrby 1
+		    @issue(issue_id)
+		    @email_replies.incrby 1
+		    @exec fn
+
+		user = User.create()
+		user('rada').add_email_reply '#142', ->
+			done()
 

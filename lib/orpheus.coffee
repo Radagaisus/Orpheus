@@ -95,6 +95,9 @@ class Orpheus extends EventEmitter
 				@[rel] = (id) ->
 					@["#{qualifier}_id"] = @["#{rel}_id"]= id
 					return @
+
+				@['un'+rel] = ->
+					@["#{qualifier}_id"] = @["#{rel}_id"] = null
 			
 			# Add a validation function to a field
 			# Example:
