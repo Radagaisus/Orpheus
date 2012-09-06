@@ -363,7 +363,7 @@ class Player extends Orpheus
 
 ## Error Handling ##
 
-- **Undefined Attributes**: Using `set`, `add` and `del` on undefined attributes will throw an error `"Orpheus :: No Such Model Attribute: #{k}"`. Trying to `no_such_attribute.incrby(1)` will result in `TypeError: Object #<Object> has no method 'incrby'`. The call stack will directly tell you where the misbehaving attributes sits.
+- **Undefined Attributes**: Using `set`, `add` and `del` on undefined attributes will throw an error `"Orpheus :: No Such Model Attribute: #{k}"`. Trying to `no_such_attribute.incrby(1)` will result in `TypeError: Object #<Object> has no method 'incrby'`. The call stack will directly tell you where the misbehaving attribute sits.
 
 ## Development ##
 ### Test ###
