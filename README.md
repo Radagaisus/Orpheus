@@ -272,11 +272,24 @@ class User extends Orpheus
 user = User.create()
 user('jackson')
   .monthly_ranking.incrby(1, 'Midnight Oil - The Dead Heart')
-  .err ->
-    res.json status: 400
   .exec ->
     res.json status: 200
 ```
+
+Using arguments in dyanmic keys is easy:
+
+```coffee
+@zset 'monthly_ranking'
+  key: (year, month) ->
+    "ranking:#{year || d.getFullYear()}:#{month || d.getMonth()+1}"
+
+# later on, in a far away place...
+user('bean')
+  .monthly_ranking.incrby(1, 'Stoned Jesus - I'm The Mountain', key: [2012, 12])
+```
+
+Everything inside the `key` object will be passed to the dynamic key function.
+
 
 ## One to One Maps
 

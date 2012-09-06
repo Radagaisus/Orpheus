@@ -270,13 +270,17 @@ class OrpheusAPI
 		@operations = ['add', 'set', 'del']
 		for f in @operations
 			@_add_op f
-	
+
 
 	_create_command: (key, value, f) ->
 		type = value.type
 
 		@[key][f] = (args...) =>
 			
+			# Pop out dynamic key arguments, if any
+			if _.isObject(args[args.length-1]) and args[args.length-1].key
+				dynamic_key_args = args.pop().key
+
 			# Type Conversion
 			# ------------------------
 			# Convert types for all the commands
@@ -306,7 +310,7 @@ class OrpheusAPI
 						return
 			
 			# Add multi command
-			@_commands.push _.flatten [f, @_get_key(key), args]
+			@_commands.push _.flatten [f, @_get_key(key, dynamic_key_args), args]
 			
 			# Response Schema
 			# --------------------
@@ -375,7 +379,7 @@ class OrpheusAPI
 		"#{host}#{pid}#{time}#{counter}#{random}"
 	
 	
-	_get_key: (key) ->
+	_get_key: (key, dynamic_key_args) ->
 		# Default: orpheus:pl:15
 		k = "#{@prefix}:#{@q}:#{@id}"
 		
@@ -393,7 +397,7 @@ class OrpheusAPI
 		# generate a new key name, if it has a
 		# dynamic key function.
 		if key and @model[key].options.key
-			key = @model[key].options.key()
+			key = @model[key].options.key.apply(this, dynamic_key_args)
 		
 		if type is 'str' or type is 'num'
 			# orpheus:us:15:name somename

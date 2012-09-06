@@ -91,6 +91,30 @@ describe 'Redis Commands', ->
 					
 					done()
 	
+	it 'Dynamic Keys Arguments', (done) ->
+		class User extends Orpheus
+			constructor: ->
+				@str 'name',
+					key: (var1, var2) ->
+						var1 ||= 'hello'
+						var2 ||= 'sup'
+						"#{var1}:#{var2}"
+		user = User.create()
+
+		user('hello')
+			.name.set('shalom')
+			.exec ->
+				r.hget "#{PREFIX}:us:hello", "hello:sup", (err, res) ->
+					expect(res).toBe 'shalom'
+
+					user('hiho')
+						.name.set('shalom', key: ['what', 'is'])
+						.exec ->
+							
+							r.hget "#{PREFIX}:us:hiho", "what:is", (err, res) ->
+								expect(res).toBe 'shalom'
+								done()
+
 	it 'Num and Str single commands', (done) ->
 		class Player extends Orpheus
 			constructor: ->
