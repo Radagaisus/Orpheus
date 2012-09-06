@@ -57,7 +57,7 @@ describe 'Error Handling', ->
 		class User extends Orpheus
 			constructor: ->
 				@str 'hi'
-		
+
 		try
 			User.create()('id').add
 					hi: 'hello'
@@ -242,45 +242,16 @@ describe 'Get', ->
 				.progress.hmset('six', 'to the mix', 'seven', 'to the heavens')
 			.exec ->
 				
-				player('someplayer').getall (err, res) ->
+				player('someplayer').get (err, res) ->
 					expect(res.name).toBe 'almog'
 					expect(res.wins[0]).toBe 'c'
 					
-					player('someplayer').game('skyrim').getall (err, res) ->
+					player('someplayer').game('skyrim').get (err, res) ->
 						expect(res.name).toBe 'mofasa'
 						expect(res.progress.five).toBe 'to the ten'
 						expect(res.progress.six).toBe 'to the mix'
 						expect(res.progress.seven).toBe 'to the heavens'
 						
-						done()
-						
-						
-	it 'Get Without Private', (done) ->
-		class Player extends Orpheus
-			constructor: ->
-				@has 'game'
-				@private @str 'name'
-				@list 'wins'
-				@str 'hoho'
-				@hash 'sting'
-				
-		player = Player.create()
-		player('someplayer')
-			.name.set('almog')
-			.wins.lpush(['a','b','c'])
-			.game('skyrim')
-				.name.set('mofasa')
-				.hoho.set('woo')
-				.sting.set('zing', 'bling')
-			.exec ->
-				player('someplayer').get (err, res) ->
-					expect(res.name).toBeUndefined()
-					expect(res.wins[0]).toBe 'c'
-					
-					player('someplayer').game('skyrim').get (err, res) ->
-						expect(res.name).toBeUndefined()
-						expect(res.hoho).toBe 'woo'
-						expect(res.sting.zing).toBe 'bling'
 						done()
 	
 	it 'Get Specific Stuff', (done) ->

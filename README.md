@@ -7,7 +7,6 @@ Orpheus is a Redis Object Model for CoffeeScript.
 
 - Rails like models
 - Validations
-- Private properties
 - simple relations
 - transactional spirit, with multi
 - Dynamic keys
@@ -24,7 +23,7 @@ Orpheus is a Redis Object Model for CoffeeScript.
       @zset 'ranking'
       
       @map @str 'fb_id'
-      @private @str 'fb_secret'
+      @str 'fb_secret'
   
   user = Player.create()
   

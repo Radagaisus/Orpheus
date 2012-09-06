@@ -154,11 +154,6 @@ class Orpheus extends EventEmitter
 										unless validations.size[k].fn(len, v)
 											return validations.size[k].msg(field, len, v)
 										return true
-							
-			
-			# Mark field as private
-			private: (field) ->
-				@model[field].options.private = true
 			
 			
 			# return OrpheusAPI if we have the id, or it's
@@ -426,32 +421,24 @@ class OrpheusAPI
 	
 	# get public information only
 	get: (fn) ->
-		@getall fn, true
-	
-	# get ALL the model information.
-	getall: (fn, get_private = false) ->
-		# Helper for determining if a value is private or not
-		not_private = -> not get_private or get_private and value.options.private isnt true
-		
 		for key, value of @model
 			type = value.type
-			if not_private()
-				switch type
-					when 'str', 'num'
-						@[key].get()
-					when 'list'
-						@[key].range 0, -1
-					when 'set'
-						@[key].members()
-					when 'zset'
-						@[key].range 0, -1, 'withscores'
-					when 'hash'
-						@[key].hgetall()
+			switch type
+				when 'str', 'num'
+					@[key].get()
+				when 'list'
+					@[key].range 0, -1
+				when 'set'
+					@[key].members()
+				when 'zset'
+					@[key].range 0, -1, 'withscores'
+				when 'hash'
+					@[key].hgetall()
 		
 		@exec fn
 	
 	err: (fn) ->
-		@error_func = fn || -> #noop
+		@error_func = fn || -> # noop
 		return @
 	
 	# execute the multi commands
