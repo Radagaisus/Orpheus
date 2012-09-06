@@ -47,6 +47,7 @@ module.exports =
 		
 		# Set
 		'smembers',
+		'scard',
 		
 		# Zset
 		'zrange',

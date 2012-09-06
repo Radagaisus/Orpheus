@@ -276,15 +276,15 @@ describe 'Get', ->
 			player('15')
 				.str.get()
 				.num.get()
-				.set1.members()
 				.list.range(0, -1)
+				.set1.scard()
 				.zset.range(0, -1, 'withscores')
 				.err ->
 					expect(1).toBe 2
 				.exec (res) ->
 					expect(res.str).toBe 'str'
 					expect(res.num).toBe 2
-					expect(res.set1[0]).toBe 'set'
+					expect(res.set1).toBe 1
 					expect(res.list[0]).toBe 'list'
 					expect(res.zset.zset).toBe 1
 					

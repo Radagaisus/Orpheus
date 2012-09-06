@@ -106,6 +106,7 @@ class Orpheus extends EventEmitter
 				if _.isFunction o
 					@validations[key].push o
 				else
+
 					# Custom validations: numericality, exclusion, inclusion
 					# format, etc. Validations are functions that recieve the
 					# field and return either true or a string as a message
@@ -154,8 +155,8 @@ class Orpheus extends EventEmitter
 										unless validations.size[k].fn(len, v)
 											return validations.size[k].msg(field, len, v)
 										return true
-			
-			
+
+
 			# return OrpheusAPI if we have the id, or it's
 			# a new id. otherwise, hget the id and then call
 			# orpheus api.
@@ -211,13 +212,13 @@ class OrpheusAPI
 		# This schema tells us how to convert the reponse
 		@_res_schema = []
 		
-		# new or existing id
+		# New or existing id
 		@id = id or @_generate_id()
 		
 		# If and Unless are used to discard changes
 		# unless certain conditions are met
 		@only = @when = (fn) =>
-			(fn.bind(this))()
+			fn.bind(this)()
 			return this
 		
 		# Create functions for working with the relation set
@@ -257,97 +258,109 @@ class OrpheusAPI
 		# Example: model('id').ranking.zadd (zrank, zscore...)
 		for key, value of @model
 			@[key] = {}
-			
 			for f in commands[value.type]
-				type = value.type
-				do (key, f, type) =>
-					@[key][f] = (args...) =>
-						
-						# Type Conversions
-						if validation_map[f]
-							if type is 'str'
-								if typeof args[0] isnt 'string'
-									if typeof args[0] is 'number'
-										args[0] = args[0].toString()
-									else
-										@validation_errors.add key,
-											msg: "Could not convert #{args[0]} to string"
-											command: f
-											args: args
-											value: args[0]
-							
-							if type is 'num'
-								if typeof args[0] isnt 'number'
-									args[0] = Number args[0]
-								if not isFinite(args[0]) or isNaN(args[0])
-									@validation_errors.add key,
-										msg: "Malformed number"
-										command: f
-										args: args
-										value: args[0]
-						
-						# Add multi command
-						@_commands.push _.flatten [f, @_get_key(key), args]
-						
-						# Adjust the response schema, if needed
-						if f in getters
-							@_res_schema.push
-								position: @_commands.length - 1
-								type: type
-								name: key
-								with_scores: type is 'zset' and 'withscores' in args
-						
-						# Run validation, if needed
-						if validation_map[f] and @validations[key]
-							
-							if type in ['str', 'num']
-								# Regular validations
-								for v in @validations[key]
-									result = v args...
-									
-									unless result is true
-										@validation_errors.add key,
-											msg: result
-											command: f
-											args: args
-											value: args[0]
-								
-								# no need to check the extra commands
-								return @ unless @validation_errors.valid()
-						
-						# Extra commands: mapping
-						@_extra_commands(key, f, args) if @model[key].options.map
-						
-						return @
-					
-					# Shorthand form, incrby instead of zincrby and hincrby is also acceptable
-					# str: h, num: h, list: l, set: s, zset: z
-					@[key][f[1..]] = @[key][f] if f[0] is commands.shorthands[value.type]
+				@_create_command key, value, f
 		
 		
-		# create the add, set and del commands
-		# based on the commands map they call
-		# the respective command for the key,
-		# value they recieve.
+		# Create the Add, Set and Del commands
 		@operations = ['add', 'set', 'del']
 		for f in @operations
-			do (f) =>
-				@[f] = (o) ->
-					for k, v of o
-
-						# Throw error on undefined attributes
-						if typeof @model[k] is 'undefined'
-							throw new Error "Orpheus :: No Such Model Attribute: #{k}"
-
-						# Add the Command. Note we won't actually
-						# execute any of this commands if the
-						# validation has failed.
-						type = @model[k].type
-						command = command_map[f][type]
-						@[k][command](v) # e.g. @name.hset 'abe'
-					
-					return this
+			@_add_op f
 	
+
+	_create_command: (key, value, f) ->
+		type = value.type
+
+		@[key][f] = (args...) =>
+			
+			# Type Conversion
+			# ------------------------
+			# Convert types for all the commands
+			# in the validation map.
+			if validation_map[f]
+				if type is 'str'
+					if typeof args[0] isnt 'string'
+						if typeof args[0] is 'number'
+							args[0] = args[0].toString()
+						else
+							@validation_errors.add key,
+								msg: "Could not convert #{args[0]} to string"
+								command: f
+								args: args
+								value: args[0]
+							return
+				
+				if type is 'num'
+					if typeof args[0] isnt 'number'
+						args[0] = Number args[0]
+					if not isFinite(args[0]) or isNaN(args[0])
+						@validation_errors.add key,
+							msg: "Malformed number"
+							command: f
+							args: args
+							value: args[0]
+						return
+			
+			# Add multi command
+			@_commands.push _.flatten [f, @_get_key(key), args]
+			
+			# Response Schema
+			# --------------------
+			# If the command is a get command
+			if f in getters
+				@_res_schema.push
+					position: @_commands.length - 1
+					type: type
+					name: key
+					with_scores: type is 'zset' and 'withscores' in args
+			
+			# Run validation, if needed
+			if validation_map[f] and @validations[key]
+				
+				if type in ['str', 'num']
+					# Regular validations
+					for v in @validations[key]
+						result = v args...
+						
+						unless result is true
+							@validation_errors.add key,
+								msg: result
+								command: f
+								args: args
+								value: args[0]
+					
+					# no need to check the extra commands
+					return @ unless @validation_errors.valid()
+			
+			# Extra commands: mapping
+			@_extra_commands(key, f, args) if @model[key].options.map
+			
+			return @
+		
+		# Shorthand form, incrby instead of zincrby and hincrby is also acceptable
+		# str: h, num: h, list: l, set: s, zset: z
+		@[key][f[1..]] = @[key][f] if f[0] is commands.shorthands[value.type]
+
+
+	# Creates the Add, Set and Del commands,
+	# based on the commands map.
+	_add_op: (f) ->
+		@[f] = (o) ->
+			for k, v of o
+
+				# Throw error on undefined attributes
+				if typeof @model[k] is 'undefined'
+					throw new Error "Orpheus :: No Such Model Attribute: #{k}"
+
+				# Add the Command. Note we won't actually
+				# execute any of this commands if the
+				# validation has failed.
+				type = @model[k].type
+				command = command_map[f][type]
+				@[k][command](v) # e.g. @name.hset 'abe'
+			
+			return this
+
 	# Generate a unique ID for model, similiar to MongoDB
 	# http://www.mongodb.org/display/DOCS/Object+IDs
 	_generate_id: ->
@@ -389,6 +402,7 @@ class OrpheusAPI
 	_add_map: (field, key) ->
 		@_commands.push ['hset', "#{@prefix}:#{@pname}:map:#{field}", key, @id]
 	
+	# Extra commands
 	_extra_commands: (key, command, args) ->
 		# Map stuff, e.g.
 		# orpheus:users:map:fb_ids
@@ -437,6 +451,37 @@ class OrpheusAPI
 		
 		@exec fn
 	
+	# Convert the results back from the multi
+	# values we get from node redis. The response
+	# schema, @_res_schema, is populated when we
+	# add commands, and now, based on the types it
+	# stored, we convert everything back to an object.
+	_create_getter_object: (res) ->
+		new_res = {}
+
+		for s in @_res_schema
+			# Convert numbers from their string representation
+			if s.type is 'num'
+				new_res[s.name] = Number res[s.position]
+
+			# Convert zsets with scores to a key->value hash
+			else if s.type is 'zset' and s.with_scores
+				new_res[s.name] = {}
+
+				for member,index in res[s.position] by 2
+					new_res[s.name][member] = Number res[s.position][index+1]
+
+			# Add everything else as attributes
+			else
+				new_res[s.name] = res[s.position]
+			
+			# Remove Empty values: null, undefined and []
+			if not new_res[s.name] or (_.isEmpty(new_res[s.name]) and _.isObject(new_res[s.name]))
+				delete new_res[s.name]
+
+		return new_res
+
+	# 
 	err: (fn) ->
 		@error_func = fn || -> # noop
 		return @
@@ -455,25 +500,12 @@ class OrpheusAPI
 			.multi(@_commands)
 			.exec (err, res) =>
 				
-				# Convert the response based on the schema, if needed
+				# If the request was just for getting information,
+				# convert the results back based on the response
+				# scehma.
 				if @_res_schema.length and not err
 					if @_res_schema.length is @_commands.length
-						new_res = {}
-						for s in @_res_schema
-							if s.type is 'num'
-								new_res[s.name] = Number res[s.position]
-							else if s.type is 'zset' and s.with_scores
-								new_res[s.name] = {}
-								for member,index in res[s.position] by 2
-									new_res[s.name][member] = Number res[s.position][index+1]
-							else
-								new_res[s.name] = res[s.position]
-							
-							# Remove Empty values: null, undefined and []
-							if not new_res[s.name] or (_.isEmpty(new_res[s.name]) and _.isObject(new_res[s.name]))
-								delete new_res[s.name]
-						
-						res = new_res
+						res = @_create_getter_object res
 				
 				# Check whether we should call the error or function
 				# or the execute function, and if we call the execute
@@ -527,4 +559,5 @@ class OrpheusValidationErrors
 			obj.errors[k] = (m.msg for m in v)
 		obj
 
+# Export
 module.exports = Orpheus
