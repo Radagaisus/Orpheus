@@ -230,9 +230,10 @@ class OrpheusAPI
 		for rel in @rels
 			prel = inflector.pluralize rel
 			@[prel] = {}
-			
+
 			for f in commands.set
 				do (prel, f) =>
+					
 					@[prel][f] = (args..., fn) =>
 						@redis[f](["#{@prefix}:#{@q}:#{@id}:#{prel}"].concat(args), fn)
 						return this

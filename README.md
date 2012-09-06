@@ -110,6 +110,77 @@ set:
 	list: 'lpush'
 ```
 
+### Getting Stuff
+
+Getting the entire model in Orpheus is pretty easy:
+
+```coffee
+user.get (err, user) ->
+  res.json user
+```
+
+Here's how get asks for different types:
+
+```coffee
+switch type
+  when 'str', 'num'
+    @[key].get()
+  when 'list'
+    @[key].range 0, -1
+  when 'set'
+    @[key].members()
+  when 'zset'
+    @[key].range 0, -1, 'withscores'
+  when 'hash'
+    @[key].hgetall()
+```
+
+Specific queries for getting stuff will also convert the response to an object, provided all the commands issued are for getting stuff.
+
+```coffee
+get_player: (fn) ->
+      @fb_id.get()
+      .fb_name.get()
+      .fb_gender.get()
+      .fb_url.get()
+      .twitter_id.get()
+      .twitter_nick.get()
+      .twitter_name.get()
+      .points.get()
+      .fb_friends.get()
+      .twitter_followers.get()
+      .member_since.get()
+      .badges.members()
+      .exec fn
+```
+
+Converting to object supports this commands:
+
+```coffee
+getters: [
+  # String, Number
+  'hget',
+  
+  # List
+  'lrange',
+  
+  # Set
+  'smembers',
+  'scard',
+  
+  # Zset
+  'zrange',
+  'zrangebyscore',
+  'zrevrange',
+  'zrevrangebyscore'
+  
+  # Hash
+  'hget',
+  'hgetall',
+  'hmget'
+]
+```
+
 ### Err and Exec
 
 Orpheus uses the `.err()` function for handling validation and unexpected errors. If `.err()` is not set the `.exec()` command receives errors as the first parameter.
