@@ -60,6 +60,28 @@ Options:
 
 ### The Straightforward Way
 
+```coffee
+  user('rada')
+    .name.hset('radagaisus')
+    .points.hincrby(5)
+    .points_by_time.zincrby(5, new Date().getTime())
+    .books.sadd('dune')
+```
+
+Note you don't need to add the command prefix in this cases:
+
+```coffee
+shorthands:
+  str: 'h'
+  num: 'h'
+  list: 'l'
+  set: 's'
+  zset: 'z'
+  hash: 'h'
+```
+
+So the commands above could have been just `set`, `incrby` and `add`.
+
 ### Adding, Setting, Deleting
 
 ```coffee
