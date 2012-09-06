@@ -288,7 +288,7 @@ user('bean')
   .monthly_ranking.incrby(1, 'Stoned Jesus - I'm The Mountain', key: [2012, 12])
 ```
 
-Everything inside the `key` object will be passed to the dynamic key function.
+Everything inside `key` will be passed to the dynamic key function.
 
 
 ## One to One Maps
