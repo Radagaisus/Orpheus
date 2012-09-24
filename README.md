@@ -230,8 +230,7 @@ Just like with the `multi` command you can supply a separate callback for specif
 ```coffee
 user('mgmt')
   .pokemons.push('pikachu', 'charizard', redis.print)
-  .err
-    -> # ...
+  .name.set('The Machine')
   .exec ->
     # ...
 ```
