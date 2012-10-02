@@ -57,6 +57,7 @@ module.exports =
 		'zscore',
 		'zrank',
 		'zrevrank',
+		'zcount',
 		
 		# Hash
 		'hget',
