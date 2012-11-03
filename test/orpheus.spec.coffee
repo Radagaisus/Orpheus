@@ -306,6 +306,7 @@ describe 'Get', ->
 				.err ->
 					expect(1).toBe 2
 				.exec (res) ->
+					log res
 					expect(res.str).toBe 'str'
 					expect(res.num).toBe 2
 					expect(res.set1).toBe 1
@@ -1003,3 +1004,32 @@ describe 'Relations', ->
 		user('rada').add_email_reply '#142', ->
 			done()
 
+
+# Defaults
+# -------------------------
+describe 'Defaults', ->
+
+	it 'Returns a default value', (done) ->
+		class User extends Orpheus
+			constructor: ->
+				@str 'name', default: 'John Doe'
+				@num 'points', default: 0
+				@hash 'reviews', default:
+					no_reviews: null
+				@list 'activities', default: []
+				@set 'experience', default: []
+				@zset 'troll', default: 'trololol'
+				@str 'sup'
+
+		user = User.create()
+
+		user('john')
+			.get (err, res) ->
+				expect(res.name).toBe 'John Doe'
+				expect(res.points).toBe 0
+				expect(res.reviews.no_reviews).toBe null
+				expect(res.activities.length).toBe 0
+				expect(res.experience.length).toBe 0
+				expect(res.troll).toBe 'trololol'
+				expect(res.sup).toBeUndefined() # No default
+				done()

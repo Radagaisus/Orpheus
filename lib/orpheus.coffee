@@ -68,12 +68,21 @@ class Orpheus extends EventEmitter
 				# Create the model
 				super()
 			
+			
+			# Creates a dynamic function that addes a field for
+			# a specific type 'f'. For example, `create_field('str')`
+			# will create the function `@str(field, options)` that
+			# gets the field name and its options and pushes
+			# them to the model schema.
+			# 
+			# - f - the type, as string: 'str', 'num', etc
+			# 
 			create_field: (f) ->
 				@[f] = (field, options = {}) ->
 					throw new Error("Field name already taken") if @model[field]
 					
 					@model[field] =
-						type: f
+						type   : f
 						options: options
 					
 					return field
@@ -213,6 +222,21 @@ class OrpheusAPI
 		
 		# Used when retrieving information from redis
 		# This schema tells us how to convert the reponse
+
+
+		# The response schema is used to figure out how
+		# to convert the multi command array response to
+		# a model object.
+		# 
+		# We populate the schema when the commands are
+		# issued.
+		# 
+		# @_res_schema.push
+		#   type: type         # The field type: 'num'
+		#   name: key          # The field name: 'points'
+		#   with_scores: false # used on zset commands with
+		#                      # scores, as they are converted
+		#                      # to either objects or arrays
 		@_res_schema = []
 		
 		# New or existing id
@@ -454,18 +478,19 @@ class OrpheusAPI
 		
 		@exec fn
 	
-	# Convert the results back from the multi
-	# values we get from node redis. The response
+	# Converts the results back from the multi
+	# array values we get from node redis. The response
 	# schema, @_res_schema, is populated when we
 	# add commands, and now, based on the types it
 	# stored, we convert everything back to an object.
-	_create_getter_object: (res) ->
+	_create_getter_object: (res) =>
 		new_res = {}
 
 		for s,i in @_res_schema
+
 			# Convert numbers from their string representation
 			if s.type is 'num'
-				new_res[s.name] = Number res[i]
+				new_res[s.name] = Number(res[i])
 
 			# Convert zsets with scores to a key->value hash
 			else if s.type is 'zset' and s.with_scores
@@ -478,9 +503,14 @@ class OrpheusAPI
 			else
 				new_res[s.name] = res[i]
 			
-			# Remove Empty values: null, undefined and []
-			if not new_res[s.name] or (_.isEmpty(new_res[s.name]) and _.isObject(new_res[s.name]))
-				delete new_res[s.name]
+			# Use the field's defaults or delete the field if
+			# it's empty (undefined, null, {}, [])
+			if not new_res[s.name] or (_.isObject(new_res[s.name]) and _.isEmpty(new_res[s.name]))
+
+				if _.isUndefined @model[s.name].options.default
+				then delete new_res[s.name]
+				else new_res[s.name] = @model[s.name].options.default
+
 
 		return new_res
 
@@ -493,11 +523,11 @@ class OrpheusAPI
 	exec: (fn) ->
 		fn ||= -> # noop
 		
+		# Check for validation errors
 		unless @validation_errors.valid()
 			if @error_func
-				return @error_func @validation_errors, @id
-			else
-				return fn @validation_errors, false, @id
+			then return @error_func @validation_errors, @id
+			else return fn          @validation_errors, null, @id
 		
 		@redis
 			.multi(@_commands)

@@ -8,6 +8,8 @@
 
 - Everything is now being tested with redis 2.6.
 
+- Added default values for all types, just pass `@str 'name', default: 'John Doe'`.
+
 # 0.1.10
 
 - Removed the @private property. Undocumented `getall` function removed as well. Use customized getters or remove the private properties in your controllers.

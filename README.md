@@ -212,7 +212,7 @@ user('putin')
 ```
 
 ### Getting the Model ID
-Only when new models are created `.exec()` receives the model ID as the last argument.
+When new models are created `.exec()` receives the model ID as the last argument.
 
 ```coffee
 user()
@@ -222,6 +222,7 @@ user()
       .name.set('turing')
       .exec()
 ```
+
 
 ### Separate Callbacks
 
@@ -245,6 +246,35 @@ player('danny').when( ->
 	if info is 'nah, never mind' then @name.set('oh YEAHH')
 ).points.incrby(5) # Business as usual
 .exec()
+```
+
+### Default Values
+Use the `default` option to pass a default value to all types:
+
+```coffee
+class User extends Orpheus
+  constructor: ->
+    @str 'name', default: 'John Doe'
+
+  user = User.create()
+
+  user('nope')
+    .name.get()
+    .exec (err, res) ->
+      log res.name # 'John Doe'
+```
+
+Note that default values will be returned in all the get commands of the type. So if you have `{someData: true}` as a default for a zset, you will get that back when you request a `zrank` of a non-existent member:
+
+```
+# User Model
+@zset 'visits', default: {'/': 0}
+
+# Query
+user('rage')
+  .visits.rank('/404.html') # No such visit, default is returned
+  .exec (err, res) ->
+    log res.visits # unexpected default zset value: {'/': 0}
 ```
 
 ### Relations
