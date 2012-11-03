@@ -19,7 +19,7 @@ log = console.log
 # Orpheus
 #-------------------------------------#
 class Orpheus extends EventEmitter
-	@version = "0.1.10"
+	@version = "0.2.0"
 	
 	# Configuration
 	@config:
