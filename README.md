@@ -212,7 +212,7 @@ user('putin')
 ```
 
 ### Getting the Model ID
-Only when new models are created `exec()` receives the model ID as the last argument.
+Only when new models are created `.exec()` receives the model ID as the last argument.
 
 ```coffee
 user()

@@ -2,9 +2,11 @@
 
 # 0.1.11
 
-- zscore, zrank and zrevrank added for getting stuff
+- `zscore`, `zrank`, `count`, `zrevrank`, `zrevrangebyscore` were added to the `getters` array.
 
-- removed returning the user_id for existing models.
+- `user_id` is not being passed to `.exec()` for existing models any more. Only new models will receive `user_id` inside `.exec()` as the last argument.
+
+- Everything is now being tested with redis 2.6.
 
 # 0.1.10
 

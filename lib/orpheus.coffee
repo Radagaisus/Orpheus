@@ -446,16 +446,11 @@ class OrpheusAPI
 		for key, value of @model
 			type = value.type
 			switch type
-				when 'str', 'num'
-					@[key].get()
-				when 'list'
-					@[key].range 0, -1
-				when 'set'
-					@[key].members()
-				when 'zset'
-					@[key].range 0, -1, 'withscores'
-				when 'hash'
-					@[key].hgetall()
+				when 'str', 'num' then @[key].get()
+				when 'list'       then @[key].range 0, -1
+				when 'set'        then @[key].members()
+				when 'zset'       then @[key].range 0, -1, 'withscores'
+				when 'hash'       then @[key].hgetall()
 		
 		@exec fn
 	

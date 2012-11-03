@@ -38,11 +38,8 @@ module.exports =
 		# - brpoplpush and friends
 	
 	getters: [
-		# String, Number
-		'hget',
-		
+
 		# List
-		# - blpop and friends
 		'lrange',
 		
 		# Set
@@ -59,7 +56,7 @@ module.exports =
 		'zrevrank',
 		'zcount',
 		
-		# Hash
+		# Hash, String, Number
 		'hget',
 		'hgetall',
 		'hmget'
