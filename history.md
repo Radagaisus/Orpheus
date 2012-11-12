@@ -3,6 +3,7 @@
 # 0.2.1
 
 - added `zcard` to the getters
+- Fixed a bug where number fields with 0 as the value would get discarded when getting the model
 
 # 0.2.0
 

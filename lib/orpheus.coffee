@@ -503,10 +503,11 @@ class OrpheusAPI
 			else
 				new_res[s.name] = res[i]
 			
-			# Use the field's defaults or delete the field if
-			# it's empty (undefined, null, {}, [])
-			if not new_res[s.name] or (_.isObject(new_res[s.name]) and _.isEmpty(new_res[s.name]))
-
+			# If the field is empty - undefined, null, {}, []
+			# then user the field's default or delete the field
+			# if there's no default.
+			field = new_res[s.name]
+			if _.isNull(field) or _.isUndefined(field) or (_.isObject(field) and _.isEmpty(field))
 				if _.isUndefined @model[s.name].options.default
 				then delete new_res[s.name]
 				else new_res[s.name] = @model[s.name].options.default

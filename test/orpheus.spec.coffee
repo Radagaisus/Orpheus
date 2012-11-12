@@ -1033,3 +1033,25 @@ describe 'Defaults', ->
 				expect(res.troll).toBe 'trololol'
 				expect(res.sup).toBeUndefined() # No default
 				done()
+
+describe 'Regressions', ->
+	it 'Returns an object with a number field with 0 as the value', (done) ->
+		class User extends Orpheus
+			constructor: ->
+				@num 'points'
+
+		user = User.create()
+		user('zero')
+		.points.set(0)
+		.exec ->
+			user('zero')
+			.points.get()
+			.exec (err, res) ->
+				expect(res.points).toBe(0)
+
+				# User with no points set whatsoever
+				user('hi')
+				.points.get()
+				.exec (err, res) ->
+					expect(res.points).toBe(0)
+					done()

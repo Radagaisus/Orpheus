@@ -37,7 +37,7 @@
       return Orpheus.__super__.constructor.apply(this, arguments);
     }
 
-    Orpheus.version = "0.2.0";
+    Orpheus.version = "0.2.1";
 
     Orpheus.config = {
       prefix: 'orpheus'
@@ -531,7 +531,7 @@
     };
 
     OrpheusAPI.prototype._create_getter_object = function(res) {
-      var i, index, member, new_res, s, _i, _j, _len, _len1, _ref, _ref1, _step;
+      var field, i, index, member, new_res, s, _i, _j, _len, _len1, _ref, _ref1, _step;
       new_res = {};
       _ref = this._res_schema;
       for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
@@ -548,7 +548,8 @@
         } else {
           new_res[s.name] = res[i];
         }
-        if (!new_res[s.name] || (_.isObject(new_res[s.name]) && _.isEmpty(new_res[s.name]))) {
+        field = new_res[s.name];
+        if (_.isNull(field) || _.isUndefined(field) || (_.isObject(field) && _.isEmpty(field))) {
           if (_.isUndefined(this.model[s.name].options["default"])) {
             delete new_res[s.name];
           } else {
