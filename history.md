@@ -1,6 +1,10 @@
 # Changelog
 
-# 0.1.11
+# 0.2.1
+
+- added `zcard` to the getters
+
+# 0.2.0
 
 - `zscore`, `zrank`, `count`, `zrevrank`, `zrevrangebyscore` were added to the `getters` array.
 
