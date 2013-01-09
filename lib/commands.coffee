@@ -41,6 +41,7 @@ module.exports =
 
 		# List
 		'lrange',
+		'llen',
 		
 		# Set
 		'smembers',

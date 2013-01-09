@@ -1,7 +1,7 @@
 {spawn, exec} = require 'child_process'
 log = console.log
       
-task 'build', "Compiles to JavaScript", ->
+task 'bake', "Compiles to JavaScript", ->
   run 'coffee -o dist -c lib/*.coffee'
   run 'cp lib/*.js dist/'
     

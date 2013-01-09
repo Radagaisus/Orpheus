@@ -1,6 +1,7 @@
 Orpheus = require '../lib/orpheus'
-redis = require 'redis'
-util = require 'util'
+redis   = require 'redis'
+util    = require 'util'
+async   = require 'async'
 
 r = redis.createClient()
 monitor = redis.createClient()
@@ -52,6 +53,8 @@ afterEach (done) ->
 		clean_db done
 
 
+# Error Handling
+# ---------------------------------------
 describe 'Error Handling', ->
 	it 'Throws Error on Undefined Model Attributes', (done) ->
 		class User extends Orpheus
@@ -73,6 +76,8 @@ describe 'Error Handling', ->
 		done()
 
 
+# Redis Commands
+# ---------------------------------------
 describe 'Redis Commands', ->
 	
 	it 'Dynamic Keys', (done) ->
@@ -246,6 +251,9 @@ describe 'Redis Commands', ->
 						expect(res[0]).toBe 1
 						done()
 
+
+# Getting Stuff
+# ----------------------------------------------
 describe 'Get', ->
 	it 'Get All', (done) ->
 		class Player extends Orpheus
@@ -315,6 +323,69 @@ describe 'Get', ->
 					
 					done()
 
+	# Sometimes we want to get differnt kinds of information
+	# on the same object. For example, you might want to
+	# know a list's length and grab the first few items from
+	# it, or you want to zcount a zset. In this case, when
+	# you request a few operations on the same element, you
+	# will recevie the results inside a property of that
+	# object called `results`.
+	it 'Getting information on the same element', (done) ->
+		class User extends Orpheus
+			constructor: ->
+				@list 'activities'
+				@zset 'points'
+				@str  'name'
+
+		user = User.create()
+
+		async.series
+
+				# Create the user data
+				create_user: (cb) ->
+					user('feist')
+					.name.set('feist')
+					.activities.push(['activity1', 'activity2', 'activity3', 'activity4'])
+					.points.add(10, 'stuff1', 20, 'stuff2', 30, 'stuff3', 45, 'stuff4')
+					.exec(cb)
+
+				# Grab information, and make sure the format is good
+				get_user: (cb) ->
+					user('feist')
+						.name.get()
+						.activities.llen()
+						.activities.lrange(0, -1)
+						.points.count(0, 21)
+						.points.count(0, 45)
+						.points.zrange(0, -1, 'withscores')
+						.points.card()
+						.exec (err, user) ->
+							console.log(user)
+							if err then cb(err)
+							else
+								expect(user.name).toEqual 'feist'
+								expect(user.activities[0]).toEqual 4
+								for i,j in ['activity4', 'activity3', 'activity2', 'activity1']
+									expect(user.activities[1][j]).toEqual i
+								expect(user.points[0]).toEqual 2
+								expect(user.points[1]).toEqual 4
+								expect(user.points[2]).toEqual 
+									stuff1: 10
+									stuff2: 20
+									stuff3: 30
+									stuff4: 45
+								expect(user.points[3]).toEqual 4
+
+								cb(undefined, user)
+
+			# Final callback, making sure we got everything right
+			, (err, results) ->
+				expect(err).toBeUndefined()
+				done()
+
+
+# Setting Stuff
+# --------------------------------------------
 describe 'Setting Records', ->
 	
 	it 'Setting Strings', (done) ->
@@ -466,6 +537,8 @@ describe 'Setting Records', ->
 				done()
 
 
+# Adding Stuff
+# --------------------------------------------------
 describe 'Adding to Records', ->
 	
 	it 'Should add strings in a record', (done) ->
@@ -560,6 +633,9 @@ describe 'Adding to Records', ->
 				expect(res[2]).toBe 'bingo'
 				done()
 
+
+# Substracting Stuff
+# -----------------------------------------------
 describe 'Substracting from Records', ->
 
 	it 'Should decerment numbers in a record, using add', (done) ->
@@ -605,6 +681,9 @@ describe 'Substracting from Records', ->
 						
 						done()
 
+
+# Deleting Stuff
+# ---------------------------------------
 describe 'Delete', ->
 	
 	it 'Remove Everything', (done) ->
@@ -639,6 +718,9 @@ describe 'Delete', ->
 							
 							done()
 
+
+# Validations
+# ------------------------------------------------
 describe 'Validation', ->
 	it 'Validate Types', (done) ->
 		class Player extends Orpheus
@@ -876,6 +958,9 @@ describe 'Validation', ->
 				expect(1).toBe 2
 				done()
 
+
+# Maps
+# ---------------------------------------
 describe 'Maps', ->
 	it 'Should create a record if @map on a @str did not find a record', (done) ->
 		class Player extends Orpheus
@@ -923,7 +1008,7 @@ describe 'Maps', ->
 
 
 # Relations
-# -------------------------
+# ------------------------------
 describe 'Relations', ->
 	
 	it 'One has', (done) ->
@@ -1006,7 +1091,7 @@ describe 'Relations', ->
 
 
 # Defaults
-# -------------------------
+# ------------------------------
 describe 'Defaults', ->
 
 	it 'Returns a default value', (done) ->
@@ -1034,6 +1119,9 @@ describe 'Defaults', ->
 				expect(res.sup).toBeUndefined() # No default
 				done()
 
+
+# Bugs & Regressions
+# ---------------------------------------
 describe 'Regressions', ->
 	it 'Returns an object with a number field with 0 as the value', (done) ->
 		class User extends Orpheus

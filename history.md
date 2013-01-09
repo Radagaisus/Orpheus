@@ -1,11 +1,16 @@
 # Changelog
 
-# 0.2.1
+## 0.2.2
+
+- Added `llen` to the getters.
+- Added an array response to multiple requests on the same property.
+
+## 0.2.1
 
 - added `zcard` to the getters
 - Fixed a bug where number fields with 0 as the value would get discarded when getting the model
 
-# 0.2.0
+## 0.2.0
 
 - `zscore`, `zrank`, `count`, `zrevrank`, `zrevrangebyscore` were added to the `getters` array.
 
@@ -15,7 +20,7 @@
 
 - Added default values for all types, just pass `@str 'name', default: 'John Doe'`.
 
-# 0.1.10
+## 0.1.10
 
 - Removed the @private property. Undocumented `getall` function removed as well. Use customized getters or remove the private properties in your controllers.
 

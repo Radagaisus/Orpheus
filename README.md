@@ -120,23 +120,7 @@ user.get (err, user) ->
   res.json user
 ```
 
-Here's how get asks for different types:
-
-```coffee
-switch type
-  when 'str', 'num'
-    @[key].get()
-  when 'list'
-    @[key].range 0, -1
-  when 'set'
-    @[key].members()
-  when 'zset'
-    @[key].range 0, -1, 'withscores'
-  when 'hash'
-    @[key].hgetall()
-```
-
-Specific queries for getting stuff will also convert the response to an object, provided all the commands issued are for getting stuff (no incrby or lpush somewhere in the query).
+Specific queries for getting stuff will also convert the response to an object, provided all the commands issued are for getting stuff (no `incrby` or `lpush` somewhere in the query).
 
 ```coffee
 get_user: (fn) ->
@@ -156,6 +140,7 @@ getters: [
   
   # List
   'lrange',
+  'llen',
   
   # Set
   'smembers',
@@ -176,7 +161,18 @@ getters: [
 ]
 ```
 
-Getting stuff while updating stuff in the same query will return the results in an array, the same way a Redis multi() command will return the results.
+Getting stuff while updating stuff in the same query will return the results in an array, the same way a Redis `multi()` command will return the results.
+
+Sometimes you need to do a few operations on the same property, like grabbing a few items off a list and getting the list length. In this case the returned propery will be an array, the first element of which is the response for the first request for that property and so on.
+
+```
+user('almog')
+  .activities.len()
+  .activites.range(0, 3)
+  .exec (err, response) ->
+    # response might be [20, ['item1', 'item2', 'item3']]
+```
+
 
 ### Err and Exec
 
@@ -548,12 +544,7 @@ class User extends Orpheus
 
 
 ## Development ##
-### Test ###
-`cake test`
 
-### Contribute ###
+- **Test** - Make sure you got [jasmine-node](https://github.com/mhevery/jasmine-node) installed (`npm install jasmine-node -g`) then run `cake test`.
 
-- `cake dev`
-- Add your tests.
-- Do your thing.
-- `cake dev`
+- **Build** - Use `cake bake` to compile the code to JavaScript.

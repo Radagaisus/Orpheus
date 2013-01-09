@@ -19,7 +19,7 @@ log = console.log
 # Orpheus
 #-------------------------------------#
 class Orpheus extends EventEmitter
-	@version = "0.2.1"
+	@version = "0.2.2"
 	
 	# Configuration
 	@config:
@@ -484,22 +484,37 @@ class OrpheusAPI
 	# add commands, and now, based on the types it
 	# stored, we convert everything back to an object.
 	_create_getter_object: (res) =>
-		new_res = {}
-
+		new_res  = {}
+		temp_res = {} 
 		for s,i in @_res_schema
 
 			# Convert numbers from their string representation
 			if s.type is 'num'
-				new_res[s.name] = Number(res[i])
-
+				res[i] = Number res[i]
+			
 			# Convert zsets with scores to a key->value hash
 			else if s.type is 'zset' and s.with_scores
-				new_res[s.name] = {}
+				zset = {}
 
 				for member,index in res[i] by 2
-					new_res[s.name][member] = Number res[i][index+1]
+					zset[member] = Number res[i][index+1]
 
-			# Add everything else as attributes
+				res[i] = zset
+
+			# Add the property to the new response. If the
+			# property already exists in the new response
+			# create an array as it has multiple return
+			# values. For example, issuing llen and lrange
+			# at the same time should return an array.
+			if new_res[s.name]?
+				# We use temp_res as a temporary storage for
+				# the multiple results array.
+				if temp_res[s.name]?
+					temp_res[s.name].push res[i]
+				else
+					temp_res[s.name] = [new_res[s.name], res[i]]
+
+				new_res[s.name] = temp_res[s.name]
 			else
 				new_res[s.name] = res[i]
 			

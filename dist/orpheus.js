@@ -37,7 +37,7 @@
       return Orpheus.__super__.constructor.apply(this, arguments);
     }
 
-    Orpheus.version = "0.2.1";
+    Orpheus.version = "0.2.2";
 
     Orpheus.config = {
       prefix: 'orpheus'
@@ -531,20 +531,30 @@
     };
 
     OrpheusAPI.prototype._create_getter_object = function(res) {
-      var field, i, index, member, new_res, s, _i, _j, _len, _len1, _ref, _ref1, _step;
+      var field, i, index, member, new_res, s, temp_res, zset, _i, _j, _len, _len1, _ref, _ref1, _step;
       new_res = {};
+      temp_res = {};
       _ref = this._res_schema;
       for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
         s = _ref[i];
         if (s.type === 'num') {
-          new_res[s.name] = Number(res[i]);
+          res[i] = Number(res[i]);
         } else if (s.type === 'zset' && s.with_scores) {
-          new_res[s.name] = {};
+          zset = {};
           _ref1 = res[i];
           for (index = _j = 0, _len1 = _ref1.length, _step = 2; _j < _len1; index = _j += _step) {
             member = _ref1[index];
-            new_res[s.name][member] = Number(res[i][index + 1]);
+            zset[member] = Number(res[i][index + 1]);
           }
+          res[i] = zset;
+        }
+        if (new_res[s.name] != null) {
+          if (temp_res[s.name] != null) {
+            temp_res[s.name].push(res[i]);
+          } else {
+            temp_res[s.name] = [new_res[s.name], res[i]];
+          }
+          new_res[s.name] = temp_res[s.name];
         } else {
           new_res[s.name] = res[i];
         }
