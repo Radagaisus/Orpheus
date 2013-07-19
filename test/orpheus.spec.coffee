@@ -75,6 +75,23 @@ describe 'Error Handling', ->
 		expect('To Catch an Error').toBe true
 		done()
 
+describe 'Schema', ->
+
+	it 'can call the different models using the schema', (done) ->
+		class Hello extends Orpheus
+			constructor: ->
+				@str 'name'
+
+		Hello.create()
+
+		Orpheus.schema.hello('id')
+			.name.set('test')
+			.exec ->
+				r.hget "#{PREFIX}:he:id", 'name', (err, res) ->
+					expect(res).toEqual 'test'
+					done()
+
+
 
 # Redis Commands
 # ---------------------------------------
