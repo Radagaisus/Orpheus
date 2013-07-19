@@ -15,28 +15,27 @@ If you are using Orpheus please ping me on [Twitter](http://twitter.com/#!/radag
 
 ## A Small Taste
 ```coffee
-  class User extends Orpheus
-    constructor: ->
-      @has 'book'
+class User extends Orpheus
+  constructor: ->
+    @has 'book'
+    
+    @str 'about_me'
+    @num 'points'
+    @set 'likes'
+    @zset 'ranking'
       
-      @str 'about_me'
-      @num 'points'
-      @set 'likes'
-      @zset 'ranking'
-      
-      @map @str 'fb_id'
-      @str 'fb_secret'
+    @map @str 'fb_id'
+    @str 'fb_secret'
   
-  user = Player.create()
+user = User.create()
   
-  user('modest')
-    .add
-      about_me: 'I like douchebags and watermelon'
-      points: 5
-    .books.add('dune','maybe some proust')
-    .err (err) ->
-      res.json err.toResponse()
-    .exec ->
+user('modest')
+  .add
+    about_me: 'I like douchebags and watermelon'
+    points: 5
+  .books.add('dune','maybe some proust')
+  .err (err) -> res.json err
+  .exec ->
       # woho!
 ```
 
