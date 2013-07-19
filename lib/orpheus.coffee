@@ -39,7 +39,7 @@ class Orpheus
 	# - you don't need to call super()
 	@create: ->
 		
-		class OrpheusModel extends @
+		class OrpheusModel extends this
 			
 			constructor: (@name, @q) ->
 				@redis = Orpheus.config.client
@@ -211,10 +211,11 @@ class Orpheus
 		# Qualifier
 		q = name.substr(0,2)
 		
-		# Add to Schema
-		Orpheus.schema[name] = @
-		
 		model = new OrpheusModel(name, q)
+
+		# Add to Schema
+		Orpheus.schema[name] = model.id
+
 		return model.id
 
 

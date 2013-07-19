@@ -1,8 +1,10 @@
 # Changelog
 
-## 0.9.0
+## 0.3.0
 
 - Added the namespace option to `@has 'book', namespace: 'book'`.
+- Fixed `Orpheus.schema`, it will now store an object of all the different models functions.
+
 
 ## 0.2.3
 
