@@ -176,41 +176,6 @@ InflectionJS =
     }
 };
 
-/*
-  This lets us detect if an Array contains a given element
-  Signature:
-    Array.indexOf(item, fromIndex, compareFunc) == Integer
-  Arguments:
-    item - Object - object to locate in the Array
-    fromIndex - Integer (optional) - starts checking from this position in the Array
-    compareFunc - Function (optional) - function used to compare Array item vs passed item
-  Returns:
-    Integer - index position in the Array of the passed item
-  Examples:
-    ['hi','there'].indexOf("guys") === -1
-    ['hi','there'].indexOf("hi") === 0
-*/
-if (!Array.prototype.indexOf)
-{
-    Array.prototype.indexOf = function(item, fromIndex, compareFunc)
-    {
-        if (!fromIndex)
-        {
-            fromIndex = -1;
-        }
-        var index = -1;
-        for (var i = fromIndex; i < this.length; i++)
-        {
-            if (this[i] === item || compareFunc && compareFunc(this[i], item))
-            {
-                index = i;
-                break;
-            }
-        }
-        return index;
-    };
-}
-
 
 /*
   This function adds plurilization support to every String object

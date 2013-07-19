@@ -11,9 +11,6 @@ task 'test', "Testing using Jasmine-Node", ->
 task 'dev', "Start developing stuff", ->
 	run 'npm install'
 	run 'jasmine-node test/orpheus.spec.coffee --verbose --color --forceexit --coffee'
-    
-task 'docs', "Create documenations using Docco", ->
-  run 'docco lib/*.coffee'
 
 run = (args...) ->
   for a in args
