@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.3
+
+- Updated the dependencies for `underscore` and `async`.
+- Locked `redis` to `0.8.2`.
+
 ## 0.2.2
 
 - Added `llen` to the getters.

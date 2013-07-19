@@ -380,7 +380,7 @@ describe 'Get', ->
 
 			# Final callback, making sure we got everything right
 			, (err, results) ->
-				expect(err).toBeUndefined()
+				expect(err).toBeNull()
 				done()
 
 
@@ -443,7 +443,7 @@ describe 'Setting Records', ->
 	it 'Setting Lists with a string', (done) ->
 		class Player extends Orpheus
 			constructor: ->
-				@list 'activities'
+				@list 'activities',
 					type: 'str'
 
 		player = Player.create()
@@ -462,7 +462,7 @@ describe 'Setting Records', ->
 	it 'Setting Lists with Array', (done) ->
 		class Player extends Orpheus
 			constructor: ->
-				@list 'activities'
+				@list 'activities',
 					type: 'str'
 
 		player = Player.create()
@@ -615,7 +615,7 @@ describe 'Adding to Records', ->
 	it 'Should add lists in a record (with an array)', (done) ->
 		class Player extends Orpheus
 			constructor: ->
-				@list 'activities'
+				@list 'activities',
 					type: 'str'
 
 		player = Player.create()
@@ -812,17 +812,17 @@ describe 'Validation', ->
 						maximum: 5
 				
 				@str 'password'
-				@validate 'password'
+				@validate 'password',
 					size:
 						in: [6,25]
 				
 				@str 'registration_number'
-				@validate 'registration_number'
+				@validate 'registration_number',
 					size:
 						is: 6
 				
 				@str 'content'
-				@validate 'content'
+				@validate 'content',
 					size:
 						tokenizer: (s) -> s.match(/\w+/g).length
 						is: 5
@@ -913,7 +913,7 @@ describe 'Validation', ->
 						less_than:    7
 						odd:          true
 				
-				@validate 'games_won'
+				@validate 'games_won',
 					numericality:
 						only_integer:             true
 						greater_than_or_equal_to: 10
@@ -1058,7 +1058,7 @@ describe 'Relations', ->
 							game('diablo').players.map players, (id, c, i) ->
 									c(null, {id: id, i: i})
 								, (err, players) ->
-									expect(err).toBeUndefined()
+									expect(err).toBeNull()
 									for p,i in players
 										expect(p.i).toBe i
 										expect(p.id).toBe ''+(15+i)
