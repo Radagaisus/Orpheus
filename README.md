@@ -13,8 +13,6 @@ Orpheus is a Redis Object Model for CoffeeScript.
 - Maps between strings and ids
 - Validations
 
-If you are using Orpheus please ping me on [Twitter](http://twitter.com/#!/radagaisus) or [EngineZombie](http://enginezombie.com/). It will make me happy.
-
 ## A Small Taste
 ```coffee
 class User extends Orpheus
@@ -29,9 +27,9 @@ class User extends Orpheus
     @map @str 'fb_id'
     @str 'fb_secret'
   
-user = User.create()
-  
-user('modest')
+User.create()
+
+Orpheus.schema.user('modest')
   .add
     about_me: 'I like douchebags and watermelon'
     points: 5
