@@ -1033,7 +1033,7 @@ describe 'Relations', ->
 					.exec (err, res) ->
 						expect(res[0]).toBe 'almog'
 						expect(res[1]).toBe 'mofasa'
-						done()				
+						done()		
 	
 	it 'Each', (done) ->
 		
@@ -1088,6 +1088,34 @@ describe 'Relations', ->
 		user = User.create()
 		user('rada').add_email_reply '#142', ->
 			done()
+
+
+	it 'Can work with a different namespace', (done) ->
+		class Player extends Orpheus
+			constructor: ->
+				@has 'game', namespace: 'blob'
+				@str 'name'
+
+		player = Player.create()
+		player('someplayer')
+			.name.set('hello')
+			.game('skyrim')
+			.name.set('hobbit')
+			.exec (err, res) ->
+				expect(err).toBeNull()
+				expect(res[0]).toBe 1
+				expect(res[1]).toBe 1
+
+				r.multi()
+					.hget("#{PREFIX}:pl:someplayer", 'name')
+					.hget("#{PREFIX}:pl:someplayer:ga:skyrim", 'name')
+					.hget("#{PREFIX}:pl:someplayer:blob:skyrim", 'name')
+					.exec (err, res) ->
+						expect(res[0]).toEqual 'hello'
+						expect(res[1]).toBeNull()
+						expect(res[2]).toEqual 'hobbit'
+						done()
+
 
 
 # Defaults

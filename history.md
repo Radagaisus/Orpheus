@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.0
+
+- Added the namespace option to `@has 'book', namespace: 'book'`.
+
 ## 0.2.3
 
 - Updated the dependencies for `underscore` and `async`.

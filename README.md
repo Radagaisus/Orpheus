@@ -298,6 +298,8 @@ user('chaplin').books.smembers (err, book_ids) ->
       # What? Did we just retrieved all the books from Redis?
 ```
 
+Your can pass `@has 'book', namespace: 'book'` to create a different namespace than the relation. The default would be `orpheus:us:{user_id}:bo:{book_id}`. By passing the namespace option the key will map to `orpheus:us:{user_id}:book:{book_id}`
+
 ## Dynamic Keys
 
 ```coffee

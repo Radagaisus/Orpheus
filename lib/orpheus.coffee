@@ -2,24 +2,21 @@
 #-------------------------------------#
 
 _            = require 'underscore'           
-async        = require 'async'            
-os           = require 'os'                    # ID Generation
-EventEmitter = require('events').EventEmitter
+async        = require 'async'        
+os           = require 'os'
 
-inflector    = require './inflector'   # Inflection
-commands     = require './commands'    # redis commands
-validations  = require './validations' # Validations
+inflector    = require './inflector'
+commands     = require './commands'
+validations  = require './validations'
 
 command_map    = commands.command_map
 validation_map = commands.validations
 getters        = commands.getters
 
-log = console.log
-
 # Orpheus
-#-------------------------------------#
-class Orpheus extends EventEmitter
-	@version = "0.2.2"
+# ---------------------------------------------------------------
+class Orpheus
+	@version = require('../package.json').version
 	
 	# Configuration
 	@config:
@@ -93,13 +90,24 @@ class Orpheus extends EventEmitter
 					throw new Error("Map only works on strings")
 				@model[field].options.map = true
 			
-			# Add relations
-			has: (rel) ->
-				@rels.push rel
-				qualifier = rel.substr(0,2)
-				@rels_qualifiers.push qualifier
-				
-				# create a relation function,
+			# Add relations.
+			# @param rel - {String} - the name of the relation
+			# @param options - {Object} - options object:
+			#   - namespace - if set, will use that namespace as
+			#     the relation qualifier. By default we use the
+			#     first two characters in the `rel` parameter.
+			# 
+			has: (rel, options = {}) ->
+				# Get the relation qualifier, either the namespace
+				# option or the first two characters in the `rel`.
+				# used in the relation key. For example, the key
+				# for a user in relation to a book will be:
+				#   orpheus:us:{user_id}:bo:{book_id}
+				qualifier = options.namespace || rel.substr(0,2)
+				# Add the relation and the qualifier to our lists
+				@rels.push(rel)
+				@rels_qualifiers.push(qualifier)
+
 				# e.g. user(12).book(15)
 				@[rel] = (id) ->
 					@["#{qualifier}_id"] = @["#{rel}_id"]= id
@@ -107,7 +115,9 @@ class Orpheus extends EventEmitter
 
 				@['un'+rel] = ->
 					@["#{qualifier}_id"] = @["#{rel}_id"] = null
+					return @
 			
+
 			# Add a validation function to a field
 			# Example:
 			# @validate 'name', (name) ->
@@ -610,5 +620,5 @@ class OrpheusValidationErrors
 			obj.errors[k] = (m.msg for m in v)
 		obj
 
-# Export
+# Export Orpheus
 module.exports = Orpheus
