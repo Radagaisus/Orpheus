@@ -111,11 +111,11 @@ class Orpheus
 				# e.g. user(12).book(15)
 				@[rel] = (id) ->
 					@["#{qualifier}_id"] = @["#{rel}_id"]= id
-					return @
+					return this
 
 				@['un'+rel] = ->
 					@["#{qualifier}_id"] = @["#{rel}_id"] = null
-					return @
+					return this
 			
 
 			# Add a validation function to a field
@@ -316,39 +316,44 @@ class OrpheusAPI
 			if _.isObject(args[args.length-1]) and args[args.length-1].key
 				dynamic_key_args = args.pop().key
 
-			# Type Conversion
-			# ------------------------
+			
+			field = args[0]
 			# Convert types for all the commands
 			# in the validation map.
 			if validation_map[f]
+				# If the field should be a string field
 				if type is 'str'
-					if typeof args[0] isnt 'string'
-						if typeof args[0] is 'number'
-							args[0] = args[0].toString()
+					# If it's not a string
+					if not _.isString(field)
+						# If it's a number
+						if _.isNumber(field)
+							# Convert to a string
+							field = field.toString()
+						# Otherwise, file a validation eror
 						else
 							@validation_errors.add key,
-								msg: "Could not convert #{args[0]} to string"
+								msg: "Could not convert #{key} to string"
 								command: f
 								args: args
-								value: args[0]
-							return
+								value: field
+							return this
 				
 				if type is 'num'
-					if typeof args[0] isnt 'number'
-						args[0] = Number args[0]
-					if not isFinite(args[0]) or isNaN(args[0])
+					if not _.isNumber(field)
+						field = Number(field)
+					if not isFinite(field) or isNaN(field)
 						@validation_errors.add key,
 							msg: "Malformed number"
 							command: f
 							args: args
-							value: args[0]
-						return
+							value: field
+						return this
 			
 			# Add multi command
 			@_commands.push _.flatten [f, @_get_key(key, dynamic_key_args), args]
 			
 			# Response Schema
-			# --------------------
+			# --------------------------------------
 			# If the command is a get command
 			if f in getters
 				@_res_schema.push
@@ -372,12 +377,12 @@ class OrpheusAPI
 								value: args[0]
 					
 					# no need to check the extra commands
-					return @ unless @validation_errors.valid()
+					return this unless @validation_errors.valid()
 			
 			# Extra commands: mapping
 			@_extra_commands(key, f, args) if @model[key].options.map
 			
-			return @
+			return this
 		
 		# Shorthand form, incrby instead of zincrby and hincrby is also acceptable
 		# str: h, num: h, list: l, set: s, zset: z
@@ -544,7 +549,7 @@ class OrpheusAPI
 	# 
 	err: (fn) ->
 		@error_func = fn || -> # noop
-		return @
+		return this
 	
 	# execute the multi commands
 	exec: (fn) ->

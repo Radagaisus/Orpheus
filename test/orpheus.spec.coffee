@@ -757,7 +757,7 @@ describe 'Validation', ->
 				points: '20a'         # This will not work
 			.err (err) ->
 				expect(err.type).toBe 'validation'
-				expect(err.toResponse().errors.name[0]).toBe 'Could not convert sonic youth to string'
+				expect(err.toResponse().errors.name[0]).toBe 'Could not convert name to string'
 				expect(err.toResponse().errors.points[0]).toBe 'Malformed number'
 				done()
 			.exec ->
