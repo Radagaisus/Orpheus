@@ -179,30 +179,91 @@ class Orpheus
 										return true
 
 
-			# return OrpheusAPI if we have the id, or it's
-			# a new id. otherwise, hget the id and then call
-			# orpheus api.
+			
+			# The `id` function is the main interface for querying Orpheus
+			# models. After the model is created it can be "instantiated"
+			# by calling this function. For example, after a User model
+			# was created the `id` function will be available as
+			# `orpheus.schema.user`.
+			# 
+			# The `id` function handles two cases: (1) where the model id
+			# is known - we simply create a new OrpheusAPI instance and
+			# return it; (2) when the model is being requested using a map:
+			# when a model attribute is defined as `@map` we automatically
+			# create a hash of `attribute_value -> model_id` under the key
+			# `prefix:plural_model_name:map:plural_attribute_name`. For
+			# example, if there's a map on the user name the key will look
+			# as `orpheus:users:map:names`. When `id` is called using an
+			# object of the form `{attribute_name: attribute_value}` we
+			# first search the map hash for the model id. If we find it,
+			# we return that model id. Otherwise, we create a new model.
+			# 
+			# When using the mapped version of the function, a callback
+			# function must be passed as a second parameter. The callback
+			# receives 3 parameters: `error` if there was an error, `id`
+			# is the model id and `is_new` is a boolean indicating whether
+			# this is a new model and a map was not found.
+			# 
+			# Usage:
+			#   Orpheus.schema.user(req.user.id)
+			#     name.set('colombus').exec()
+			# 
+			#   Orpheus.scehma.user()
+			#     .name.set('whatever').exec()  
+			# 
+			#   Orpheus.schema.user name: 'colombus', (err, id, is_new) ->
+			#     req.session.user.id = id
+			# 
+			# @param id - {Mixed} optional. either the model is as a number or a
+			# string, or an object map to use to look up the model id, in the form
+			# of `{attribute_name: attribute_value`}. If the id parameter is not
+			# provided a new model id will be generated.
+			# @param fn - {Function} optional. A callback function, used when
+			# calling `id` with a map object.
+			# @return an OrpheusAPI instance ready for querying the model.
+			# 
 			id: (id, fn) =>
+				# If there is no ID or there is a regular string/number id
 				if not id or _.isString(id) or _.isNumber(id)
+					# If there's a callback function provided
 					if fn
+						# Create a new OrpheusAPI instance
 						new_model = new OrpheusAPI(id, this)
-						fn null, new_model, new_model.id, false
+						# Call the callback function
+						fn(null, new_model, new_model.id, false)
 					else
+						# Simply create a new OrpheusAPI instance and return it
 						new OrpheusAPI(id, this)
-				else
-					for k,v of id
-						pk = inflector.pluralize k
-						@redis.hget "#{@prefix}:#{@pname}:map:#{pk}", v, (err, model_id) =>
-							return fn err, false if err
+				# If the `id` parameter is a map object
+				else if _.isObject(id) and fn
+					# Break the map into an attribute name and value
+					for name, value of id
+						# Pluralize the attribute name
+						plural_name = inflector.pluralize(name)
+						# Create the Redis map key
+						key = "#{@prefix}:#{@pname}:map:#{plural_name}"
+						# Try to see if there's a hash record for the model
+						# id using the map object value
+						@redis.hget key, value, (err, model_id) =>
+							return fn(err) if err
+							# If there is an existing model record in the map
 							if model_id
-								# existing
+								# Create a new OrpheusAPI instance with the id
 								new_model = new OrpheusAPI(model_id, this)
-								fn null, new_model, model_id, false
+								# Call the callback function
+								fn(null, new_model, model_id, false)
+							# The model record was not found, we'll create a new one
 							else
-								# new
-								model = new OrpheusAPI(null, this)
-								model._add_map pk, v
-								fn null, model, model.id, true
+								# Create a new OrpheusAPI instance with no id
+								new_model = new OrpheusAPI(null, this)
+								# Add a map for the new model with the specified value
+								new_model._add_map(plural_name, value)
+								# Call the callback function
+								fn(null, new_model, model.id, true)
+				else
+					# Throw an error, the `id` parameter was not passed correctly
+					message = "Orpheus Model must be instantiated with a proper id"
+					throw new Error(message)
 					
 		
 		# Converts class Player to 'player'
@@ -559,7 +620,7 @@ class OrpheusAPI
 		unless @validation_errors.valid()
 			if @error_func
 			then return @error_func @validation_errors, @id
-			else return fn          @validation_errors, null, @id
+			else return fn @validation_errors, null, @id
 		
 		@redis
 			.multi(@_commands)
