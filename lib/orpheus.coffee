@@ -259,7 +259,7 @@ class Orpheus
 								# Add a map for the new model with the specified value
 								new_model._add_map(plural_name, value)
 								# Call the callback function
-								fn(null, new_model, model.id, true)
+								fn(null, new_model, new_model.id, true)
 				else
 					# Throw an error, the `id` parameter was not passed correctly
 					message = "Orpheus Model must be instantiated with a proper id"

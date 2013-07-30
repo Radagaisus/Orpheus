@@ -227,7 +227,7 @@
                 } else {
                   new_model = new OrpheusAPI(null, _this);
                   new_model._add_map(plural_name, value);
-                  return fn(null, new_model, model.id, true);
+                  return fn(null, new_model, new_model.id, true);
                 }
               }));
             }
