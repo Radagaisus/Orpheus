@@ -202,7 +202,7 @@
         };
 
         OrpheusModel.prototype.id = function(id, fn) {
-          var k, new_model, pk, v, _results,
+          var key, message, name, new_model, plural_name, value, _results,
             _this = this;
           if (!id || _.isString(id) || _.isNumber(id)) {
             if (fn) {
@@ -211,27 +211,30 @@
             } else {
               return new OrpheusAPI(id, this);
             }
-          } else {
+          } else if (_.isObject(id) && fn) {
             _results = [];
-            for (k in id) {
-              v = id[k];
-              pk = inflector.pluralize(k);
-              _results.push(this.redis.hget("" + this.prefix + ":" + this.pname + ":map:" + pk, v, function(err, model_id) {
-                var model;
+            for (name in id) {
+              value = id[name];
+              plural_name = inflector.pluralize(name);
+              key = "" + this.prefix + ":" + this.pname + ":map:" + plural_name;
+              _results.push(this.redis.hget(key, value, function(err, model_id) {
                 if (err) {
-                  return fn(err, false);
+                  return fn(err);
                 }
                 if (model_id) {
                   new_model = new OrpheusAPI(model_id, _this);
                   return fn(null, new_model, model_id, false);
                 } else {
-                  model = new OrpheusAPI(null, _this);
-                  model._add_map(pk, v);
-                  return fn(null, model, model.id, true);
+                  new_model = new OrpheusAPI(null, _this);
+                  new_model._add_map(plural_name, value);
+                  return fn(null, new_model, model.id, true);
                 }
               }));
             }
             return _results;
+          } else {
+            message = "Orpheus Model must be instantiated with a proper id";
+            throw new Error(message);
           }
         };
 
@@ -252,7 +255,7 @@
   OrpheusAPI = (function() {
 
     function OrpheusAPI(id, model) {
-      var f, key, prel, rel, value, _fn, _fn1, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3, _ref4,
+      var f, key, prel, rel, value, _fn, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3, _ref4,
         _this = this;
       this.model = model;
       this._create_getter_object = __bind(this._create_getter_object, this);
@@ -267,8 +270,28 @@
         return _this;
       };
       _ref = this.rels;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        rel = _ref[_i];
+        prel = inflector.pluralize(rel);
+        this.model[prel] = {
+          type: 'set',
+          options: {}
+        };
+        this[prel] = {};
+      }
+      _ref1 = this.model;
+      for (key in _ref1) {
+        value = _ref1[key];
+        this[key] = {};
+        _ref2 = commands[value.type];
+        for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
+          f = _ref2[_j];
+          this._create_command(key, value, f);
+        }
+      }
+      _ref3 = this.rels;
       _fn = function(rel, prel) {
-        var k, v, _ref1, _results;
+        var k, v, _ref4, _results;
         _this[prel].map = function(arr, iter, done) {
           var i;
           if (arr == null) {
@@ -282,41 +305,16 @@
         _results = [];
         for (k in async) {
           v = async[k];
-          if ((_ref1 = !k) === 'map' || _ref1 === 'noConflict') {
+          if ((_ref4 = !k) === 'map' || _ref4 === 'noConflict') {
             _results.push(_this[prel][k] = v);
           }
         }
         return _results;
       };
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        rel = _ref[_i];
+      for (_k = 0, _len2 = _ref3.length; _k < _len2; _k++) {
+        rel = _ref3[_k];
         prel = inflector.pluralize(rel);
-        this[prel] = {};
-        _ref1 = commands.set;
-        _fn1 = function(prel, f) {
-          _this[prel][f] = function() {
-            var args, fn, _k;
-            args = 2 <= arguments.length ? __slice.call(arguments, 0, _k = arguments.length - 1) : (_k = 0, []), fn = arguments[_k++];
-            _this.redis[f](["" + _this.prefix + ":" + _this.q + ":" + _this.id + ":" + prel].concat(args), fn);
-            return _this;
-          };
-          return _this[prel][f.slice(1)] = _this[prel][f];
-        };
-        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-          f = _ref1[_j];
-          _fn1(prel, f);
-        }
         _fn(rel, prel);
-      }
-      _ref2 = this.model;
-      for (key in _ref2) {
-        value = _ref2[key];
-        this[key] = {};
-        _ref3 = commands[value.type];
-        for (_k = 0, _len2 = _ref3.length; _k < _len2; _k++) {
-          f = _ref3[_k];
-          this._create_command(key, value, f);
-        }
       }
       this.operations = ['add', 'set', 'del'];
       _ref4 = this.operations;
@@ -331,39 +329,40 @@
         _this = this;
       type = value.type;
       this[key][f] = function() {
-        var args, dynamic_key_args, result, v, _i, _len, _ref;
+        var args, dynamic_key_args, field, result, v, _i, _len, _ref;
         args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
         if (_.isObject(args[args.length - 1]) && args[args.length - 1].key) {
           dynamic_key_args = args.pop().key;
         }
+        field = args[0];
         if (validation_map[f]) {
           if (type === 'str') {
-            if (typeof args[0] !== 'string') {
-              if (typeof args[0] === 'number') {
-                args[0] = args[0].toString();
+            if (!_.isString(field)) {
+              if (_.isNumber(field)) {
+                field = field.toString();
               } else {
                 _this.validation_errors.add(key, {
-                  msg: "Could not convert " + args[0] + " to string",
+                  msg: "Could not convert " + key + " to string",
                   command: f,
                   args: args,
-                  value: args[0]
+                  value: field
                 });
-                return;
+                return _this;
               }
             }
           }
           if (type === 'num') {
-            if (typeof args[0] !== 'number') {
-              args[0] = Number(args[0]);
+            if (!_.isNumber(field)) {
+              field = Number(field);
             }
-            if (!isFinite(args[0]) || isNaN(args[0])) {
+            if (!isFinite(field) || isNaN(field)) {
               _this.validation_errors.add(key, {
                 msg: "Malformed number",
                 command: f,
                 args: args,
-                value: args[0]
+                value: field
               });
-              return;
+              return _this;
             }
           }
         }
@@ -574,7 +573,7 @@
     OrpheusAPI.prototype.exec = function(fn) {
       var _this = this;
       fn || (fn = function() {});
-      if (!this.validation_errors.valid()) {
+      if (this.validation_errors.invalid()) {
         if (this.error_func) {
           return this.error_func(this.validation_errors, this.id);
         } else {

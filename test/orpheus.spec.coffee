@@ -1028,6 +1028,38 @@ describe 'Maps', ->
 # ------------------------------
 describe 'Relations', ->
 	
+	it 'handles getting and setting', (done) ->
+		class User extends Orpheus
+			constructor: ->
+				@has 'thing'
+				@str 'name'
+
+		class Thing extends Orpheus
+			constructor: ->
+				@has 'user'
+				@str 'name'
+
+
+		thing = Thing.create()
+		user = User.create()
+
+		user('someuser')
+			.things.sadd('34234')
+			.things.scard()
+			.exec (err, res) ->
+				expect(err).toBeNull()
+				expect(res[0]).toEqual 1
+				expect(res[1]).toEqual 1
+				done()
+
+				thing('something')
+					.users.sadd('555')
+					.users.scard()
+					.exec (err, res) ->
+						expect(err).toBeNull()
+						expect(res[0]).toEqual(1)
+						expect(res[1]).toEqual(1)
+
 	it 'One has', (done) ->
 		class Player extends Orpheus
 			constructor: ->
