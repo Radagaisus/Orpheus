@@ -1065,17 +1065,17 @@ describe 'Relations', ->
 		
 		game = Game.create()
 		player = Player.create()
-		game('diablo').players.sadd '15', '16', '17', ->
+		game('diablo').players.sadd('15', '16', '17').exec ->
 			player('15').name.set('almog').exec ->
 				player('16').name.set('almog').exec ->
 					player('17').name.set('almog').exec ->
 						
-						game('diablo').players.smembers (err, players) ->
+						game('diablo').players.smembers().exec (err, players) ->
 							expect(err).toBe null
 							game('diablo').players.map players, (id, c, i) ->
 									c(null, {id: id, i: i})
 								, (err, players) ->
-									expect(err).toBeNull()
+									expect(err).toBeUndefined()
 									for p,i in players
 										expect(p.i).toBe i
 										expect(p.id).toBe ''+(15+i)

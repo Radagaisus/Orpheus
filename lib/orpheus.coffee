@@ -324,34 +324,9 @@ class OrpheusAPI
 		# e.g. user(15).books.sadd('dune') will map to sadd
 		# orpheus:us:15:books dune.
 		for rel in @rels
-			prel = inflector.pluralize rel
+			prel = inflector.pluralize(rel)
+			@model[prel] = {type: 'set', options: {}}
 			@[prel] = {}
-
-			for f in commands.set
-				do (prel, f) =>
-
-					@[prel][f] = (args..., fn) =>
-						@redis[f](["#{@prefix}:#{@q}:#{@id}:#{prel}"].concat(args), fn)
-						return this
-					
-					# shorthand, use add instead of sadd
-					@[prel][f[1..]] = @[prel][f]
-			
-			
-			# Async functions for handling relations
-			do (rel, prel) =>
-				
-				# user(10).books.each
-				# Run in parallel using async
-				@[prel].map = (arr = [], iter, done) =>
-					i = 0
-					async.map arr, (item, cb) ->
-							iter item, cb, i++
-						, done
-				
-				# Add all async functions.
-				for k,v of async when not k in ['map', 'noConflict']
-					@[prel][k] = v
 		
 		
 		# Add all redis commands relevant to the field and its type
@@ -360,7 +335,23 @@ class OrpheusAPI
 			@[key] = {}
 			for f in commands[value.type]
 				@_create_command key, value, f
-		
+
+		for rel in @rels
+			prel = inflector.pluralize(rel)
+			# Async functions for handling relations
+			do (rel, prel) =>
+				
+				# user(10).books.each
+				# Run in parallel using async
+				@[prel].map = (arr = [], iter, done) =>
+					i = 0
+					async.map arr, (item, cb) ->
+						iter item, cb, i++
+					, done
+				
+				# Add all async functions.
+				for k,v of async when not k in ['map', 'noConflict']
+					@[prel][k] = v
 		
 		# Create the Add, Set and Del commands
 		@operations = ['add', 'set', 'del']
@@ -612,16 +603,23 @@ class OrpheusAPI
 		@error_func = fn || -> # noop
 		return this
 	
-	# execute the multi commands
+	# Executes all the commands in the current query
+	# @param fn - {Function} callback function.
 	exec: (fn) ->
-		fn ||= -> # noop
+		# Set the callback function to a no-op function by default
+		fn ||= ->
 		
-		# Check for validation errors
-		unless @validation_errors.valid()
+		# If there were any validation errors we immediately call
+		# the callback before issuing any commands to redis. If
+		# an error callback was supplied with `err` then we call
+		# it with the validation errors and the model id. Otherwise
+		# we call the `fn` callback with the errors, `null` as the
+		# results and the model id.
+		if @validation_errors.invalid()
 			if @error_func
-			then return @error_func @validation_errors, @id
-			else return fn @validation_errors, null, @id
-		
+			then return @error_func(@validation_errors, @id)
+			else return fn(@validation_errors, null, @id)
+
 		@redis
 			.multi(@_commands)
 			.exec (err, res) =>
@@ -653,8 +651,9 @@ class OrpheusAPI
 					if @_new_id then fn err, res, @id
 					else fn err, res
 
+
 # Orpheus Validation errors
-#-------------------------------------#
+#---------------------------------------------------------------------#
 class OrpheusValidationErrors
 	
 	constructor: ->
@@ -665,7 +664,7 @@ class OrpheusValidationErrors
 		_.isEmpty @errors
 	
 	invalid: ->
-		!@valid()
+		not @valid()
 	
 	add: (field, error) ->
 		# Add date, useful for logging

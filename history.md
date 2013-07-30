@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1
+
+- Relationship queries must use `.exec` to execute.
+
 ## 0.3.0
 
 - Added the namespace option to `@has 'book', namespace: 'book'`.
