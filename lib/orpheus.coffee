@@ -333,8 +333,13 @@ class OrpheusAPI
 		# Example: model('id').ranking.zadd (zrank, zscore...)
 		for key, value of @model
 			@[key] = {}
+			# Add all the type commands
 			for f in commands[value.type]
 				@_create_command key, value, f
+			# Add key commands (del, expire, etc)
+			if value.type in ['set', 'zset', 'hash', 'list']
+				for f in commands.keys
+					@_create_command key, value, f
 
 		for rel in @rels
 			prel = inflector.pluralize(rel)
@@ -354,8 +359,7 @@ class OrpheusAPI
 					@[prel][k] = v
 		
 		# Create the Add, Set and Del commands
-		@operations = ['add', 'set', 'del']
-		for f in @operations
+		for f in ['add', 'set']
 			@_add_op f
 
 

@@ -82,7 +82,7 @@ shorthands:
 
 So the commands above could have been just `set`, `incrby` and `add`.
 
-### Adding, Setting, Deleting
+### Adding, Setting
 
 ```coffee
 user('dune')
@@ -94,7 +94,7 @@ user('dune')
   .exec()
 ```
 
-```
+```coffee
 add:
 	num:  'hincrby'
 	str:  'hset'
@@ -108,6 +108,12 @@ set:
 	set:  'sadd'
 	zset: 'zadd'
 	list: 'lpush'
+```
+
+### Removing the Model
+
+```coffee
+user('dune').delete (err, res) ->
 ```
 
 ### Getting Stuff

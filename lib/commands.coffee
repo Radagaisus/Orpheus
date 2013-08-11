@@ -153,6 +153,20 @@ module.exports =
 		'hsetnx',
 		'hvals'
 	]
+
+	# Operations that can be called on zset, set, hash and list attributes
+	keys: [
+		'type'
+		'ttl'
+		'pexpire'
+		'pexpireat'
+		'pttl'
+		'persist'
+		'expireat'
+		'expire'
+		'exists'
+		'del'
+	]
 	
 	shorthands:
 		str: 'h'
@@ -180,10 +194,3 @@ module.exports =
 			set: 'sadd'
 			zset: 'zadd'
 			list: 'lpush'
-		
-		delete:
-			num: 'hdel'
-			str: 'hdel'
-			set: 'del'
-			zset: 'del'
-			list: 'del'

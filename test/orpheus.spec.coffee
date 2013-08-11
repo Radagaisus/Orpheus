@@ -735,6 +735,32 @@ describe 'Delete', ->
 							
 							done()
 
+	it 'Deletes specific model attributes', (done) ->
+		class User extends Orpheus
+			constructor: ->
+				@num 'points'
+				@list 'things'
+
+		user = User.create()
+		user('someone')
+			.points.set(10)
+			.things.push(1, 2, 3, 4)
+			.exec ->
+				r.hgetall "#{PREFIX}:us:someone", (err, res) ->
+					expect(res.points).toEqual '10'
+
+					# Delete the keys
+					user('someone')
+						.points.del()
+						.exec ->
+							r.exists "#{PREFIX}:us:someone", (err, res) ->
+								expect(res).toEqual 0
+
+								user('someone').things.del().exec ->
+									r.exists "#{PREFIX}:us:someone:things", (err, res) ->
+										expect(res).toEqual 0
+										done()
+
 
 # Validations
 # ------------------------------------------------
@@ -1220,3 +1246,4 @@ describe 'Regressions', ->
 				.exec (err, res) ->
 					expect(res.points).toBe(0)
 					done()
+

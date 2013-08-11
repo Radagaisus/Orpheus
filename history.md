@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.0
+- Removed the `.del` operation.
+- Added the `type`, `ttl`, `pexpire`, `pexpireat`, `pttl`, `persist`, `expireat`, `expire` `exists` and `del` commands for sets, zsets, lists and hashes.
+
 ## 0.3.1
 
 - Relationship queries must use `.exec` to execute.
