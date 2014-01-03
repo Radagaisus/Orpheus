@@ -23,6 +23,7 @@
     set: ['sadd', 'scard', 'sdiff', 'sdiffstore', 'sinter', 'sinterstore', 'sismember', 'smembers', 'smove', 'spop', 'srandmember', 'srem', 'sunion', 'sunionstore'],
     zset: ['zadd', 'zcard', 'zcount', 'zincrby', 'zinterstore', 'zrange', 'zrangebyscore', 'zrank', 'zrem', 'zremrangebyrank', 'zremrangebyscore', 'zrevrange', 'zrevrangebyscore', 'zrevrank', 'zscore', 'zunionstore'],
     hash: ['hdel', 'hexists', 'hget', 'hgetall', 'hincrby', 'hincrbyfloat', 'hkeys', 'hlen', 'hmget', 'hmset', 'hset', 'hsetnx', 'hvals'],
+    keys: ['type', 'ttl', 'pexpire', 'pexpireat', 'pttl', 'persist', 'expireat', 'expire', 'exists', 'del'],
     shorthands: {
       str: 'h',
       num: 'h',
@@ -45,13 +46,6 @@
         set: 'sadd',
         zset: 'zadd',
         list: 'lpush'
-      },
-      "delete": {
-        num: 'hdel',
-        str: 'hdel',
-        set: 'del',
-        zset: 'del',
-        list: 'del'
       }
     }
   };

@@ -415,6 +415,7 @@ class OrpheusAPI
 				@_res_schema.push
 					type: type
 					name: key
+					dynamic_key_args: dynamic_key_args
 					with_scores: type is 'zset' and 'withscores' in args
 			
 			# Run validation, if needed
@@ -581,10 +582,19 @@ class OrpheusAPI
 			if new_res[s.name]?
 				# We use temp_res as a temporary storage for
 				# the multiple results array.
-				if temp_res[s.name]?
-					temp_res[s.name].push res[i]
+
+				if @model[s.name].options.key
+
+					temp_res[s.name] ||= {}
+					dynamic_key = @model[s.name].options.key.apply(this, s.dynamic_key_args)
+					temp_res[s.name][dynamic_key] = res[i]
+
 				else
-					temp_res[s.name] = [new_res[s.name], res[i]]
+
+					if temp_res[s.name]?
+						temp_res[s.name].push res[i]
+					else
+						temp_res[s.name] = [new_res[s.name], res[i]]
 
 				new_res[s.name] = temp_res[s.name]
 			else

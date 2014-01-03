@@ -255,7 +255,7 @@
   OrpheusAPI = (function() {
 
     function OrpheusAPI(id, model) {
-      var f, key, prel, rel, value, _fn, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3, _ref4,
+      var f, key, prel, rel, value, _fn, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6,
         _this = this;
       this.model = model;
       this._create_getter_object = __bind(this._create_getter_object, this);
@@ -288,10 +288,17 @@
           f = _ref2[_j];
           this._create_command(key, value, f);
         }
+        if ((_ref3 = value.type) === 'set' || _ref3 === 'zset' || _ref3 === 'hash' || _ref3 === 'list') {
+          _ref4 = commands.keys;
+          for (_k = 0, _len2 = _ref4.length; _k < _len2; _k++) {
+            f = _ref4[_k];
+            this._create_command(key, value, f);
+          }
+        }
       }
-      _ref3 = this.rels;
+      _ref5 = this.rels;
       _fn = function(rel, prel) {
-        var k, v, _ref4, _results;
+        var k, v, _ref6, _results;
         _this[prel].map = function(arr, iter, done) {
           var i;
           if (arr == null) {
@@ -305,21 +312,20 @@
         _results = [];
         for (k in async) {
           v = async[k];
-          if ((_ref4 = !k) === 'map' || _ref4 === 'noConflict') {
+          if ((_ref6 = !k) === 'map' || _ref6 === 'noConflict') {
             _results.push(_this[prel][k] = v);
           }
         }
         return _results;
       };
-      for (_k = 0, _len2 = _ref3.length; _k < _len2; _k++) {
-        rel = _ref3[_k];
+      for (_l = 0, _len3 = _ref5.length; _l < _len3; _l++) {
+        rel = _ref5[_l];
         prel = inflector.pluralize(rel);
         _fn(rel, prel);
       }
-      this.operations = ['add', 'set', 'del'];
-      _ref4 = this.operations;
-      for (_l = 0, _len3 = _ref4.length; _l < _len3; _l++) {
-        f = _ref4[_l];
+      _ref6 = ['add', 'set'];
+      for (_m = 0, _len4 = _ref6.length; _m < _len4; _m++) {
+        f = _ref6[_m];
         this._add_op(f);
       }
     }
@@ -371,6 +377,7 @@
           _this._res_schema.push({
             type: type,
             name: key,
+            dynamic_key_args: dynamic_key_args,
             with_scores: type === 'zset' && __indexOf.call(args, 'withscores') >= 0
           });
         }
@@ -526,7 +533,7 @@
     };
 
     OrpheusAPI.prototype._create_getter_object = function(res) {
-      var field, i, index, member, new_res, s, temp_res, zset, _i, _j, _len, _len1, _ref, _ref1, _step;
+      var dynamic_key, field, i, index, member, new_res, s, temp_res, zset, _i, _j, _len, _len1, _name, _ref, _ref1, _step;
       new_res = {};
       temp_res = {};
       _ref = this._res_schema;
@@ -544,10 +551,16 @@
           res[i] = zset;
         }
         if (new_res[s.name] != null) {
-          if (temp_res[s.name] != null) {
-            temp_res[s.name].push(res[i]);
+          if (this.model[s.name].options.key) {
+            temp_res[_name = s.name] || (temp_res[_name] = {});
+            dynamic_key = this.model[s.name].options.key.apply(this, s.dynamic_key_args);
+            temp_res[s.name][dynamic_key] = res[i];
           } else {
-            temp_res[s.name] = [new_res[s.name], res[i]];
+            if (temp_res[s.name] != null) {
+              temp_res[s.name].push(res[i]);
+            } else {
+              temp_res[s.name] = [new_res[s.name], res[i]];
+            }
           }
           new_res[s.name] = temp_res[s.name];
         } else {
