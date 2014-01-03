@@ -340,6 +340,11 @@ class OrpheusAPI
 			if value.type in ['set', 'zset', 'hash', 'list']
 				for f in commands.keys
 					@_create_command key, value, f
+			# Add a `key` function, that supplies dynamic key arguments for keys.
+			do (key) =>
+				@[key].key = (args...) =>
+					@[key]._key_arguments = args
+					return @[key]
 
 		for rel in @rels
 			prel = inflector.pluralize(rel)
@@ -492,11 +497,18 @@ class OrpheusAPI
 		
 		type = @model[key].type
 		
-		# Generate a new key name, if it has a dynamic key function.
+		# Generate a new key name, if it has a dynamic key function, and if it's not
+		# just a request to get the regular model hash.
 		if key and @model[key].options.key
-			# Dynamic keys arguments can be passed in an array, or, if it's just one
-			# key, as is.
-			dynamic_key_args = [dynamic_key_args] unless _.isArray(dynamic_key_args)
+			# If the dynamic key was supploed as a paramter, we use that. Otherwise,
+			# we use the `@[key]._key_arguments` that was supplied using the `key`
+			# function.
+			if dynamic_key_args
+				# Dynamic keys arguments can be passed in an array, or, if it's just one
+				# key, as is.
+				dynamic_key_args = [dynamic_key_args] unless _.isArray(dynamic_key_args)
+			else
+				dynamic_key_args = @[key]._key_arguments
 			# Call the model key function with the dynamic key arguments to get the key
 			key = @model[key].options.key.apply(this, dynamic_key_args)
 		

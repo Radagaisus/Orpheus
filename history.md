@@ -36,6 +36,28 @@ Instead of:
 }
 
 
+- Add a new function for all dynamic key models, `key`, that stores and then uses the parameters it was supplied with as the dynamic key arguments for the command. For example:
+
+```coffee
+class User extends orpheus
+	constructor: ->
+		@set 'books', key: (genre) -> "books:#{genre}"
+
+user = orpheus.schema.user
+
+user(user_id)
+	.books.key('scifi').add('Hyperion')
+	.exec()
+```
+
+Might be more convenient than:
+
+```coffee
+user(uder_id)
+	.books.add('Hyperion', key: 'scifi')
+	.exec()
+```
+
 - Support for NodeJS 0.10 and above
 
 

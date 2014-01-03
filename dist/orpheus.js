@@ -255,7 +255,7 @@
   OrpheusAPI = (function() {
 
     function OrpheusAPI(id, model) {
-      var f, key, prel, rel, value, _fn, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6,
+      var f, key, prel, rel, value, _fn, _fn1, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6,
         _this = this;
       this.model = model;
       this._create_getter_object = __bind(this._create_getter_object, this);
@@ -280,6 +280,14 @@
         this[prel] = {};
       }
       _ref1 = this.model;
+      _fn = function(key) {
+        return _this[key].key = function() {
+          var args;
+          args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+          _this[key]._key_arguments = args;
+          return _this[key];
+        };
+      };
       for (key in _ref1) {
         value = _ref1[key];
         this[key] = {};
@@ -295,9 +303,10 @@
             this._create_command(key, value, f);
           }
         }
+        _fn(key);
       }
       _ref5 = this.rels;
-      _fn = function(rel, prel) {
+      _fn1 = function(rel, prel) {
         var k, v, _ref6, _results;
         _this[prel].map = function(arr, iter, done) {
           var i;
@@ -321,7 +330,7 @@
       for (_l = 0, _len3 = _ref5.length; _l < _len3; _l++) {
         rel = _ref5[_l];
         prel = inflector.pluralize(rel);
-        _fn(rel, prel);
+        _fn1(rel, prel);
       }
       _ref6 = ['add', 'set'];
       for (_m = 0, _len4 = _ref6.length; _m < _len4; _m++) {
@@ -458,8 +467,12 @@
       }
       type = this.model[key].type;
       if (key && this.model[key].options.key) {
-        if (!_.isArray(dynamic_key_args)) {
-          dynamic_key_args = [dynamic_key_args];
+        if (dynamic_key_args) {
+          if (!_.isArray(dynamic_key_args)) {
+            dynamic_key_args = [dynamic_key_args];
+          }
+        } else {
+          dynamic_key_args = this[key]._key_arguments;
         }
         key = this.model[key].options.key.apply(this, dynamic_key_args);
       }

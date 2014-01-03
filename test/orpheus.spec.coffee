@@ -151,7 +151,22 @@ describe 'Redis Commands', ->
 				r.hget "#{PREFIX}:te:hello", "test:yeah", (err, res) ->
 					expect(res).toBe 'Barış'
 					done()
-	
+
+	it 'Dynamic key arguments, using the key function', (done) ->
+
+		class Test extends Orpheus
+			constructor: ->
+				@str 'something', key: (one, two) -> "#{one}:#{two}"
+
+		test = Test.create()
+		
+		test('hi')
+			.something.key('ha', 'ha').set('boom')
+			.exec ->
+				r.hget "#{PREFIX}:te:hi", "ha:ha", (err, res) ->
+					expect(res).toBe 'boom'
+					done()
+
 
 	it 'Num and Str single commands', (done) ->
 		class Player extends Orpheus
