@@ -458,6 +458,9 @@
       }
       type = this.model[key].type;
       if (key && this.model[key].options.key) {
+        if (!_.isArray(dynamic_key_args)) {
+          dynamic_key_args = [dynamic_key_args];
+        }
         key = this.model[key].options.key.apply(this, dynamic_key_args);
       }
       if (type === 'str' || type === 'num') {

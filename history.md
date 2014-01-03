@@ -1,7 +1,55 @@
 # Changelog
 
+## 0.5.0
+
+- Added a way to send dynamic key arguments as either an array or, if it's one argument, as is. For example, `User('id').yearly_bread(key: [2012]).exec()` as well as `User('id').yearly_bread(key: [2012]).exec()`.
+
+- If multiple values of a dynamic key were requested during one request, the result will be returned as an object, with the generated keys as the object keys, instead of arrays. For example:
+
+```coffee
+
+User('radagaisus')
+	.books(key: 'history').smembers()
+	.books.key('science').smembers()
+	.exec ->
+```
+
+Will result in:
+
+```coffee
+{
+	books: {
+		history: ['1776', 'The Devil in the White City']
+		science: ['The Selfish Gene']
+	}
+}
+```
+
+Instead of:
+
+```coffee
+{
+	books: [
+		['1776', 'The Devil in the White City'],
+		['The Selfish Gene']
+	]
+}
+
+
+- Support for NodeJS 0.10 and above
+
+
+
+## 0.5.0
+
+- Added a way to wsend
+
+- 
+
 ## 0.4.0
+
 - Removed the `.del` operation.
+
 - Added the `type`, `ttl`, `pexpire`, `pexpireat`, `pttl`, `persist`, `expireat`, `expire` `exists` and `del` commands for sets, zsets, lists and hashes.
 
 ## 0.3.1
