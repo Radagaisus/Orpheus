@@ -492,9 +492,12 @@ class OrpheusAPI
 		
 		type = @model[key].type
 		
-		# generate a new key name, if it has a
-		# dynamic key function.
+		# Generate a new key name, if it has a dynamic key function.
 		if key and @model[key].options.key
+			# Dynamic keys arguments can be passed in an array, or, if it's just one
+			# key, as is.
+			dynamic_key_args = [dynamic_key_args] unless _.isArray(dynamic_key_args)
+			# Call the model key function with the dynamic key arguments to get the key
 			key = @model[key].options.key.apply(this, dynamic_key_args)
 		
 		if type is 'str' or type is 'num'

@@ -8,12 +8,11 @@
 	"devDependencies": {
 		"jasmine-node": "latest",
 		"metrics": "0.1.6",
-		"redis": "0.8.2"
+		"redis": "0.10.0"
 	},
 	"dependencies": {
 		"async": "0.1.22",
-		"underscore": "1.4.3",
-		"hooks": "0.2.1"
+		"underscore": "1.4.3"
 	},
 	"bugs": {
 		"url": "http://github.com/Radagaisus/Orpheus/issues"
