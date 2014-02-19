@@ -60,14 +60,6 @@ user(uder_id)
 
 - Support for NodeJS 0.10 and above
 
-
-
-## 0.5.0
-
-- Added a way to wsend
-
-- 
-
 ## 0.4.0
 
 - Removed the `.del` operation.
