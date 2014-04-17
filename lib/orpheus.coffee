@@ -537,10 +537,8 @@ class OrpheusAPI
 		@_res_schema = []
 	
 	# deletes the model.
-	delete: (fn) ->
-		# flush commands and validations
-		@flush()
-		
+	delete_model: ->
+		# Adding the needed redis commands to @_commands array.
 		hdel_flag = false # no need to delete a hash twice
 		for key, value of @model
 			type = value.type
@@ -550,7 +548,11 @@ class OrpheusAPI
 					@_commands.push ['del', @_get_key()]
 			else
 				@_commands.push ['del', @_get_key(key)]
-		
+
+	delete: (fn) ->
+		# flush commands and validations
+		@flush()
+		@delete_model()
 		@exec fn
 	
 	# get public information only
