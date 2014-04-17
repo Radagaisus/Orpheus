@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1
+
+- The `delete()` function is now using `delete_model()` to prepare its redis commands. So that if you need only the commands for some reason, you can invoke `delete_model()` directly and it will add the command to the commands array to be executed.
+
 ## 0.5.0
 
 - Added a way to send dynamic key arguments as either an array or, if it's one argument, as is. For example, `User('id').yearly_bread(key: [2012]).exec()` as well as `User('id').yearly_bread(key: [2012]).exec()`.
