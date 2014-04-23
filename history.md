@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.5.1
+
+- Fixed a bug when responding with several calls to the same dynamic key. Calling the key once will return it directly:
+
+```
+User.book_author.get(key: ['1984']).exec()
+> {books: 'Orwell'}
+```
+
+Calling it several times will return it in a nested object:
+
+```
+User
+	.book_author.get(key: ['1984'])
+	.book_author.get(key: ['asoiaf'])
+	.exec()
+> 
+  {
+	  books: {
+		  '1984': 'Orwell',
+		  'asoiaf': 'GRRM'
+	  }
+  }
+```
+
+The bug in the implementation caused the first result in multiple calls to the same dynamic key to be discarded.
+
+
 ## 0.5.0
 
 - Added a way to send dynamic key arguments as either an array or, if it's one argument, as is. For example, `User('id').yearly_bread(key: [2012]).exec()` as well as `User('id').yearly_bread(key: [2012]).exec()`.
