@@ -192,9 +192,7 @@ describe 'Redis Commands', ->
 				.book_pages.get(key: ['Infinite Jest'])
 				.book_pages.get(key: ['A Game of Thrones'])
 				.leaderboard.get(key: ['Almog'])
-				.when( -> console.log @_commands)
 				.exec (err, res) ->
-					console.log res
 					expect(res.book_pages['1984 pages']).toEqual(500)
 					expect(res.book_pages['Infinite Jest pages']).toEqual(200)
 					expect(res.book_pages['A Game of Thrones pages']).toEqual(9999)
@@ -443,7 +441,6 @@ describe 'Get', ->
 						.points.zrange(0, -1, 'withscores')
 						.points.card()
 						.exec (err, user) ->
-							console.log(user)
 							if err then cb(err)
 							else
 								expect(user.name).toEqual 'feist'
