@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.5.1
+## 0.5.2
 
 - Fixed a bug when responding with several calls to the same dynamic key. Calling the key once will return it directly:
 
