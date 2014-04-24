@@ -560,10 +560,7 @@ class OrpheusAPI
 		@_res_schema = []
 	
 	# deletes the model.
-	delete: (fn) ->
-		# flush commands and validations
-		@flush()
-		
+	delete: ->
 		hdel_flag = false # no need to delete a hash twice
 		for key, value of @model
 			type = value.type
@@ -573,8 +570,7 @@ class OrpheusAPI
 					@_commands.push ['del', @_get_key()]
 			else
 				@_commands.push ['del', @_get_key(key)]
-		
-		@exec fn
+		return this
 	
 	# get public information only
 	get: (fn) ->
@@ -596,45 +592,99 @@ class OrpheusAPI
 	# stored, we convert everything back to an object.
 	_create_getter_object: (res) =>
 		new_res  = {}
-		temp_res = {} 
+		temp_res = {}
 		for s,i in @_res_schema
 
-			# Convert numbers from their string representation
+			# Convert fields that are set as Numbers in the schema to numbers
+			# from the string representation we received from Redis.
 			if s.type is 'num'
 				res[i] = Number res[i]
-			
-			# Convert zsets with scores to a key->value hash
+			# If the field type is a zset, and the command requested the field
+			# using 'withscores', convert the response to a `key -> value` hash
+			# from the array of [key, val, ...] it was received in.
 			else if s.type is 'zset' and s.with_scores
+				# Initialize an empty object
 				zset = {}
-
-				for member,index in res[i] by 2
-					zset[member] = Number res[i][index+1]
-
+				# Go over each pair in the response for this command, and add them
+				# to the `zset` object, after converting the value to a number.
+				for member, index in res[i] by 2
+					zset[member] = Number(res[i][index+1])
+				# Add the converted `zset` to the response.
 				res[i] = zset
-
-			# Add the property to the new response. If the
-			# property already exists in the new response
-			# create an array as it has multiple return
-			# values. For example, issuing llen and lrange
-			# at the same time should return an array.
-			if new_res[s.name]?
-				# We use temp_res as a temporary storage for
-				# the multiple results array.
-
-				if @model[s.name].options.key
-
-					temp_res[s.name] ||= {}
+			
+			# Handle conversion of dynamic key responses. If the request only
+			# issued one command for this dynamic key, add the response directly
+			# under the key. If several commands were issued, add all the results
+			# into an object with that dynamic key name. For example:
+			# 
+			#   User.book_author.get(key: ['1984']).exec()
+			#   > {books: 'Orwell'}
+			# 
+			#   User
+			#     .book_author.get(key: ['1984'])
+			#     .book_author.get(key: ['asoiaf'])
+			#   > {
+			#       books: {
+			#         '1984': 'Orwell',
+			#         'asoiaf': 'GRRM'
+			#       }
+			#     }
+			# 
+			# Since we're going over the response items one by one, and don't want
+			# to introduce another inner loop, the code below is a bit dirty. The
+			# first time we receive a dynamic key we set it to `res[field_name`],
+			# add add it's generated dynamic name to `res["#{field_name}_key"].
+			# The next time, we check if this exist, and if so - convert into the
+			# aforementioned object.
+			# 
+			if @model[s.name].options.key
+				# If this is the first command / response we parse for this field
+				if not temp_res[s.name]?
+					# Add it to the temporary response
+					temp_res[s.name] = res[i]
+					# And record the value of its dynamic key name
+					temp_res["#{s.name}_key"] = @model[s.name]
+						.options.key.apply(this, s.dynamic_key_args)
+				# Otherwise, convert the previous (the first) command / response into
+				# the object format, and add the new one there.
+				else
+					# Get the dynamic key name for the last key
+					dynamic_key = temp_res["#{s.name}_key"]
+					# If it exists, convert it to a new object
+					if dynamic_key
+						# Get its value into a temp variable
+						tmp = temp_res[s.name]
+						# Change it to an object
+						temp_res[s.name] = {}
+						# Set the field with its dynamic key to its value
+						temp_res[s.name][dynamic_key] = tmp
+						# And delete its dynamic key from the temp response
+						delete temp_res["#{s.name}_key"]
+					# Now add the current key into the new object that we created, first
+					# by getting the name of its dynamic key
 					dynamic_key = @model[s.name].options.key.apply(this, s.dynamic_key_args)
 					temp_res[s.name][dynamic_key] = res[i]
-
-				else
-
-					if temp_res[s.name]?
-						temp_res[s.name].push res[i]
-					else
-						temp_res[s.name] = [new_res[s.name], res[i]]
-
+				# Now add it to the `new_res` we return
 				new_res[s.name] = temp_res[s.name]
+			# Handle multiple commands and responses for the same field. If the
+			# property already exists in the new response then we create an array
+			# of results for this property. For example, issuing a `llen` and `lrange`
+			# one of the other should return an array with their results, say:
+			#   
+			#   User.books.llen().books.lrange(0, -1).exec()
+			#   > [3, [1, 2, 3]]
+			# 
+			else if new_res[s.name]?
+				# We use temp_res as a temporary storage for the multiple results
+				# array. If it's empty, we initialize it with the current response
+				# and the last one found in `new_res[s.name]`. Otherwise, we just
+				# push the new item to it.
+				if temp_res[s.name]?
+				then temp_res[s.name].push(res[i])
+				else temp_res[s.name] = [new_res[s.name], res[i]]
+				# Now assign it into the `new_res` that we return
+				new_res[s.name] = temp_res[s.name]
+			# Otherwise, just add the response to the `new_res` we return.
 			else
 				new_res[s.name] = res[i]
 			
@@ -647,7 +697,7 @@ class OrpheusAPI
 				then delete new_res[s.name]
 				else new_res[s.name] = @model[s.name].options.default
 
-
+		# Return the new response
 		return new_res
 
 	# 

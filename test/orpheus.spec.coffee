@@ -168,6 +168,39 @@ describe 'Redis Commands', ->
 					done()
 
 
+	it 'Respond properly to multiple requests to get the same dynamic key', (done) ->
+		
+		class User extends Orpheus
+			constructor: ->
+				@num 'book_pages',
+					key: (book) -> "#{book} pages"
+				@num 'leaderboard',
+					key: (name) -> "#{name} leaderboard"
+
+
+		user = User.create()
+
+		user('test')
+			.book_pages.set(500, key: ['1984'])
+			.book_pages.set(200, key: ['Infinite Jest'])
+			.book_pages.set(9999, key: ['A Game of Thrones'])
+			.leaderboard.set(100, key: ['Almog'])
+			.exec (err, res) ->
+
+				user('test')
+				.book_pages.get(key: ['1984'])
+				.book_pages.get(key: ['Infinite Jest'])
+				.book_pages.get(key: ['A Game of Thrones'])
+				.leaderboard.get(key: ['Almog'])
+				.exec (err, res) ->
+					expect(res.book_pages['1984 pages']).toEqual(500)
+					expect(res.book_pages['Infinite Jest pages']).toEqual(200)
+					expect(res.book_pages['A Game of Thrones pages']).toEqual(9999)
+					expect(res.leaderboard).toEqual(100)
+
+					done()
+
+
 	it 'Num and Str single commands', (done) ->
 		class Player extends Orpheus
 			constructor: ->
@@ -408,7 +441,6 @@ describe 'Get', ->
 						.points.zrange(0, -1, 'withscores')
 						.points.card()
 						.exec (err, user) ->
-							console.log(user)
 							if err then cb(err)
 							else
 								expect(user.name).toEqual 'feist'
@@ -749,7 +781,7 @@ describe 'Delete', ->
 				bonga: [5, 'donga']
 			.bonanza.set('klingon', 'we hate them')
 			.exec ->
-				player('id').delete (err, res, id) ->
+				player('id').delete().exec (err, res, id) ->
 					expect(err).toBe null
 					expect(id).toBeUndefined()
 					
@@ -1292,6 +1324,7 @@ describe 'Connect', ->
 # Bugs & Regressions
 # ---------------------------------------
 describe 'Regressions', ->
+	
 	it 'Returns an object with a number field with 0 as the value', (done) ->
 		class User extends Orpheus
 			constructor: ->
@@ -1312,4 +1345,3 @@ describe 'Regressions', ->
 				.exec (err, res) ->
 					expect(res.points).toBe(0)
 					done()
-
