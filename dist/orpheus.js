@@ -283,7 +283,6 @@
       var f, key, prel, rel, value, _fn, _fn1, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
       this.model = model;
       this._create_getter_object = __bind(this._create_getter_object, this);
-      this.flush = __bind(this.flush, this);
       _.extend(this, this.model);
       this._commands = [];
       this.validation_errors = new OrpheusValidationErrors;
