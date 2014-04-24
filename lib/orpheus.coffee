@@ -32,6 +32,38 @@ class Orpheus
 	# UniqueID counters
 	@id_counter: 0
 	@unique_id: -> @id_counter++
+
+
+
+
+
+	@connect: (models, callback) ->
+		# Holds a small schema, so we'll know how to return the results
+		schema = {}
+		# Holds all the multi commands we will issue
+		multi_commands = []
+		# Go over each modal and prepare a small schema
+		for model_name, model of models
+			# Get the model commands
+			model_commands = model._commands
+			# Note in the schema how many commands go per model
+			schema[model_name] = model_commands.length
+			# Add the model commands to the multi commands
+			multi_commands = multi_commands.concat(model_commands)
+
+		# Issue the request to Redis, and convert the schema in the callback
+		Orpheus.config.client.multi(multi_commands).exec (err, results) ->
+			# If there was an error, move on to the original callback
+			if err then callback(err, results = [])
+			else
+				# The response
+				resp = {}
+				# Go over the schema
+				for key, num of schema
+					resp[key] = results.splice(0, num)
+				# Call the callback, with the error and the parsed results
+				callback(err, resp)
+
 	
 	# Orpheus model extends the model
 	# - we can automagically detect
@@ -530,31 +562,9 @@ class OrpheusAPI
 			pkey = inflector.pluralize key
 			@_add_map pkey, args[0]
 
-	# Given array of Orpheus operations, concat the commands arrays into one.
-	# e.g:
-	#   player('100').name.get().concat_commands([Player('200').name.get()])
-	#   will yield:
-	#     [ [ 'hget', 'orpheus:pl:100', 'name' ],
-	#     [ 'hget', 'orpheus:pl:200', 'points' ] ]
-	concat_commands: (operations) ->
-		# The commands are array in array, e.g:
-		# [ ["hget", "key_name", "field"] ]
-		# so we need to run through the actions array given, and then
-		# through the array of commands each action has to concat the commands.
-		for operation in operations
-			for inner_commands in operation._commands
-				@_commands.push(inner_commands)
-		@_commands
-
-	# Given array of Orpheus operations and optionally, callback function,
-	# concat the operations together and perform them all together atomically.
-	connect: (operations, fn) ->
-		@concat_commands(operations)
-		@exec(fn)
-
 
 	# Empties the object to be reused
-	flush: ->
+	flush: =>
 		@_commands = []
 		@validation_errors.empty()
 		@_res_schema = []
@@ -755,7 +765,7 @@ class OrpheusAPI
 
 
 # Orpheus Validation errors
-#---------------------------------------------------------------------#
+#---------------------------------------------------------------------
 class OrpheusValidationErrors
 	
 	constructor: ->

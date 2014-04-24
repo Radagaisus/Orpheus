@@ -1286,38 +1286,45 @@ describe 'Defaults', ->
 				done()
 
 
-# Connect multiple actions into one atomic multi
-# -------------------------------------------------------
+# Ability to connect multiple actions into one atomic multi call
+# -----------------------------------------------------------------
 describe 'Connect', ->
-	it 'concat command stream from multiple operations',  ->
-		class Player extends Orpheus
+
+	it 'Connects commands from two operations', (done) ->
+		
+		class User extends Orpheus
 			constructor: ->
 				@str 'name'
 				@num 'points'
 
-		commands = [
-			[ 'hget', 'orpheus:pl:100', 'name' ],
-			[ 'hget', 'orpheus:pl:200', 'points' ]
-		]
-
-		player = Player.create()
-
-		expect(player('100').name.get().concat_commands([player('200').points.get()])).toEqual(commands)
-
-	it 'Connect several operations into one multi call', (done)->
-		class Player extends Orpheus
+		class App extends Orpheus
 			constructor: ->
 				@str 'name'
 				@num 'points'
 
-		player = Player.create()
-		player('100').name.set('Test')
-		.connect [player('200').points.set(20)],
-			(err, res) ->
-				expect(err).toBe null
-				expect(res).toEqual([1,1])
+		user = User.create()
+		app = App.create()
 
-		done()
+		Orpheus.connect
+
+			user:
+				user('some-user')
+					.points.set(200)
+					.name.set('Snir')
+
+			app:
+				app('some-app')
+					.points.set(1000)
+					.name.set('Super App')
+
+		, (err, res) ->
+			expect(err).toBe null
+			expect(res.user[0]).toEqual 1
+			expect(res.user[1]).toEqual 1
+			expect(res.app[0]).toEqual 1
+			expect(res.app[1]).toEqual 1
+
+			done()
 
 
 

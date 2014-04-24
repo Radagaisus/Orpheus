@@ -307,6 +307,31 @@ user('chaplin').books.smembers().exec (err, book_ids) ->
 
 Your can pass `@has 'book', namespace: 'book'` to create a different namespace than the relation. The default would be `orpheus:us:{user_id}:bo:{book_id}`. By passing the namespace option the key will map to `orpheus:us:{user_id}:book:{book_id}`
 
+
+## `Orpheus.connect`
+
+The `Orpheus.connect` function enables you to create one MULTI call from several Orpheus models. Example usage:
+
+```
+Orpheus.connect
+
+      user:
+        user('some-user')
+          .points.set(200)
+          .name.set('Snir')
+
+      app:
+        app('some-app')
+          .points.set(1000)
+          .name.set('Super App')
+
+    , (err, res) ->
+      # `res` is {user: [1,1], app: [1,1]}
+```
+
+This is a preliminary work. In future releases `connect` would be able to better parse the results based on the model schema. For now, it only makes sure to create one MULTI call for all the models it receives, and returns the results in an object, with the keys based on the object it received as the first parameter.
+
+
 ## Dynamic Keys
 
 ```coffee
