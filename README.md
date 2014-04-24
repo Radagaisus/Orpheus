@@ -336,6 +336,27 @@ user('bean')
 
 Everything inside `key` will be passed to the dynamic key function.
 
+You can also easily retrieve items under dynamic keys. Issuing a single command to a dynamic key will return it once:
+
+```
+User.book_author.get(key: ['1984']).exec (err, res) ->
+  # res is `{books: 'Orwell'}`
+```
+
+Issuing several commands will return a nested object:
+
+```
+User
+.book_author.get(key: ['1984'])
+.book_author.get(key: ['asoiaf'])
+.exec (err, res) ->
+#  > {
+#    books: {
+#      '1984': 'Orwell',
+#      'asoiaf': 'GRRM'
+#    }
+#  }
+```
 
 ## One to One Maps
 
