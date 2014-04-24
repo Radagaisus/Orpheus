@@ -749,7 +749,7 @@ describe 'Delete', ->
 				bonga: [5, 'donga']
 			.bonanza.set('klingon', 'we hate them')
 			.exec ->
-				player('id').delete (err, res, id) ->
+				player('id').delete().exec (err, res, id) ->
 					expect(err).toBe null
 					expect(id).toBeUndefined()
 					
