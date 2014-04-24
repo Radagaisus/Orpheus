@@ -852,20 +852,20 @@ describe 'Validation', ->
 			.exec ->
 				expect(3).toBe 4
 				done()
-	
-	
+
+
 	it 'Validate Strings', (done) ->
 		class Player extends Orpheus
 			constructor: ->
 				@str 'name'
 				@validate 'name', (s) -> if s is 'almog' then true else 'String should be almog'
-		
+
 		player = Player.create()
 		player('15').set
 			name: 'almog'
 		.exec (err, res, id) ->
 			expect(res[0]).toBe 1
-			
+
 			player('15').set
 				name: 'chiko'
 			.err (res) ->
@@ -878,7 +878,7 @@ describe 'Validation', ->
 			.exec (err, res, id) ->
 				expect(1).toBe 2 # Impossible!
 				done()
-	
+
 	it 'Validates Format', (done) ->
 		class Player extends Orpheus
 			constructor: ->
@@ -891,7 +891,7 @@ describe 'Validation', ->
 			legacy_code: 'sdfsd234'
 		.err (err) ->
 			expect(err.toResponse().errors.legacy_code[0]).toBe 'sdfsd234 must be only A-Za-z'
-			
+
 			player('mint').add
 				legacy_code: 'hello'
 			.err (err) ->
@@ -903,7 +903,7 @@ describe 'Validation', ->
 		.exec ->
 			expect(1).toBe 2
 			done()
-	
+
 	it 'Validates Size', (done) ->
 		class Player extends Orpheus
 			constructor: ->
@@ -911,28 +911,28 @@ describe 'Validation', ->
 				@validate 'name',
 					size:
 						minimum: 2
-				
+
 				@str 'bio'
 				@validate 'bio',
 					size:
 						maximum: 5
-				
+
 				@str 'password'
 				@validate 'password',
 					size:
 						in: [6,25]
-				
+
 				@str 'registration_number'
 				@validate 'registration_number',
 					size:
 						is: 6
-				
+
 				@str 'content'
 				@validate 'content',
 					size:
 						tokenizer: (s) -> s.match(/\w+/g).length
 						is: 5
-		
+
 		player = Player.create()
 		player('tyrion').add
 			name: 'clear'
@@ -950,7 +950,7 @@ describe 'Validation', ->
 			expect(res[2]).toBe 1
 			expect(res[3]).toBe 1
 			expect(res[4]).toBe 1
-			
+
 			player('beirut').add
 				name: 'i'
 				bio: 'long stuff is long'
@@ -963,12 +963,12 @@ describe 'Validation', ->
 				expect(err.toResponse().errors.password[0]).toBe "'no' length is 2. Must be between 6 and 25."
 				expect(err.toResponse().errors.registration_number[0]).toBe "'haha' length is 4. Must be 6."
 				expect(err.toResponse().errors.content[0]).toBe "'four words it is' length is 4. Must be 5."
-				
+
 				done()
 			.exec ->
 				expect(3).toBe 4
 				done()
-	
+
 	it 'Validate Exclusion & Inclusion', (done) ->
 		class Player extends Orpheus
 			constructor: ->
@@ -978,7 +978,7 @@ describe 'Validation', ->
 					exclusion: ['www', 'us', 'ca', 'jp']
 				@validate 'size',
 					inclusion: ['small', 'medium', 'large']
-		
+
 		player = Player.create()
 		player('james').add
 			subdomain: 'co'
@@ -989,7 +989,7 @@ describe 'Validation', ->
 		.exec (res) ->
 			expect(res[0]).toBe 1
 			expect(res[1]).toBe 1
-			
+
 			player('mames').add
 				subdomain: 'us'
 				size: 'penis'
@@ -1000,25 +1000,25 @@ describe 'Validation', ->
 			.exec (res) ->
 				expect(1).toBe 2
 				done()
-	
+
 	it 'Validate Numbers', (done) ->
 		class Player extends Orpheus
 			constructor: ->
 				@num 'points'
 				@num 'games_played'
 				@num 'games_won'
-				
+
 				@validate 'points',
 					numericality:
 						only_integer: true
-				
+
 				@validate 'games_played',
 					numericality:
 						only_integer: true
 						greater_than: 3
 						less_than:    7
 						odd:          true
-				
+
 				@validate 'games_won',
 					numericality:
 						only_integer:             true
@@ -1026,7 +1026,7 @@ describe 'Validation', ->
 						equal_to:                 10
 						less_than_or_equal_to:    10
 						even:                     true
-		
+
 		player = Player.create()
 		player('id').add
 			points: 20
@@ -1039,7 +1039,7 @@ describe 'Validation', ->
 			expect(res[0]).toBe 20
 			expect(res[1]).toBe 5
 			expect(res[2]).toBe 10
-			
+
 			player('idz').add
 				points: 50.5
 				games_played: 10
@@ -1048,7 +1048,7 @@ describe 'Validation', ->
 				expect(err.toResponse().errors.points[0]).toBe '50.5 must be an integer.'
 				expect(err.toResponse().errors.games_played[0]).toBe '10 must be less than 7.'
 				expect(err.toResponse().errors.games_won[0]).toBe '11 must be equal to 10.'
-				
+
 				player('nigz').add
 					points: 20
 					games_played: 5
@@ -1284,6 +1284,48 @@ describe 'Defaults', ->
 				expect(res.troll).toBe 'trololol'
 				expect(res.sup).toBeUndefined() # No default
 				done()
+
+
+# Ability to connect multiple actions into one atomic multi call
+# -----------------------------------------------------------------
+describe 'Connect', ->
+
+	it 'Connects commands from two operations', (done) ->
+		
+		class User extends Orpheus
+			constructor: ->
+				@str 'name'
+				@num 'points'
+
+		class App extends Orpheus
+			constructor: ->
+				@str 'name'
+				@num 'points'
+
+		user = User.create()
+		app = App.create()
+
+		Orpheus.connect
+
+			user:
+				user('some-user')
+					.points.set(200)
+					.name.set('Snir')
+
+			app:
+				app('some-app')
+					.points.set(1000)
+					.name.set('Super App')
+
+		, (err, res) ->
+			expect(err).toBe null
+			expect(res.user[0]).toEqual 1
+			expect(res.user[1]).toEqual 1
+			expect(res.app[0]).toEqual 1
+			expect(res.app[1]).toEqual 1
+
+			done()
+
 
 
 # Bugs & Regressions

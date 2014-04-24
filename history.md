@@ -4,6 +4,30 @@
 
 - The `delete()` command is now chainable. It does not execute immediately and doesn't expect to receive a callback function. Use `.delete().exec()` from now on. This change was made to make the API more consistent.
 
+
+- Added a new function `Orpheus.connect(models, callback)` that can receive several Orpheus models and connect them into one MULTI call to Redis. Example usage:
+
+```
+Orpheus.connect
+
+			user:
+				user('some-user')
+					.points.set(200)
+					.name.set('Snir')
+
+			app:
+				app('some-app')
+					.points.set(1000)
+					.name.set('Super App')
+
+		, (err, res) ->
+			# `res` is {user: [1,1], app: [1,1]}
+```
+
+This is a preliminary work. In future releases `connect` would be able to better parse the results based on the model schema. For now, it only makes sure to create one MULTI call for all the models it receives.
+
+
+
 ## 0.5.2
 
 - Fixed a bug when responding with several calls to the same dynamic key. Calling the key once will return it directly:

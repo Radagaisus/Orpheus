@@ -46,6 +46,31 @@
       return this.id_counter++;
     };
 
+    Orpheus.connect = function(models, callback) {
+      var model, model_commands, model_name, multi_commands, schema;
+      schema = {};
+      multi_commands = [];
+      for (model_name in models) {
+        model = models[model_name];
+        model_commands = model._commands;
+        schema[model_name] = model_commands.length;
+        multi_commands = multi_commands.concat(model_commands);
+      }
+      return Orpheus.config.client.multi(multi_commands).exec(function(err, results) {
+        var key, num, resp;
+        if (err) {
+          return callback(err, results = []);
+        } else {
+          resp = {};
+          for (key in schema) {
+            num = schema[key];
+            resp[key] = results.splice(0, num);
+          }
+          return callback(err, resp);
+        }
+      });
+    };
+
     Orpheus.create = function() {
       var OrpheusModel, model, name, q;
       OrpheusModel = (function(_super) {
@@ -258,6 +283,7 @@
       var f, key, prel, rel, value, _fn, _fn1, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
       this.model = model;
       this._create_getter_object = __bind(this._create_getter_object, this);
+      this.flush = __bind(this.flush, this);
       _.extend(this, this.model);
       this._commands = [];
       this.validation_errors = new OrpheusValidationErrors;
@@ -506,9 +532,8 @@
       return this._res_schema = [];
     };
 
-    OrpheusAPI.prototype["delete"] = function(fn) {
+    OrpheusAPI.prototype["delete"] = function() {
       var hdel_flag, key, type, value, _ref;
-      this.flush();
       hdel_flag = false;
       _ref = this.model;
       for (key in _ref) {
@@ -523,7 +548,7 @@
           this._commands.push(['del', this._get_key(key)]);
         }
       }
-      return this.exec(fn);
+      return this;
     };
 
     OrpheusAPI.prototype.get = function(fn) {
