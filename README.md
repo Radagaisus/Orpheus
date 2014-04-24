@@ -113,8 +113,11 @@ set:
 ### Removing the Model
 
 ```coffee
-user('dune').delete (err, res) ->
+user('dune').delete().exec (err, res) ->
 ```
+
+Will remove everything in the model, including the model's basic hash, nested hashes, sets, zsets and lists.
+
 
 ### Getting Stuff
 
