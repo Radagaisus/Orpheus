@@ -529,7 +529,30 @@ class OrpheusAPI
 		if @model[key].options.map and command is 'hset'
 			pkey = inflector.pluralize key
 			@_add_map pkey, args[0]
-	
+
+	# Given array of Orpheus operations, concat the commands arrays into one.
+	# e.g:
+	#   player('100').name.get().concat_commands([Player('200').name.get()])
+	#   will yield:
+	#     [ [ 'hget', 'orpheus:pl:100', 'name' ],
+	#     [ 'hget', 'orpheus:pl:200', 'points' ] ]
+	concat_commands: (operations) ->
+		# The commands are array in array, e.g:
+		# [ ["hget", "key_name", "field"] ]
+		# so we need to run through the actions array given, and then
+		# through the array of commands each action has to concat the commands.
+		for operation in operations
+			for inner_commands in operation._commands
+				@_commands.push(inner_commands)
+		@_commands
+
+	# Given array of Orpheus operations and optionally, callback function,
+	# concat the operations together and perform them all together atomically.
+	connect: (operations, fn) ->
+		@concat_commands(operations)
+		@exec(fn)
+
+
 	# Empties the object to be reused
 	flush: ->
 		@_commands = []
