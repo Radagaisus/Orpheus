@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.0
+
+- The `delete()` command is now chainable. It does not execute immediately and doesn't expect to receive a callback function. Use `.delete().exec()` from now on. This change was made to make the API more consistent.
+
 ## 0.5.2
 
 - Fixed a bug when responding with several calls to the same dynamic key. Calling the key once will return it directly:
