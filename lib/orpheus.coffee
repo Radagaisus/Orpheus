@@ -564,7 +564,7 @@ class OrpheusAPI
 
 
 	# Empties the object to be reused
-	flush: =>
+	flush: ->
 		@_commands = []
 		@validation_errors.empty()
 		@_res_schema = []
