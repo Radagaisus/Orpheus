@@ -34,9 +34,35 @@ class Orpheus
 	@unique_id: -> @id_counter++
 
 
-
-
-
+	# Connects lazy commands from several Orpheus models into one big MULTI
+	# command. This is convenient, for example, for updating denomralized data
+	# across several models.
+	# 
+	# Example usage:
+	# 
+	#   Orpheus.connect
+	# 
+	#     user:
+	#       user('some-user')
+	#       .points.set(200)
+	#       .name.set('Snir')
+	# 
+	#     app:
+	#       app('some-app')
+	#       .points.set(1000)
+	#       .name.set('Super App')
+	# 
+	#  , (err, res) ->
+	#    # `res` is {user: [1,1], app: [1,1]}
+	# 
+	# 
+	# @param models - {Object|Array} An object or an array of Orpheus models.
+	#        the keys in the object are the names we want to assign to the
+	#        response we return from Redis.
+	# @param callback - {Function} a callback function, with the signature of
+	#        `(error, results)`. The results will be the parsed results from
+	#        redis.
+	# 
 	@connect: (models, callback) ->
 		# Holds a small schema, so we'll know how to return the results
 		schema = {}

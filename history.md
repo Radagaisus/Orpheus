@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.1 (Not released)
+
+- Added a test for `Orpheus.connect()` when the models are passed as an array instead of an object.
+
+
 ## 0.6.0
 
 - The `delete()` command is now chainable. It does not execute immediately and doesn't expect to receive a callback function. Use `.delete().exec()` from now on. This change was made to make the API more consistent.

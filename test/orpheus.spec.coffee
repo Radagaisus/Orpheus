@@ -1290,7 +1290,7 @@ describe 'Defaults', ->
 # -----------------------------------------------------------------
 describe 'Connect', ->
 
-	it 'Connects commands from two operations', (done) ->
+	it 'Connects commands from two operations, using an object', (done) ->
 		
 		class User extends Orpheus
 			constructor: ->
@@ -1323,6 +1323,39 @@ describe 'Connect', ->
 			expect(res.user[1]).toEqual 1
 			expect(res.app[0]).toEqual 1
 			expect(res.app[1]).toEqual 1
+
+			done()
+
+
+	it 'Connects commands from two operations, using an array', (done) ->
+		
+		class User extends Orpheus
+			constructor: ->
+				@str 'name'
+				@num 'points'
+
+		class App extends Orpheus
+			constructor: ->
+				@str 'name'
+				@num 'points'
+
+		user = User.create()
+		app = App.create()
+
+		Orpheus.connect [
+				user('some-user')
+				.points.set(200)
+				.name.set('Snir')
+			,
+				app('some-app')
+					.points.set(1000)
+					.name.set('Super App')
+		], (err, res) ->
+			expect(err).toBe null
+			expect(res[0][0]).toEqual 1
+			expect(res[0][1]).toEqual 1
+			expect(res[1][0]).toEqual 1
+			expect(res[1][1]).toEqual 1
 
 			done()
 
