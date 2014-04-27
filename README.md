@@ -1,11 +1,11 @@
 # Orpheus - Redis Little Helper
 Orpheus is a Redis Object Model for CoffeeScript.
 
-![https://nodei.co/npm/orpheus.png?downloads=true](OrpheusJS)
+![https://nodei.co/npm/orpheus.png?downloads=true](https://nodei.co/npm/orpheus.png?downloads=true)
 
 `npm install orpheus`
 
-[![build status](https://secure.travis-ci.org/Radagaisus/Orpheus.png)](https://nodei.co/npm/orpheus.png?downloads=true)
+[![build status](https://secure.travis-ci.org/Radagaisus/Orpheus.png)](http://travis-ci.org/Radagaisus/Orpheus)
 
 - Rails like models
 - Sexy DSL
