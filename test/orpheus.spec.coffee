@@ -308,7 +308,8 @@ describe 'Redis Commands', ->
 			.name.set('greg')
 			.exec()
 	
-	it 'When', (done) ->
+	it '#When', (done) ->
+
 		class Player extends Orpheus
 			constructor: ->
 				@str 'name'
@@ -330,6 +331,34 @@ describe 'Redis Commands', ->
 							@name.set('boy')
 					).err().exec (res) ->
 						expect(res[0]).toBe 1
+						done()
+
+	it '#When with a condition as parameter', (done) ->
+
+		class User extends Orpheus
+			constructor: ->
+				@str 'name'
+
+		user = User.create()
+
+		user('test')
+		.name.set('hi')
+		.when true, -> @name.set('hello')
+		.exec ->
+			r.hget "#{PREFIX}:us:test", 'name', (_, res) ->
+				expect(res).toBe 'hello'
+
+				user('test2')
+				.name.set('hi')
+				.when false, ->
+					# I have no idea why, but moving this to the same line as the `when`
+					# will make the tests hang. BUT, it does work if the condition is true.
+					@name.set('hello')
+				.exec ->
+
+					r.hget "#{PREFIX}:us:test2", 'name', (_, res) ->
+						expect(res).toBe 'hi'
+
 						done()
 
 
