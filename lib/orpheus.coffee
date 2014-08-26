@@ -348,7 +348,7 @@ class OrpheusAPI
 		# Redis multi commands
 		@_commands = []
 
-		# Query flags
+		# Initialize the query flags
 		@flags = {}
 		
 		@validation_errors = new OrpheusValidationErrors
