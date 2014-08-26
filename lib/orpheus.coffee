@@ -742,6 +742,8 @@ class OrpheusAPI
 	# Marks the query to return raw response
 	raw: ->
 		@flags.raw_response = true
+		# Return `this` for chaining
+		return this
 
 	# 
 	err: (fn) ->

@@ -54,7 +54,7 @@ afterEach (done) ->
 
 
 # Error Handling
-# ---------------------------------------
+# -----------------------------------------------------------------------------
 describe 'Error Handling', ->
 	it 'Throws Error on Undefined Model Attributes', (done) ->
 		class User extends Orpheus
@@ -69,12 +69,37 @@ describe 'Error Handling', ->
 		catch e
 			return done()
 
-
-		# Fails if it gets here,
-		# Jasmine .toThrow() is shit.
+		# Fails if it gets here
 		expect('To Catch an Error').toBe true
 		done()
 
+
+# Raw Responses
+# --------------------------------------------------------------------------
+describe 'Raw Responses', ->
+
+	it 'returns a raw response', (done) ->
+		class App extends Orpheus
+			constructor: ->
+				@zset 'leaderboard'
+
+		app = App.create()
+
+		app('test')
+		.leaderboard.add(50, 'radagaisus', 20, 'captain')
+		.exec ->
+			app('test')
+			.leaderboard.score('captain')
+			.leaderboard.revrank('captain')
+			.raw()
+			.exec (err, res) ->
+				expect(res[0]).toEqual '20'
+				expect(res[1]).toEqual 1
+				done()
+
+
+# Schema Specs
+# ------------------------------------------------------------------------------
 describe 'Schema', ->
 
 	it 'can call the different models using the schema', (done) ->
