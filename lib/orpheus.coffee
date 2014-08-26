@@ -375,11 +375,36 @@ class OrpheusAPI
 		# New or existing id
 		@id = id or @_generate_id()
 		
-		# If and Unless are used to discard changes
-		# unless certain conditions are met
-		@only = @when = (fn) =>
-			fn.bind(this)()
+		
+		# Runs the given `function` inside the model context. Optionally, if `only`
+		# or `when` receive the `condition` parameter it will only run the function
+		# conditionally.
+		# 
+		# Example usage:
+		#   
+		#   User('john')
+		#   .when ->
+		#     if the_sky_is_blue then @name.set('happy john')
+		#   .exec()
+		# 
+		#   User('john')
+		#   .when the_sky_is_blue, ->
+		#     @name.set('happy john')
+		#   .exec()
+		# 
+		# @param condition - {Mixed} if just one argument is passed, `condition` is
+		# assumed to be the function to run in the context of the model. If two arguments
+		# are passed, `condition` will be used to evaluate whether to run the function or
+		# not.
+		# @param fn - {Function} the function to run in the context of the model
+		# @return {this} for chaining
+		# 
+		@only = @when = (condition, fn = condition) =>
+			# Apply the function in the current context if the condition is truthy
+			fn.bind(this)() if condition
+			# Return `this` for chaining
 			return this
+		
 		
 		# Create functions for working with the relation set
 		# e.g. user(15).books.sadd('dune') will map to sadd
