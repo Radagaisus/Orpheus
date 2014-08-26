@@ -285,12 +285,18 @@
       this._create_getter_object = __bind(this._create_getter_object, this);
       _.extend(this, this.model);
       this._commands = [];
+      this.flags = {};
       this.validation_errors = new OrpheusValidationErrors;
       this._res_schema = [];
       this.id = id || this._generate_id();
       this.only = this.when = (function(_this) {
-        return function(fn) {
-          fn.bind(_this)();
+        return function(condition, fn) {
+          if (fn == null) {
+            fn = condition;
+          }
+          if (condition) {
+            fn.bind(_this)();
+          }
           return _this;
         };
       })(this);
@@ -633,6 +639,11 @@
       return new_res;
     };
 
+    OrpheusAPI.prototype.raw = function() {
+      this.flags.raw_response = true;
+      return this;
+    };
+
     OrpheusAPI.prototype.err = function(fn) {
       this.error_func = fn || function() {};
       return this;
@@ -651,7 +662,9 @@
         return function(err, res) {
           if (_this._res_schema.length && !err) {
             if (_this._res_schema.length === _this._commands.length) {
-              res = _this._create_getter_object(res);
+              if (!_this.flags.raw_response) {
+                res = _this._create_getter_object(res);
+              }
             }
           }
           if (_this.error_func) {
