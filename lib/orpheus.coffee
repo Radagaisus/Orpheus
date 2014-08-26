@@ -347,6 +347,9 @@ class OrpheusAPI
 		
 		# Redis multi commands
 		@_commands = []
+
+		# Initialize the query flags
+		@flags = {}
 		
 		@validation_errors = new OrpheusValidationErrors
 		
@@ -736,6 +739,12 @@ class OrpheusAPI
 		# Return the new response
 		return new_res
 
+	# Marks the query to return raw response
+	raw: ->
+		@flags.raw_response = true
+		# Return `this` for chaining
+		return this
+
 	# 
 	err: (fn) ->
 		@error_func = fn || -> # noop
@@ -767,7 +776,8 @@ class OrpheusAPI
 				# scehma.
 				if @_res_schema.length and not err
 					if @_res_schema.length is @_commands.length
-						res = @_create_getter_object res
+						unless @flags.raw_response
+							res = @_create_getter_object res
 				
 				# Check whether we should call the error or function
 				# or the execute function, and if we call the execute
