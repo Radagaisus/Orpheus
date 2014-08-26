@@ -1,9 +1,26 @@
 # Changelog
 
-## 0.6.1 (Not released)
+## 0.6.1
 
 - Added a test for `Orpheus.connect()` when the models are passed as an array instead of an object.
 
+- Added the `.raw()` query flag. Queries that run with this flag will return the raw response from Redis.
+
+- `.when()` and `.only()` can now optionally receive a boolean flag as the first argument. Only if it's true the function passed to `.when()` will run.
+
+For example:
+
+```coffee
+User('john')
+.when ->
+  if the_sky_is_blue then @name.set('happy john')
+.exec()
+
+User('john')
+when the_sky_is_blue, ->
+  @name.set('happy john')
+.exec()
+```
 
 ## 0.6.0
 
