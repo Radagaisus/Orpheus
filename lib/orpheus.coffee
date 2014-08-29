@@ -83,12 +83,11 @@ class Orpheus
 			if err then callback(err, results = [])
 			else
 				# The response
-				resp = {}
-				# Go over the schema
-				for key, num of schema
-					resp[key] = results.splice(0, num)
+				response = {}
+				# Go over the schema and convert it a a response object
+				response[key] = results.splice(0, num) for key, num of schema
 				# Call the callback, with the error and the parsed results
-				callback(err, resp)
+				callback(err, response)
 
 	
 	# Orpheus model extends the model
