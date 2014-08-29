@@ -322,20 +322,60 @@ class Orpheus
 					# Throw an error, the `id` parameter was not passed correctly
 					message = "Orpheus Model must be instantiated with a proper id"
 					throw new Error(message)
-					
 		
-		# Converts class Player to 'player'
+		
+		# Converts class User to 'user'
 		name = @toString().match(/function (.*)\(/)[1].toLowerCase()
-		
-		# Qualifier
+		# Get the plural name
+		plural_name = inflector.pluralize(name)
+		# Get the model qualifier from the name
 		q = name.substr(0,2)
-		
+		# Create the model
 		model = new OrpheusModel(name, q)
-
-		# Add to Schema
+		# Add the model to the schema
 		Orpheus.schema[name] = model.id
-
+		# Add the collection to the schema
+		Orpheus.schema[plural_name] = new OrpheusCollection(model.id)
+		# Return the model's `id` function, ready to be used
 		return model.id
+
+
+# Orpheus Collection API
+# -------------------------------------------------------------------------------------
+class OrpheusCollection
+
+	# Create the orpheus collection. Properly sets the name of the collection and the
+	# model the collection should use, and generates all the asynchronous functions
+	# that are available to be used on the collection's models.
+	constructor: (model) ->
+		# Set the name of the collection to the model's pluralized name
+		@name = model.pname
+		# The model we invoke with the collection methods
+		@model = model
+		# Dynamically generate all the collection's methods
+		@create_methods()
+
+
+	# Dynamically generate all the available methods. Each method's usage syntax is
+	# very similar:
+	# 
+	#   Collection.each ['id1', 'id2', 'id3'],
+	#     action: (model, callback) -> model.do_stuff().exec(callback)
+	#     callback: (err, collection = []) ->
+	#       # stuff has been done on all the models, or an error occured
+	# 
+	create_methods: =>
+		# List of all the available collection methods
+		available_methods = ['each', 'eachSeries']
+		# Run over all the methods
+		for method in available_methods
+			do (method) =>
+				@[method] = (models = [], options = {}) ->
+					# Convert the model ids to ready to be used model APIs
+					models = (@model(id) for id in models)
+					# Call the specified `method` in AsyncJS with the models (ready to be used),
+					# the `action` function to run on each and the final `callback` function.
+					async[method](models, options.action, options.callback)
 
 
 # Orpheus API

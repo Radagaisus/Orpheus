@@ -514,7 +514,7 @@ describe 'Get', ->
 
 			# Final callback, making sure we got everything right
 			, (err, results) ->
-				expect(err).toBeNull()
+				expect(err).toBeUndefined()
 				done()
 
 
@@ -1414,9 +1414,36 @@ describe 'Connect', ->
 			done()
 
 
+# Collections API
+# -----------------------------------------------------------------------------------
+describe 'Collections', ->
+	
+	it '#each', (done) ->
+		class User extends Orpheus
+			constructor: ->
+				@str 'name'
+		user = User.create()
+		users = Orpheus.schema.users
 
-# Bugs & Regressions
-# ---------------------------------------
+		users.each ['a', 'b', 'c'],
+			action: (user, callback) -> user.name.set(user.id).exec(callback)
+			callback: (err, results) ->
+
+				r.multi()
+					.hget("#{PREFIX}:us:a", 'name')
+					.hget("#{PREFIX}:us:b", 'name')
+					.hget("#{PREFIX}:us:c", 'name')
+					.exec (err, results) ->
+						console.log '???', results
+						expect(results[0]).toEqual 'a'
+						expect(results[1]).toEqual 'b'
+						expect(results[2]).toEqual 'c'
+						done()
+
+		
+
+# Bugs and Regressions
+# -----------------------------------------------------------------------------------
 describe 'Regressions', ->
 	
 	it 'Returns an object with a number field with 0 as the value', (done) ->
@@ -1439,3 +1466,4 @@ describe 'Regressions', ->
 				.exec (err, res) ->
 					expect(res.points).toBe(0)
 					done()
+
