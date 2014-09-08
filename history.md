@@ -17,7 +17,7 @@ User('john')
 .exec()
 
 User('john')
-when the_sky_is_blue, ->
+.when the_sky_is_blue, ->
   @name.set('happy john')
 .exec()
 ```
