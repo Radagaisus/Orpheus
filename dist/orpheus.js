@@ -57,16 +57,16 @@
         multi_commands = multi_commands.concat(model_commands);
       }
       return Orpheus.config.client.multi(multi_commands).exec(function(err, results) {
-        var key, num, resp;
+        var key, num, response;
         if (err) {
           return callback(err, results = []);
         } else {
-          resp = {};
+          response = {};
           for (key in schema) {
             num = schema[key];
-            resp[key] = results.splice(0, num);
+            response[key] = results.splice(0, num);
           }
-          return callback(err, resp);
+          return callback(err, response);
         }
       });
     };
@@ -313,10 +313,14 @@
       _ref1 = this.model;
       _fn = (function(_this) {
         return function(key) {
-          return _this[key].key = function() {
+          _this[key].key = function() {
             var args;
             args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
             _this[key]._key_arguments = args;
+            return _this[key];
+          };
+          return _this[key].as = function(name) {
+            _this[key]._key_name = name;
             return _this[key];
           };
         };
@@ -379,7 +383,7 @@
       type = value.type;
       this[key][f] = (function(_this) {
         return function() {
-          var args, dynamic_key_args, field, result, v, _i, _len, _ref;
+          var args, dynamic_key_args, field, key_name, result, v, _i, _len, _ref;
           args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
           if (_.isObject(args[args.length - 1]) && args[args.length - 1].key) {
             dynamic_key_args = args.pop().key;
@@ -417,10 +421,13 @@
             }
           }
           _this._commands.push(_.flatten([f, _this._get_key(key, dynamic_key_args), args]));
+          key_name = _this[key]._key_name;
+          delete _this[key]._key_name;
           if (__indexOf.call(getters, f) >= 0) {
             _this._res_schema.push({
               type: type,
               name: key,
+              key_name: key_name,
               dynamic_key_args: dynamic_key_args,
               with_scores: type === 'zset' && __indexOf.call(args, 'withscores') >= 0
             });
@@ -601,7 +608,9 @@
           }
           res[i] = zset;
         }
-        if (this.model[s.name].options.key) {
+        if (s.key_name) {
+          new_res[s.key_name] = res[i];
+        } else if (this.model[s.name].options.key) {
           if (temp_res[s.name] == null) {
             temp_res[s.name] = res[i];
             temp_res["" + s.name + "_key"] = this.model[s.name].options.key.apply(this, s.dynamic_key_args);

@@ -518,6 +518,25 @@ describe 'Get', ->
 				done()
 
 
+	it 'Use #as to change the returned key name', (done) ->
+		# Define the User model, with only one field - a `name` string
+		class User extends Orpheus
+			constructor: ->
+				@str 'name'
+		# Create the user
+		user = User.create()
+		# Set the user name
+		user('test-user').name.set('test-name').exec ->
+			# Retrieve the user name as `first_name`
+			user('test-user').name.as('first_name').get().exec (err, res) ->
+				# Verify we got it in the right key name
+				expect(res.first_name).toEqual 'test-name'
+				# Verify we didn't get it in the wrong key name
+				expect(res.name).toBeUndefined()
+				# We're done
+				done()
+
+
 # Setting Stuff
 # --------------------------------------------
 describe 'Setting Records', ->
