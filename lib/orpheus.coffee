@@ -433,18 +433,24 @@ class OrpheusAPI
 					return @[key]
 
 				# Add a dynamic `.as` function for each key. When doing retrieval operations
-				# `.as` can be called to note how we want the key name to be returned:
+				# `.as` can be called to note how we want the key name to be returned. `.as`
+				# takes a single parameter, `key_name`, that declares the key name we want
+				# to see the retrieved value placed at. `key_name` can be nested. For example,
+				# you can use 'first.name' to create a nested object `{first: {name: value}}`.
 				# 
 				# Example Usage:
 				#   user('1').name.as('first_name').get().exec (err, res) ->
 				#     expect(res.first_name).toEqual 'the user name'
 				# 
-				# @param name - The key name we want to use for the retrieved value
+				#   user('1').name.as('name.first').get().exec (err, res) ->
+				#     expect(res.name.first).toEqual 'the user name'
+				# 
+				# @param key_name - The key name we want to use for the retrieved value
 				# @return {Object} the key object, for chaining of other commands
 				# 
-				@[key].as = (name) =>
+				@[key].as = (key_name) =>
 					# Mark the key name we want to use as a flag to be used later
-					@[key]._key_name = name
+					@[key]._key_name = key_name
 					# Return the key object for chaining
 					return @[key]
 
@@ -704,7 +710,20 @@ class OrpheusAPI
 			# of the key for the retrieved value. See the `.as` comamnd definition for
 			# more details on this.
 			if s.key_name
-				new_res[s.key_name] = res[i]
+				# Split the key for traversal based on dot syntax, e.g. 'first.name'
+				traversal = s.key_name.split('.')
+				# Go over each nesting
+				for nesting, index in traversal
+					# Use a temporary structure to help with recursion. Objects in JavaScript
+					# are by-reference, so it's easy to do this in a loop.
+					tmp = tmp || new_res
+					# If we're at the last nesting level, add the retrieved value. Otherwise,
+					# create an empty object, if it doesn't exist yet.
+					if index + 1 is traversal.length
+					then tmp[nesting] = res[i]
+					else tmp[nesting] ||= {}
+					# Update the temporary object to the next nesting level
+					tmp = tmp[nesting]
 			# Handle conversion of dynamic key responses. If the request only
 			# issued one command for this dynamic key, add the response directly
 			# under the key. If several commands were issued, add all the results

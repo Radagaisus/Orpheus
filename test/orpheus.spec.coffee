@@ -537,6 +537,24 @@ describe 'Get', ->
 				done()
 
 
+	it 'Use #as to change the returned key name, with nesting', (done) ->
+		# Define the User model, with only one field - a `name` string
+		class User extends Orpheus
+			constructor: ->
+				@str 'name'
+		# Create the user
+		user = User.create()
+		# Set the user name
+		user('test-user').name.set('test-name').exec ->
+			# Retrieve the user name as `first_name`
+			user('test-user').name.as('name.first').get().exec (err, res) ->
+				console.log res
+				# Verify we got it in the right key name
+				expect(res.name.first).toEqual 'test-name'
+				# We're done
+				done()
+
+
 # Setting Stuff
 # --------------------------------------------
 describe 'Setting Records', ->
