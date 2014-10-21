@@ -319,8 +319,8 @@
             _this[key]._key_arguments = args;
             return _this[key];
           };
-          return _this[key].as = function(name) {
-            _this[key]._key_name = name;
+          return _this[key].as = function(key_name) {
+            _this[key]._key_name = key_name;
             return _this[key];
           };
         };
@@ -591,7 +591,7 @@
     };
 
     OrpheusAPI.prototype._create_getter_object = function(res) {
-      var dynamic_key, field, i, index, member, new_res, s, temp_res, tmp, zset, _i, _j, _len, _len1, _ref, _ref1;
+      var dynamic_key, field, i, index, member, nesting, new_res, s, temp_res, tmp, traversal, zset, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
       new_res = {};
       temp_res = {};
       _ref = this._res_schema;
@@ -609,7 +609,17 @@
           res[i] = zset;
         }
         if (s.key_name) {
-          new_res[s.key_name] = res[i];
+          traversal = s.key_name.split('.');
+          for (index = _k = 0, _len2 = traversal.length; _k < _len2; index = ++_k) {
+            nesting = traversal[index];
+            tmp = tmp || new_res;
+            if (index + 1 === traversal.length) {
+              tmp[nesting] = res[i];
+            } else {
+              tmp[nesting] || (tmp[nesting] = {});
+            }
+            tmp = tmp[nesting];
+          }
         } else if (this.model[s.name].options.key) {
           if (temp_res[s.name] == null) {
             temp_res[s.name] = res[i];
