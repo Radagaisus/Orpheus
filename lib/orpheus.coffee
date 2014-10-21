@@ -525,9 +525,9 @@ class OrpheusAPI
 			# Response Schema
 			# --------------------------------------
 
-			# Extract the `_key_name` flag, so we can use it in the response schema,
-			# and then delete it so it won't stay for future operations on the key.
+			# Extract the `_key_name` flag, so we can use it in the response schema.
 			key_name = @[key]._key_name
+			# And then delete it so it won't stay for future operations on the key.
 			delete @[key]._key_name
 
 			# If the command is a get command
@@ -707,7 +707,7 @@ class OrpheusAPI
 				res[i] = zset
 			
 			# If the `key_name` flag exists on the response schema, use it as the name
-			# of the key for the retrieved value. See the `.as` comamnd definition for
+			# of the key for the retrieved value. See the `.as()` command definition for
 			# more details on this.
 			if s.key_name
 				# Split the key for traversal based on dot syntax, e.g. 'first.name'

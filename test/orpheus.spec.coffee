@@ -548,9 +548,10 @@ describe 'Get', ->
 		user('test-user').name.set('test-name').exec ->
 			# Retrieve the user name as `first_name`
 			user('test-user').name.as('name.first').get().exec (err, res) ->
-				console.log res
 				# Verify we got it in the right key name
 				expect(res.name.first).toEqual 'test-name'
+				# And that `res.name` is now an object
+				expect(typeof res.name).toEqual 'object'
 				# We're done
 				done()
 
