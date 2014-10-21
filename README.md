@@ -184,6 +184,21 @@ user('almog')
 ```
 
 
+#### Using `.as` to create nice objects
+
+When doing retrieval operations, `.as(key_name)` can be used to note how we want the key name to be returned. `.as` takes a single parameter, `key_name`, that declares what key we want the retrieved value to be placed at. `key_name` can be nested. For example, you can use `'first.name` to created a nested object: `{first: {name: value}}`.
+
+Example Usage:
+
+```coffee
+user('1').name.as('first_name').get().exec (err, res) ->
+  expect(res.first_name).toEqual 'the user name'
+
+user('1').name.as('name.first').get().exec (err, res) ->
+  expect(res.name.first).toEqual 'the user name'
+```
+
+
 ### Err and Exec
 
 Orpheus uses the `.err()` function for handling validation and unexpected errors. If `.err()` is not set the `.exec()` command receives errors as the first parameter.
