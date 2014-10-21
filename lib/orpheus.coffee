@@ -425,11 +425,35 @@ class OrpheusAPI
 			if value.type in ['set', 'zset', 'hash', 'list']
 				for f in commands.keys
 					@_create_command key, value, f
-			# Add a `key` function, that supplies dynamic key arguments for keys.
+			
 			do (key) =>
+				# Add a `key` function, that supplies dynamic key arguments for keys
 				@[key].key = (args...) =>
 					@[key]._key_arguments = args
 					return @[key]
+
+				# Add a dynamic `.as` function for each key. When doing retrieval operations
+				# `.as` can be called to note how we want the key name to be returned. `.as`
+				# takes a single parameter, `key_name`, that declares the key name we want
+				# to see the retrieved value placed at. `key_name` can be nested. For example,
+				# you can use 'first.name' to create a nested object `{first: {name: value}}`.
+				# 
+				# Example Usage:
+				#   user('1').name.as('first_name').get().exec (err, res) ->
+				#     expect(res.first_name).toEqual 'the user name'
+				# 
+				#   user('1').name.as('name.first').get().exec (err, res) ->
+				#     expect(res.name.first).toEqual 'the user name'
+				# 
+				# @param key_name - The key name we want to use for the retrieved value
+				# @return {Object} the key object, for chaining of other commands
+				# 
+				@[key].as = (key_name) =>
+					# Mark the key name we want to use as a flag to be used later
+					@[key]._key_name = key_name
+					# Return the key object for chaining
+					return @[key]
+
 
 		for rel in @rels
 			prel = inflector.pluralize(rel)
@@ -500,11 +524,18 @@ class OrpheusAPI
 			
 			# Response Schema
 			# --------------------------------------
+
+			# Extract the `_key_name` flag, so we can use it in the response schema.
+			key_name = @[key]._key_name
+			# And then delete it so it won't stay for future operations on the key.
+			delete @[key]._key_name
+
 			# If the command is a get command
 			if f in getters
 				@_res_schema.push
 					type: type
 					name: key
+					key_name: key_name
 					dynamic_key_args: dynamic_key_args
 					with_scores: type is 'zset' and 'withscores' in args
 			
@@ -675,6 +706,24 @@ class OrpheusAPI
 				# Add the converted `zset` to the response.
 				res[i] = zset
 			
+			# If the `key_name` flag exists on the response schema, use it as the name
+			# of the key for the retrieved value. See the `.as()` command definition for
+			# more details on this.
+			if s.key_name
+				# Split the key for traversal based on dot syntax, e.g. 'first.name'
+				traversal = s.key_name.split('.')
+				# Go over each nesting
+				for nesting, index in traversal
+					# Use a temporary structure to help with recursion. Objects in JavaScript
+					# are by-reference, so it's easy to do this in a loop.
+					tmp = tmp || new_res
+					# If we're at the last nesting level, add the retrieved value. Otherwise,
+					# create an empty object, if it doesn't exist yet.
+					if index + 1 is traversal.length
+					then tmp[nesting] = res[i]
+					else tmp[nesting] ||= {}
+					# Update the temporary object to the next nesting level
+					tmp = tmp[nesting]
 			# Handle conversion of dynamic key responses. If the request only
 			# issued one command for this dynamic key, add the response directly
 			# under the key. If several commands were issued, add all the results
@@ -700,7 +749,7 @@ class OrpheusAPI
 			# The next time, we check if this exist, and if so - convert into the
 			# aforementioned object.
 			# 
-			if @model[s.name].options.key
+			else if @model[s.name].options.key
 				# If this is the first command / response we parse for this field
 				if not temp_res[s.name]?
 					# Add it to the temporary response
