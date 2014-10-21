@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.6.2
+
+- Added the `.as()` function for each key. When doing retrieval operations, `.as(key_name)` can be used to note how we want the key name to be returned. `.as` takes a single parameter, `key_name`, that declares what key we want the retrieved value to be placed at. `key_name` can be nested. For example, you can use `'first.name` to created a nested object: `{first: {name: value}}`.
+
+Example Usage:
+
+```coffee
+user('1').name.as('first_name').get().exec (err, res) ->
+	expect(res.first_name).toEqual 'the user name'
+
+user('1').name.as('name.first').get().exec (err, res) ->
+	expect(res.name.first).toEqual 'the user name'
+```
+
 ## 0.6.1
 
 - Added a test for `Orpheus.connect()` when the models are passed as an array instead of an object.
