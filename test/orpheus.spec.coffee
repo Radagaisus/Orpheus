@@ -7,7 +7,7 @@ r = redis.createClient()
 monitor = redis.createClient()
 
 
-# Monitor redis commands
+# Monitor Redis commands
 commands = []
 monitor.monitor()
 monitor.on 'monitor', (time, args) ->
@@ -1453,8 +1453,8 @@ describe 'Connect', ->
 
 
 
-# Bugs & Regressions
-# ---------------------------------------
+# Bugs and Regressions
+# ----------------------------------------------------------------------------------
 describe 'Regressions', ->
 	
 	it 'Returns an object with a number field with 0 as the value', (done) ->
@@ -1477,3 +1477,46 @@ describe 'Regressions', ->
 				.exec (err, res) ->
 					expect(res.points).toBe(0)
 					done()
+
+
+	# This test validates that default field values are cloned and passed by-value
+	# to the response, rather than by-reference. If the end-user tries to modify
+	# a response that contains by-reference default fields, this can "pollute"
+	# default values for other queries. The scenario we test here:
+	# 
+	# 1. Every reader has a set of books that defaults to an empty array.
+	# 2. We retrieve the first reader's (empty) list of books
+	# 3. We update that list with a new book that that reader has read
+	# 4. We retrieve the second reader's (empty) list of books.
+	# 
+	# When default values are passed by-reference, this would've caused the second
+	# reader's list of books to be "polluted" with the first readers book. Cloning
+	# the default value takes care of this.
+	# 
+	it 'Default field values are returned in the response as clones', (done) ->	
+		# Define a new Reader model, that holds a set of books they've read, that
+		# defaults to an empty array. Arrays are by-reference in JavaScript.
+		class Reader extends Orpheus
+			constructor: ->
+				@set 'books', default: []
+		# Create the reader API
+		reader = Reader.create()
+		# Retrieve the first reader's books. The first reader has no books yet,
+		# so this will return the default value - an empty array.
+		reader('first').books.members().exec (err, res) ->
+			# Update the reader's books with a new book they've read.
+			res.books.push('The Great Hunt')
+			# Update the books set for the first reader in the database. This step
+			# is not really needed for the test, but it helps illustrate a real
+			# world scenario for this issue.
+			reader('first').books.add(res.books).exec (err, res) ->
+				# Retrieve the books of the second reader. The second reader has no
+				# books yet, so we expect the list to be empty. The bug we test here
+				# would have caused the empty default array to be "polluted" with the
+				# first reader's books.
+				reader('second').books.members().exec (err, res) ->
+					# Check that the books list is empty
+					expect(res.books.length).toEqual 0
+					# We're done.
+					done()
+
