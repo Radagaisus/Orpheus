@@ -4,6 +4,7 @@
 _            = require 'underscore'           
 async        = require 'async'        
 os           = require 'os'
+clone        = require 'clone'
 
 inflector    = require './inflector'
 commands     = require './commands'
@@ -797,14 +798,20 @@ class OrpheusAPI
 			else
 				new_res[s.name] = res[i]
 			
-			# If the field is empty - undefined, null, {}, []
-			# then user the field's default or delete the field
-			# if there's no default.
+			# Get a quick reference to the current response field
 			field = new_res[s.name]
+			# If the field is `undefined`, `null`, or an empty object or array, then we
+			# either use the field's default value or delete it from the response if
+			# there's no default value.
 			if _.isNull(field) or _.isUndefined(field) or (_.isObject(field) and _.isEmpty(field))
+				# If no default value was set on the field, we delete it from the response.
+				# Otherwise, we clone the default value and add it as the field in the response.
 				if _.isUndefined @model[s.name].options.default
-				then delete new_res[s.name]
-				else new_res[s.name] = @model[s.name].options.default
+					# Delete the field from the response
+					delete new_res[s.name]
+				else
+					# Clone the default value of the field, and add it to the response
+					new_res[s.name] = clone(@model[s.name].options.default)
 
 		# Return the new response
 		return new_res
