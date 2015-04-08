@@ -26,7 +26,7 @@ class Orpheus
 	@configure: (o) ->
 		@config = _.extend @config, o
 	
-	# easy reference to all models
+	# Easy reference to all models
 	@schema = {}
 	
 	# UniqueID counters
@@ -146,7 +146,8 @@ class Orpheus
 					throw new Error("Map only works on strings")
 				@model[field].options.map = true
 			
-			# Add relations.
+			# Adds relations.
+			# 
 			# @param rel - {String} - the name of the relation
 			# @param options - {Object} - options object:
 			#   - namespace - if set, will use that namespace as
