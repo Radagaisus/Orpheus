@@ -1,13 +1,19 @@
 # Orpheus - a small DSL for Redis
-# ----------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 
 _            = require 'underscore'           
 async        = require 'async'        
 os           = require 'os'
 clone        = require 'clone'
 
+# Require the inflector, that takes care of pluralizing model relationships
 inflector    = require './inflector'
+
+# Require the commands module. It contains a bunch of dictionaries that tell
+# us how to handle different model field types, different Redis commands,
+# their shorthands, and validations.
 commands     = require './commands'
+# Require the validations module, that contains a bunch of validation methods.
 validations  = require './validations'
 
 command_map    = commands.command_map
@@ -15,14 +21,15 @@ validation_map = commands.validations
 getters        = commands.getters
 
 # Orpheus
-# ---------------------------------------------------------------
+# ----------------------------------------------------------------------------
+# 
 class Orpheus
 	@version = require('../package.json').version
 	
 	# Configuration
 	@config:
-		prefix: 'orpheus' # redis prefix, orpheus:obj:id:prop
-		# client -        # redis client
+		prefix: 'orpheus' # Redis prefix, orpheus:obj:id:prop
+		# client -        # Redis client
 	
 	@configure: (o) ->
 		@config = _.extend @config, o
