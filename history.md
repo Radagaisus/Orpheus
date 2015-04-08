@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.3
+
+- Added node.js 0.12 and io.js to the CI.
+
+- Fixed a bug where modifying responses would "pollute" default values for other queries. [See the pull request for more details](https://github.com/Radagaisus/Orpheus/pull/11).
+
 ## 0.6.2
 
 - Added the `.as()` function for each key. When doing retrieval operations, `.as(key_name)` can be used to note how we want the key name to be returned. `.as` takes a single parameter, `key_name`, that declares what key we want the retrieved value to be placed at. `key_name` can be nested. For example, you can use `'first.name` to created a nested object: `{first: {name: value}}`.
