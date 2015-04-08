@@ -1,5 +1,5 @@
-# Orpheus - a small DSL for redis
-#-------------------------------------#
+# Orpheus - a small DSL for Redis
+# ----------------------------------------------------------------------
 
 _            = require 'underscore'           
 async        = require 'async'        
