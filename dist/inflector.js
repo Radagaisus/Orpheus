@@ -178,7 +178,7 @@ InflectionJS =
 
 
 /*
-  This function adds plurilization support to every String object
+  This function adds pluralization support to every String object
     Signature:
       String.pluralize(plural) == String
     Arguments:
