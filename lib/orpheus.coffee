@@ -35,7 +35,7 @@ class Orpheus
 
 
 	# Connects lazy commands from several Orpheus models into one big MULTI
-	# command. This is convenient, for example, for updating denomralized data
+	# command. This is convenient, for example, for updating denormalized data
 	# across several models.
 	# 
 	# Example usage:
@@ -57,11 +57,11 @@ class Orpheus
 	# 
 	# 
 	# @param models - {Object|Array} An object or an array of Orpheus models.
-	#        the keys in the object are the names we want to assign to the
-	#        response we return from Redis.
+	# the keys in the object are the names we want to assign to the
+	# response we return from Redis.
 	# @param callback - {Function} a callback function, with the signature of
-	#        `(error, results)`. The results will be the parsed results from
-	#        redis.
+	# `(error, results)`. The results will be the parsed results from
+	# Redis.
 	# 
 	@connect: (models, callback) ->
 		# Holds a small schema, so we'll know how to return the results
@@ -91,8 +91,7 @@ class Orpheus
 
 	
 	# Orpheus model extends the model
-	# - we can automagically detect
-	#   the model name and qualifier.
+	# - we can automatically detect the model name and qualifier.
 	# - you don't need to call super()
 	@create: ->
 		
@@ -123,7 +122,7 @@ class Orpheus
 				super()
 			
 			
-			# Creates a dynamic function that addes a field for
+			# Creates a dynamic function that adds a field for
 			# a specific type 'f'. For example, `create_field('str')`
 			# will create the function `@str(field, options)` that
 			# gets the field name and its options and pushes
@@ -175,7 +174,8 @@ class Orpheus
 					return this
 			
 
-			# Add a validation function to a field
+			# Adds a validation function to a field.
+			# 
 			# Example:
 			# @validate 'name', (name) ->
 			#   if name is 'jay' then true else 'invalid!'
@@ -187,7 +187,7 @@ class Orpheus
 				else
 
 					# Custom validations: numericality, exclusion, inclusion
-					# format, etc. Validations are functions that recieve the
+					# format, etc. Validations are functions that receive the
 					# field and return either true or a string as a message
 					if o.numericality
 						for k,v of o.numericality
