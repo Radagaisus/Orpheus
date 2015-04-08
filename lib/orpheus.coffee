@@ -28,7 +28,7 @@ class Orpheus
 	
 	# Configuration
 	@config:
-		prefix: 'orpheus' # Redis prefix, orpheus:obj:id:prop
+		prefix: 'orpheus' # Redis prefix, `orpheus:obj:id:prop`
 		# client -        # Redis client
 	
 	@configure: (o) ->
@@ -136,7 +136,7 @@ class Orpheus
 			# gets the field name and its options and pushes
 			# them to the model schema.
 			# 
-			# - f - the type, as string: 'str', 'num', etc
+			# @param f - {String} the field type, as string: 'str', 'num', etc
 			# 
 			create_field: (f) ->
 				@[f] = (field, options = {}) ->
@@ -173,7 +173,7 @@ class Orpheus
 				@rels.push(rel)
 				@rels_qualifiers.push(qualifier)
 
-				# e.g. user(12).book(15)
+				# e.g. `user(12).book(15)`
 				@[rel] = (id) ->
 					@["#{qualifier}_id"] = @["#{rel}_id"]= id
 					return this
