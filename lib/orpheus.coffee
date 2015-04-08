@@ -352,10 +352,6 @@ class OrpheusAPI
 		
 		@validation_errors = new OrpheusValidationErrors
 		
-		# Used when retrieving information from redis
-		# This schema tells us how to convert the reponse
-
-
 		# The response schema is used to figure out how
 		# to convert the multi command array response to
 		# a model object.
@@ -406,7 +402,7 @@ class OrpheusAPI
 		
 		
 		# Create functions for working with the relation set
-		# e.g. user(15).books.sadd('dune') will map to sadd
+		# e.g. user(15).books.sadd('dune') will map to `sadd`
 		# orpheus:us:15:books dune.
 		for rel in @rels
 			prel = inflector.pluralize(rel)
@@ -414,7 +410,7 @@ class OrpheusAPI
 			@[prel] = {}
 		
 		
-		# Add all redis commands relevant to the field and its type
+		# Add all Redis commands relevant to the field and its type
 		# Example: model('id').ranking.zadd (zrank, zscore...)
 		for key, value of @model
 			@[key] = {}
@@ -499,7 +495,7 @@ class OrpheusAPI
 						if _.isNumber(field)
 							# Convert to a string
 							field = field.toString()
-						# Otherwise, file a validation eror
+						# Otherwise, file a validation error
 						else
 							@validation_errors.add key,
 								msg: "Could not convert #{key} to string"
@@ -562,7 +558,7 @@ class OrpheusAPI
 			
 			return this
 		
-		# Shorthand form, incrby instead of zincrby and hincrby is also acceptable
+		# Shorthand form, `incrby` instead of `zincrby` and `hincrby `is also acceptable
 		# str: h, num: h, list: l, set: s, zset: z
 		@[key][f[1..]] = @[key][f] if f[0] is commands.shorthands[value.type]
 
@@ -586,7 +582,7 @@ class OrpheusAPI
 			
 			return this
 
-	# Generate a unique ID for model, similiar to MongoDB
+	# Generate a unique ID for model, similar to MongoDB
 	# http://www.mongodb.org/display/DOCS/Object+IDs
 	_generate_id: ->
 		@_new_id = true
@@ -603,7 +599,7 @@ class OrpheusAPI
 		k = "#{@prefix}:#{@q}:#{@id}"
 		
 		# Add qualifiers, if the relation was set.
-		# e.g. orpheus:us:30:book:dune:page:13
+		# e.g. `orpheus:us:30:book:dune:page:13`
 		for rel in @rels_qualifiers when @[rel+"_id"]
 			k += ":#{rel}:"+@[rel+"_id"]
 		
@@ -616,7 +612,7 @@ class OrpheusAPI
 		# Generate a new key name, if it has a dynamic key function, and if it's not
 		# just a request to get the regular model hash.
 		if key and @model[key].options.key
-			# If the dynamic key was supploed as a paramter, we use that. Otherwise,
+			# If the dynamic key was supplied as a parameter, we use that. Otherwise,
 			# we use the `@[key]._key_arguments` that was supplied using the `key`
 			# function.
 			if dynamic_key_args
@@ -680,7 +676,7 @@ class OrpheusAPI
 		@exec fn
 	
 	# Converts the results back from the multi
-	# array values we get from node redis. The response
+	# array values we get from node Redis. The response
 	# schema, @_res_schema, is populated when we
 	# add commands, and now, based on the types it
 	# stored, we convert everything back to an object.
@@ -694,7 +690,7 @@ class OrpheusAPI
 			if s.type is 'num'
 				res[i] = Number res[i]
 			# If the field type is a zset, and the command requested the field
-			# using 'withscores', convert the response to a `key -> value` hash
+			# using `withscores`, convert the response to a `key -> value` hash
 			# from the array of [key, val, ...] it was received in.
 			else if s.type is 'zset' and s.with_scores
 				# Initialize an empty object
@@ -820,7 +816,7 @@ class OrpheusAPI
 
 	# 
 	err: (fn) ->
-		@error_func = fn || -> # noop
+		@error_func = fn || -> # no-op
 		return this
 	
 	# Executes all the commands in the current query
@@ -830,7 +826,7 @@ class OrpheusAPI
 		fn ||= ->
 		
 		# If there were any validation errors we immediately call
-		# the callback before issuing any commands to redis. If
+		# the callback before issuing any commands to Redis. If
 		# an error callback was supplied with `err` then we call
 		# it with the validation errors and the model id. Otherwise
 		# we call the `fn` callback with the errors, `null` as the
@@ -846,7 +842,7 @@ class OrpheusAPI
 				
 				# If the request was just for getting information,
 				# convert the results back based on the response
-				# scehma.
+				# schema.
 				if @_res_schema.length and not err
 					if @_res_schema.length is @_commands.length
 						unless @flags.raw_response
