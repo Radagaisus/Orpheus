@@ -2,7 +2,7 @@
 
 ## 0.6.4
 
-- Update the redis package dependency.
+- Updated `node_redis` dependency to 0.12.1.
 
 ## 0.6.3
 
