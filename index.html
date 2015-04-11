@@ -1,34 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-us">
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-
+    <meta charset="UTF-8">
     <title>Orpheus by Radagaisus</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
-
   <body>
+    <section class="page-header">
+      <h1 class="project-name">Orpheus</h1>
+      <h2 class="project-tagline">A Small CoffeeScript Object Model for Redis</h2>
+      <a href="https://github.com/Radagaisus/Orpheus" class="btn">View on GitHub</a>
+      <a href="https://github.com/Radagaisus/Orpheus/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/Radagaisus/Orpheus/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-    <header>
-      <div class="container">
-        <h1>Orpheus</h1>
-        <h2>A Small CoffeeScript Object Model for Redis</h2>
-
-        <section id="downloads">
-          <a href="https://github.com/Radagaisus/Orpheus/zipball/master" class="btn">Download as .zip</a>
-          <a href="https://github.com/Radagaisus/Orpheus/tarball/master" class="btn">Download as .tar.gz</a>
-          <a href="https://github.com/Radagaisus/Orpheus" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
-        </section>
-      </div>
-    </header>
-
-    <div class="container">
-      <section id="main_content">
-        <h1>Orpheus - Redis Little Helper</h1>
+    <section class="main-content">
+      <h1>
+<a id="orpheus---redis-little-helper" class="anchor" href="#orpheus---redis-little-helper" aria-hidden="true"><span class="octicon octicon-link"></span></a>Orpheus - Redis Little Helper</h1>
 
 <p>Orpheus is a Redis Object Model for CoffeeScript.</p>
 
@@ -42,45 +34,48 @@
 <li>Dynamic keys</li>
 <li>Maps between strings and ids</li>
 <li>Validations</li>
-</ul><p>If you are using Orpheus please ping me on <a href="http://twitter.com/#!/radagaisus">Twitter</a> or <a href="http://enginezombie.com/">EngineZombie</a>. It will make me happy.</p>
+</ul>
 
-<h2>A Small Taste</h2>
+<p>If you are using Orpheus please ping me on <a href="http://twitter.com/#!/radagaisus">Twitter</a> or <a href="http://enginezombie.com/">EngineZombie</a>. It will make me happy.</p>
 
-<div class="highlight"><pre>  <span class="k">class</span> <span class="nx">User</span> <span class="k">extends</span> <span class="nx">Orpheus</span>
-    <span class="nv">constructor: </span><span class="o">-&gt;</span>
-      <span class="nx">@has</span> <span class="s">'book'</span>
+<h2>
+<a id="a-small-taste" class="anchor" href="#a-small-taste" aria-hidden="true"><span class="octicon octicon-link"></span></a>A Small Taste</h2>
 
-      <span class="nx">@str</span> <span class="s">'about_me'</span>
-      <span class="nx">@num</span> <span class="s">'points'</span>
-      <span class="nx">@set</span> <span class="s">'likes'</span>
-      <span class="nx">@zset</span> <span class="s">'ranking'</span>
+<div class="highlight highlight-coffee"><pre>  <span class="pl-k">class</span> <span class="pl-en">User</span> <span class="pl-k">extends</span> <span class="pl-e">Orpheus</span>
+    <span class="pl-en">constructor</span><span class="pl-k">:</span> <span class="pl-k"><span class="pl-k">-&gt;</span></span>
+      <span class="pl-smi">@has</span> <span class="pl-s"><span class="pl-pds">'</span>book<span class="pl-pds">'</span></span>
 
-      <span class="nx">@map</span> <span class="nx">@str</span> <span class="s">'fb_id'</span>
-      <span class="nx">@str</span> <span class="s">'fb_secret'</span>
+      <span class="pl-smi">@str</span> <span class="pl-s"><span class="pl-pds">'</span>about_me<span class="pl-pds">'</span></span>
+      <span class="pl-smi">@num</span> <span class="pl-s"><span class="pl-pds">'</span>points<span class="pl-pds">'</span></span>
+      <span class="pl-smi">@set</span> <span class="pl-s"><span class="pl-pds">'</span>likes<span class="pl-pds">'</span></span>
+      <span class="pl-smi">@zset</span> <span class="pl-s"><span class="pl-pds">'</span>ranking<span class="pl-pds">'</span></span>
 
-  <span class="nv">user = </span><span class="nx">Player</span><span class="p">.</span><span class="nx">create</span><span class="p">()</span>
+      <span class="pl-smi">@map</span> <span class="pl-smi">@str</span> <span class="pl-s"><span class="pl-pds">'</span>fb_id<span class="pl-pds">'</span></span>
+      <span class="pl-smi">@str</span> <span class="pl-s"><span class="pl-pds">'</span>fb_secret<span class="pl-pds">'</span></span>
 
-  <span class="nx">user</span><span class="p">(</span><span class="s">'modest'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">add</span>
-      <span class="nv">about_me: </span><span class="s">'I like douchebags and watermelon'</span>
-      <span class="nv">points: </span><span class="mi">5</span>
-    <span class="p">.</span><span class="nx">books</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s">'dune'</span><span class="p">,</span><span class="s">'maybe some proust'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">err</span> <span class="nf">(err) -&gt;</span>
-      <span class="nx">res</span><span class="p">.</span><span class="nx">json</span> <span class="nx">err</span><span class="p">.</span><span class="nx">toResponse</span><span class="p">()</span>
-    <span class="p">.</span><span class="nx">exec</span> <span class="o">-&gt;</span>
-      <span class="c1"># woho!</span>
-</pre></div>
+  <span class="pl-v"><span class="pl-v">user <span class="pl-k">=</span></span></span> Player.create()
 
-<h2>Types</h2>
+  user(<span class="pl-s"><span class="pl-pds">'</span>modest<span class="pl-pds">'</span></span>)
+    .add
+      <span class="pl-v"><span class="pl-v">about_me:</span></span> <span class="pl-s"><span class="pl-pds">'</span>I like douchebags and watermelon<span class="pl-pds">'</span></span>
+      <span class="pl-v"><span class="pl-v">points:</span></span> <span class="pl-c1">5</span>
+    .books.add(<span class="pl-s"><span class="pl-pds">'</span>dune<span class="pl-pds">'</span></span>,<span class="pl-s"><span class="pl-pds">'</span>maybe some proust<span class="pl-pds">'</span></span>)
+    .err <span class="pl-smi">(err)</span> <span class="pl-k">-&gt;</span>
+      res.json err.toResponse()
+    .exec <span class="pl-k">-&gt;</span>
+      <span class="pl-c"># woho!</span></pre></div>
+
+<h2>
+<a id="types" class="anchor" href="#types" aria-hidden="true"><span class="octicon octicon-link"></span></a>Types</h2>
 
 <p>Orpheus supports all the basic types of Redis: <code>@num</code>, <code>@str</code>, <code>@list</code>, <code>@set</code>, <code>@zset</code> and <code>@hash</code>. Note that strings and numbers are stored inside the model hash. See the wiki for <a href="https://github.com/Radagaisus/Orpheus/wiki">supported commands and key names for each type</a>.</p>
 
-<h2>Configuration</h2>
+<h2>
+<a id="configuration" class="anchor" href="#configuration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configuration</h2>
 
-<div class="highlight"><pre><span class="nx">Orpheus</span><span class="p">.</span><span class="nx">configure</span>
-   <span class="nv">client: </span><span class="nx">redis</span><span class="p">.</span><span class="nx">createClient</span><span class="p">()</span>
-   <span class="nv">prefix: </span><span class="s">'bookapp'</span>
-</pre></div>
+<div class="highlight highlight-coffee"><pre>Orpheus.configure
+   <span class="pl-v"><span class="pl-v">client:</span></span> redis.createClient()
+   <span class="pl-v"><span class="pl-v">prefix:</span></span> <span class="pl-s"><span class="pl-pds">'</span>bookapp<span class="pl-pds">'</span></span></pre></div>
 
 <p>Options:</p>
 
@@ -89,40 +84,42 @@
 <strong>client</strong>: the Redis client.</li>
 <li>
 <strong>prefix</strong>: optional prefix for keys. defaults to <code>orpheus</code>.</li>
-</ul><h2>Issuing Commands with Orpheus</h2>
+</ul>
 
-<h3>The Straightforward Way</h3>
+<h2>
+<a id="issuing-commands-with-orpheus" class="anchor" href="#issuing-commands-with-orpheus" aria-hidden="true"><span class="octicon octicon-link"></span></a>Issuing Commands with Orpheus</h2>
 
-<div class="highlight"><pre>  <span class="nx">user</span><span class="p">(</span><span class="s">'rada'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">name</span><span class="p">.</span><span class="nx">hset</span><span class="p">(</span><span class="s">'radagaisus'</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">points</span><span class="p">.</span><span class="nx">hincrby</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
-    <span class="p">.</span><span class="nx">points_by_time</span><span class="p">.</span><span class="nx">zincrby</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTime</span><span class="p">())</span>
-    <span class="p">.</span><span class="nx">books</span><span class="p">.</span><span class="nx">sadd</span><span class="p">(</span><span class="s">'dune'</span><span class="p">)</span>
-</pre></div>
+<h3>
+<a id="the-straightforward-way" class="anchor" href="#the-straightforward-way" aria-hidden="true"><span class="octicon octicon-link"></span></a>The Straightforward Way</h3>
+
+<div class="highlight highlight-coffee"><pre>  user(<span class="pl-s"><span class="pl-pds">'</span>rada<span class="pl-pds">'</span></span>)
+    .name.hset(<span class="pl-s"><span class="pl-pds">'</span>radagaisus<span class="pl-pds">'</span></span>)
+    .points.hincrby(<span class="pl-c1">5</span>)
+    .points_by_time.zincrby(<span class="pl-c1">5</span>, <span class="pl-k">new</span> <span class="pl-en">Date</span>().getTime())
+    .books.sadd(<span class="pl-s"><span class="pl-pds">'</span>dune<span class="pl-pds">'</span></span>)</pre></div>
 
 <p>Note you don't need to add the command prefix in this cases:</p>
 
-<div class="highlight"><pre><span class="nv">shorthands:</span>
-  <span class="nv">str: </span><span class="s">'h'</span>
-  <span class="nv">num: </span><span class="s">'h'</span>
-  <span class="nv">list: </span><span class="s">'l'</span>
-  <span class="nv">set: </span><span class="s">'s'</span>
-  <span class="nv">zset: </span><span class="s">'z'</span>
-  <span class="nv">hash: </span><span class="s">'h'</span>
-</pre></div>
+<div class="highlight highlight-coffee"><pre><span class="pl-v"><span class="pl-v">shorthands:</span></span>
+  <span class="pl-v"><span class="pl-v">str:</span></span> <span class="pl-s"><span class="pl-pds">'</span>h<span class="pl-pds">'</span></span>
+  <span class="pl-v"><span class="pl-v">num:</span></span> <span class="pl-s"><span class="pl-pds">'</span>h<span class="pl-pds">'</span></span>
+  <span class="pl-v"><span class="pl-v">list:</span></span> <span class="pl-s"><span class="pl-pds">'</span>l<span class="pl-pds">'</span></span>
+  <span class="pl-v"><span class="pl-v">set:</span></span> <span class="pl-s"><span class="pl-pds">'</span>s<span class="pl-pds">'</span></span>
+  <span class="pl-v"><span class="pl-v">zset:</span></span> <span class="pl-s"><span class="pl-pds">'</span>z<span class="pl-pds">'</span></span>
+  <span class="pl-v"><span class="pl-v">hash:</span></span> <span class="pl-s"><span class="pl-pds">'</span>h<span class="pl-pds">'</span></span></pre></div>
 
 <p>So the commands above could have been just <code>set</code>, <code>incrby</code> and <code>add</code>.</p>
 
-<h3>Adding, Setting, Deleting</h3>
+<h3>
+<a id="adding-setting-deleting" class="anchor" href="#adding-setting-deleting" aria-hidden="true"><span class="octicon octicon-link"></span></a>Adding, Setting, Deleting</h3>
 
-<div class="highlight"><pre><span class="nx">user</span><span class="p">(</span><span class="s">'dune'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">add</span>
-    <span class="nv">points: </span><span class="mi">20</span>
-    <span class="nv">ranking: </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s">'best book ever!'</span><span class="p">]</span>
-  <span class="p">.</span><span class="nx">set</span>
-    <span class="nv">name: </span><span class="s">'sequel'</span>
-  <span class="p">.</span><span class="nx">exec</span><span class="p">()</span>
-</pre></div>
+<div class="highlight highlight-coffee"><pre>user(<span class="pl-s"><span class="pl-pds">'</span>dune<span class="pl-pds">'</span></span>)
+  .add
+    <span class="pl-v"><span class="pl-v">points:</span></span> <span class="pl-c1">20</span>
+    <span class="pl-v"><span class="pl-v">ranking:</span></span> [<span class="pl-c1">1</span>, <span class="pl-s"><span class="pl-pds">'</span>best book ever!<span class="pl-pds">'</span></span>]
+  .set
+    <span class="pl-v"><span class="pl-v">name:</span></span> <span class="pl-s"><span class="pl-pds">'</span>sequel<span class="pl-pds">'</span></span>
+  .exec()</pre></div>
 
 <pre><code>add:
     num:  'hincrby'
@@ -139,175 +136,171 @@ set:
     list: 'lpush'
 </code></pre>
 
-<h3>Getting Stuff</h3>
+<h3>
+<a id="getting-stuff" class="anchor" href="#getting-stuff" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting Stuff</h3>
 
 <p>Getting the entire model in Orpheus is pretty easy:</p>
 
-<div class="highlight"><pre><span class="nx">user</span><span class="p">.</span><span class="nx">get</span> <span class="nf">(err, user) -&gt;</span>
-  <span class="nx">res</span><span class="p">.</span><span class="nx">json</span> <span class="nx">user</span>
-</pre></div>
+<div class="highlight highlight-coffee"><pre>user.get <span class="pl-smi">(err, user)</span> <span class="pl-k">-&gt;</span>
+  res.json user</pre></div>
 
 <p>Here's how get asks for different types:</p>
 
-<div class="highlight"><pre><span class="k">switch</span> <span class="nx">type</span>
-  <span class="k">when</span> <span class="s">'str'</span><span class="p">,</span> <span class="s">'num'</span>
-    <span class="nx">@</span><span class="p">[</span><span class="nx">key</span><span class="p">].</span><span class="nx">get</span><span class="p">()</span>
-  <span class="k">when</span> <span class="s">'list'</span>
-    <span class="nx">@</span><span class="p">[</span><span class="nx">key</span><span class="p">].</span><span class="nx">range</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
-  <span class="k">when</span> <span class="s">'set'</span>
-    <span class="nx">@</span><span class="p">[</span><span class="nx">key</span><span class="p">].</span><span class="nx">members</span><span class="p">()</span>
-  <span class="k">when</span> <span class="s">'zset'</span>
-    <span class="nx">@</span><span class="p">[</span><span class="nx">key</span><span class="p">].</span><span class="nx">range</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s">'withscores'</span>
-  <span class="k">when</span> <span class="s">'hash'</span>
-    <span class="nx">@</span><span class="p">[</span><span class="nx">key</span><span class="p">].</span><span class="nx">hgetall</span><span class="p">()</span>
-</pre></div>
+<div class="highlight highlight-coffee"><pre><span class="pl-k">switch</span> type
+  <span class="pl-k">when</span> <span class="pl-s"><span class="pl-pds">'</span>str<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>num<span class="pl-pds">'</span></span>
+    <span class="pl-smi">@</span>[key].get()
+  <span class="pl-k">when</span> <span class="pl-s"><span class="pl-pds">'</span>list<span class="pl-pds">'</span></span>
+    <span class="pl-smi">@</span>[key].range <span class="pl-c1">0</span>, <span class="pl-k">-</span><span class="pl-c1">1</span>
+  <span class="pl-k">when</span> <span class="pl-s"><span class="pl-pds">'</span>set<span class="pl-pds">'</span></span>
+    <span class="pl-smi">@</span>[key].members()
+  <span class="pl-k">when</span> <span class="pl-s"><span class="pl-pds">'</span>zset<span class="pl-pds">'</span></span>
+    <span class="pl-smi">@</span>[key].range <span class="pl-c1">0</span>, <span class="pl-k">-</span><span class="pl-c1">1</span>, <span class="pl-s"><span class="pl-pds">'</span>withscores<span class="pl-pds">'</span></span>
+  <span class="pl-k">when</span> <span class="pl-s"><span class="pl-pds">'</span>hash<span class="pl-pds">'</span></span>
+    <span class="pl-smi">@</span>[key].hgetall()</pre></div>
 
 <p>Specific queries for getting stuff will also convert the response to an object, provided all the commands issued are for getting stuff (no incrby or lpush somewhere in the query).</p>
 
-<div class="highlight"><pre><span class="nv">get_user: </span><span class="nf">(fn) -&gt;</span>
-      <span class="nx">@name</span><span class="p">.</span><span class="nx">get</span><span class="p">()</span>
-      <span class="nx">@fb_id</span><span class="p">.</span><span class="nx">get</span><span class="p">()</span>
-      <span class="nx">@fb_friends</span><span class="p">.</span><span class="nx">get</span><span class="p">()</span>
-      <span class="nx">@member_since</span><span class="p">.</span><span class="nx">get</span><span class="p">()</span>
-      <span class="nx">@exec</span> <span class="nx">fn</span>
-</pre></div>
+<div class="highlight highlight-coffee"><pre><span class="pl-en">get_user</span><span class="pl-k">:</span><span class="pl-smi"> <span class="pl-smi">(fn)</span></span> <span class="pl-k"><span class="pl-k">-&gt;</span></span>
+      <span class="pl-smi">@name</span>.get()
+      <span class="pl-smi">@fb_id</span>.get()
+      <span class="pl-smi">@fb_friends</span>.get()
+      <span class="pl-smi">@member_since</span>.get()
+      <span class="pl-smi">@exec</span> fn</pre></div>
 
 <p>Converting to object supports this commands:</p>
 
-<div class="highlight"><pre><span class="nv">getters: </span><span class="p">[</span>
-  <span class="c1"># String, Number</span>
-  <span class="s">'hget'</span><span class="p">,</span>
+<div class="highlight highlight-coffee"><pre><span class="pl-v"><span class="pl-v">getters:</span></span> [
+  <span class="pl-c"># String, Number</span>
+  <span class="pl-s"><span class="pl-pds">'</span>hget<span class="pl-pds">'</span></span>,
 
-  <span class="c1"># List</span>
-  <span class="s">'lrange'</span><span class="p">,</span>
+  <span class="pl-c"># List</span>
+  <span class="pl-s"><span class="pl-pds">'</span>lrange<span class="pl-pds">'</span></span>,
 
-  <span class="c1"># Set</span>
-  <span class="s">'smembers'</span><span class="p">,</span>
-  <span class="s">'scard'</span><span class="p">,</span>
+  <span class="pl-c"># Set</span>
+  <span class="pl-s"><span class="pl-pds">'</span>smembers<span class="pl-pds">'</span></span>,
+  <span class="pl-s"><span class="pl-pds">'</span>scard<span class="pl-pds">'</span></span>,
 
-  <span class="c1"># Zset</span>
-  <span class="s">'zrange'</span><span class="p">,</span>
-  <span class="s">'zrangebyscore'</span><span class="p">,</span>
-  <span class="s">'zrevrange'</span><span class="p">,</span>
-  <span class="s">'zrevrangebyscore'</span>
+  <span class="pl-c"># Zset</span>
+  <span class="pl-s"><span class="pl-pds">'</span>zrange<span class="pl-pds">'</span></span>,
+  <span class="pl-s"><span class="pl-pds">'</span>zrangebyscore<span class="pl-pds">'</span></span>,
+  <span class="pl-s"><span class="pl-pds">'</span>zrevrange<span class="pl-pds">'</span></span>,
+  <span class="pl-s"><span class="pl-pds">'</span>zrevrangebyscore<span class="pl-pds">'</span></span>
 
-  <span class="c1"># Hash</span>
-  <span class="s">'hget'</span><span class="p">,</span>
-  <span class="s">'hgetall'</span><span class="p">,</span>
-  <span class="s">'hmget'</span>
-<span class="p">]</span>
-</pre></div>
+  <span class="pl-c"># Hash</span>
+  <span class="pl-s"><span class="pl-pds">'</span>hget<span class="pl-pds">'</span></span>,
+  <span class="pl-s"><span class="pl-pds">'</span>hgetall<span class="pl-pds">'</span></span>,
+  <span class="pl-s"><span class="pl-pds">'</span>hmget<span class="pl-pds">'</span></span>
+]</pre></div>
 
 <p>Getting stuff while updating stuff in the same query will return the results in an array, the same way a Redis multi() command will return the results.</p>
 
-<h3>Err and Exec</h3>
+<h3>
+<a id="err-and-exec" class="anchor" href="#err-and-exec" aria-hidden="true"><span class="octicon octicon-link"></span></a>Err and Exec</h3>
 
 <p>Orpheus uses the <code>.err()</code> function for handling validation and unexpected errors. If <code>.err()</code> is not set the <code>.exec()</code> command receives errors as the first parameter.</p>
 
-<div class="highlight"><pre><span class="nx">user</span><span class="p">(</span><span class="s">'sonic youth'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">add</span>
-    <span class="nv">name: </span><span class="s">'modest mouse'</span>
-    <span class="nv">points: </span><span class="mi">50</span>
-  <span class="p">.</span><span class="nx">err</span> <span class="nf">(err) -&gt;</span>
-    <span class="k">if</span> <span class="nx">err</span><span class="p">.</span><span class="nx">type</span> <span class="o">is</span> <span class="s">'validation'</span>
-      <span class="c1"># phew, it's just a validation error</span>
-      <span class="nx">res</span><span class="p">.</span><span class="nx">json</span> <span class="nx">err</span><span class="p">.</span><span class="nx">toResponse</span><span class="p">()</span>
-    <span class="k">else</span>
-      <span class="c1"># Redis Error, or a horrendous</span>
-      <span class="c1"># bug in Orpheus</span>
-      <span class="nx">log</span> <span class="s">"Wake the sysadmins! </span><span class="si">#{</span><span class="nx">err</span><span class="si">}</span><span class="s">"</span>
-      <span class="nx">res</span><span class="p">.</span><span class="nx">json</span> <span class="nv">status: </span><span class="mi">500</span>
-  <span class="p">.</span><span class="nx">exec</span> <span class="nf">(res, id) -&gt;</span>
-    <span class="c1"># fun!</span>
-</pre></div>
+<div class="highlight highlight-coffee"><pre>user(<span class="pl-s"><span class="pl-pds">'</span>sonic youth<span class="pl-pds">'</span></span>)
+  .add
+    <span class="pl-v"><span class="pl-v">name:</span></span> <span class="pl-s"><span class="pl-pds">'</span>modest mouse<span class="pl-pds">'</span></span>
+    <span class="pl-v"><span class="pl-v">points:</span></span> <span class="pl-c1">50</span>
+  .err <span class="pl-smi">(err)</span> <span class="pl-k">-&gt;</span>
+    <span class="pl-k">if</span> err.type <span class="pl-k">is</span> <span class="pl-s"><span class="pl-pds">'</span>validation<span class="pl-pds">'</span></span>
+      <span class="pl-c"># phew, it's just a validation error</span>
+      res.json err.toResponse()
+    <span class="pl-k">else</span>
+      <span class="pl-c"># Redis Error, or a horrendous</span>
+      <span class="pl-c"># bug in Orpheus</span>
+      log <span class="pl-s"><span class="pl-pds">"</span>Wake the sysadmins! <span class="pl-s1"><span class="pl-pse">#{</span>err<span class="pl-pse">}</span></span><span class="pl-pds">"</span></span>
+      res.json <span class="pl-v"><span class="pl-v">status:</span></span> <span class="pl-c1">500</span>
+  .exec <span class="pl-smi">(res, id)</span> <span class="pl-k">-&gt;</span>
+    <span class="pl-c"># fun!</span></pre></div>
 
 <p><strong>Without Err</strong>:</p>
 
-<div class="highlight"><pre><span class="nx">user</span><span class="p">(</span><span class="s">'putin'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">add</span>
-    <span class="nv">name: </span><span class="s">'putout'</span>
-  <span class="p">.</span><span class="nx">exec</span> <span class="nf">(err, res, id) -&gt;</span>
-    <span class="c1"># err is the first parameter</span>
-    <span class="c1"># everything else as usual</span>
-</pre></div>
+<div class="highlight highlight-coffee"><pre>user(<span class="pl-s"><span class="pl-pds">'</span>putin<span class="pl-pds">'</span></span>)
+  .add
+    <span class="pl-v"><span class="pl-v">name:</span></span> <span class="pl-s"><span class="pl-pds">'</span>putout<span class="pl-pds">'</span></span>
+  .exec <span class="pl-smi">(err, res, id)</span> <span class="pl-k">-&gt;</span>
+    <span class="pl-c"># err is the first parameter</span>
+    <span class="pl-c"># everything else as usual</span></pre></div>
 
-<h3>Separate Callbacks</h3>
+<h3>
+<a id="separate-callbacks" class="anchor" href="#separate-callbacks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Separate Callbacks</h3>
 
 <p>Just like with the <code>multi</code> command you can supply a separate callback for specific commands.</p>
 
-<div class="highlight"><pre><span class="nx">user</span><span class="p">(</span><span class="s">'mgmt'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">pokemons</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s">'pikachu'</span><span class="p">,</span> <span class="s">'charizard'</span><span class="p">,</span> <span class="nx">redis</span><span class="p">.</span><span class="nx">print</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">err</span>
-    <span class="o">-&gt;</span> <span class="c1"># ...</span>
-  <span class="p">.</span><span class="nx">exec</span> <span class="o">-&gt;</span>
-    <span class="c1"># ...</span>
-</pre></div>
+<div class="highlight highlight-coffee"><pre>user(<span class="pl-s"><span class="pl-pds">'</span>mgmt<span class="pl-pds">'</span></span>)
+  .pokemons.<span class="pl-c1">push</span>(<span class="pl-s"><span class="pl-pds">'</span>pikachu<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>charizard<span class="pl-pds">'</span></span>, redis.print)
+  .err
+    <span class="pl-k">-&gt;</span> <span class="pl-c"># ...</span>
+  .exec <span class="pl-k">-&gt;</span>
+    <span class="pl-c"># ...</span></pre></div>
 
-<h3>Conditional Commands</h3>
+<h3>
+<a id="conditional-commands" class="anchor" href="#conditional-commands" aria-hidden="true"><span class="octicon octicon-link"></span></a>Conditional Commands</h3>
 
 <p>Sometimes you'll want to only issue specific commands based on a condition. If you don't want to break the chaining and clutter the code, use <code>.when(fn)</code>. <code>When</code> executes <code>fn</code> immediately, with the context set to the model context. <code>only</code> is an alias for <code>when</code>.</p>
 
-<div class="highlight"><pre><span class="nv">info = </span><span class="nx">get_mission_critical_information</span><span class="p">()</span>
-<span class="nx">player</span><span class="p">(</span><span class="s">'danny'</span><span class="p">).</span><span class="k">when</span><span class="p">(</span> <span class="o">-&gt;</span>
-    <span class="k">if</span> <span class="nx">info</span> <span class="o">is</span> <span class="s">'nah, never mind'</span> <span class="k">then</span> <span class="nx">@name</span><span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="s">'oh YEAHH'</span><span class="p">)</span>
-<span class="p">).</span><span class="nx">points</span><span class="p">.</span><span class="nx">incrby</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="c1"># Business as usual</span>
-<span class="p">.</span><span class="nx">exec</span><span class="p">()</span>
-</pre></div>
+<div class="highlight highlight-coffee"><pre><span class="pl-v"><span class="pl-v">info <span class="pl-k">=</span></span></span> get_mission_critical_information()
+player(<span class="pl-s"><span class="pl-pds">'</span>danny<span class="pl-pds">'</span></span>).when( <span class="pl-k">-&gt;</span>
+    <span class="pl-k">if</span> info <span class="pl-k">is</span> <span class="pl-s"><span class="pl-pds">'</span>nah, never mind<span class="pl-pds">'</span></span> <span class="pl-k">then</span> <span class="pl-smi">@name</span>.set(<span class="pl-s"><span class="pl-pds">'</span>oh YEAHH<span class="pl-pds">'</span></span>)
+).points.incrby(<span class="pl-c1">5</span>) <span class="pl-c"># Business as usual</span>
+.exec()</pre></div>
 
-<h3>Relations</h3>
+<h3>
+<a id="relations" class="anchor" href="#relations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Relations</h3>
 
-<div class="highlight"><pre><span class="k">class</span> <span class="nx">User</span> <span class="k">extends</span> <span class="nx">Orpheus</span>
-  <span class="nv">constructor: </span><span class="o">-&gt;</span>
-    <span class="nx">@has</span> <span class="s">'book'</span>
+<div class="highlight highlight-coffee"><pre><span class="pl-k">class</span> <span class="pl-en">User</span> <span class="pl-k">extends</span> <span class="pl-e">Orpheus</span>
+  <span class="pl-en">constructor</span><span class="pl-k">:</span> <span class="pl-k"><span class="pl-k">-&gt;</span></span>
+    <span class="pl-smi">@has</span> <span class="pl-s"><span class="pl-pds">'</span>book<span class="pl-pds">'</span></span>
 
-<span class="k">class</span> <span class="nx">Book</span> <span class="k">extends</span> <span class="nx">Orpheus</span>
-  <span class="nv">constructor: </span><span class="o">-&gt;</span>
-    <span class="nx">@has</span> <span class="s">'user'</span>
+<span class="pl-k">class</span> <span class="pl-en">Book</span> <span class="pl-k">extends</span> <span class="pl-e">Orpheus</span>
+  <span class="pl-en">constructor</span><span class="pl-k">:</span> <span class="pl-k"><span class="pl-k">-&gt;</span></span>
+    <span class="pl-smi">@has</span> <span class="pl-s"><span class="pl-pds">'</span>user<span class="pl-pds">'</span></span>
 
-<span class="nv">user = </span><span class="nx">User</span><span class="p">.</span><span class="nx">create</span><span class="p">()</span>
-<span class="nv">book = </span><span class="nx">Book</span><span class="p">.</span><span class="nx">create</span><span class="p">()</span>
+<span class="pl-v"><span class="pl-v">user <span class="pl-k">=</span></span></span> User.create()
+<span class="pl-v"><span class="pl-v">book <span class="pl-k">=</span></span></span> Book.create()
 
-<span class="c1"># Every relation means a set for that relation</span>
-<span class="nx">user</span><span class="p">(</span><span class="s">'chaplin'</span><span class="p">).</span><span class="nx">books</span><span class="p">.</span><span class="nx">smembers</span> <span class="nf">(err, book_ids) -&gt;</span>
+<span class="pl-c"># Every relation means a set for that relation</span>
+user(<span class="pl-s"><span class="pl-pds">'</span>chaplin<span class="pl-pds">'</span></span>).books.smembers <span class="pl-smi">(err, book_ids)</span> <span class="pl-k">-&gt;</span>
 
-  <span class="c1"># With async functions for fun and profit</span>
-  <span class="nx">user</span><span class="p">(</span><span class="s">'chaplin'</span><span class="p">).</span><span class="nx">books</span><span class="p">.</span><span class="nx">map</span> <span class="nx">book_ids</span><span class="p">,</span> <span class="nf">(id, cb, i) -&gt;</span>
-      <span class="nx">book</span><span class="p">(</span><span class="nx">id</span><span class="p">).</span><span class="nx">get</span> <span class="nx">cb</span>
-    <span class="nf">(err, books) -&gt;</span>
-      <span class="c1"># What? Did we just retrieved all the books from Redis?</span>
-</pre></div>
+  <span class="pl-c"># With async functions for fun and profit</span>
+  user(<span class="pl-s"><span class="pl-pds">'</span>chaplin<span class="pl-pds">'</span></span>).books.<span class="pl-c1">map</span> book_ids, <span class="pl-smi">(id, cb, i)</span> <span class="pl-k">-&gt;</span>
+      book(id).get cb
+    <span class="pl-smi">(err, books)</span> <span class="pl-k">-&gt;</span>
+      <span class="pl-c"># What? Did we just retrieved all the books from Redis?</span></pre></div>
 
-<h2>Dynamic Keys</h2>
+<h2>
+<a id="dynamic-keys" class="anchor" href="#dynamic-keys" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dynamic Keys</h2>
 
-<div class="highlight"><pre><span class="k">class</span> <span class="nx">User</span> <span class="k">extends</span> <span class="nx">Orpheus</span>
-  <span class="nv">constructor: </span><span class="o">-&gt;</span>
-    <span class="nx">@zset</span> <span class="s">'monthly_ranking'</span>
-      <span class="nv">key: </span><span class="o">-&gt;</span>
-        <span class="nv">d = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">()</span>
-        <span class="c1"># prefix:user:id:ranking:2012:5</span>
-        <span class="s">"ranking:</span><span class="si">#{</span><span class="nx">d</span><span class="p">.</span><span class="nx">getFullYear</span><span class="p">()</span><span class="si">}</span><span class="s">:</span><span class="si">#{</span><span class="nx">d</span><span class="p">.</span><span class="nx">getMonth</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s">"</span>
+<div class="highlight highlight-coffee"><pre><span class="pl-k">class</span> <span class="pl-en">User</span> <span class="pl-k">extends</span> <span class="pl-e">Orpheus</span>
+  <span class="pl-en">constructor</span><span class="pl-k">:</span> <span class="pl-k"><span class="pl-k">-&gt;</span></span>
+    <span class="pl-smi">@zset</span> <span class="pl-s"><span class="pl-pds">'</span>monthly_ranking<span class="pl-pds">'</span></span>
+      <span class="pl-en">key</span><span class="pl-k">:</span> <span class="pl-k"><span class="pl-k">-&gt;</span></span>
+        <span class="pl-v"><span class="pl-v">d <span class="pl-k">=</span></span></span> <span class="pl-k">new</span> <span class="pl-en">Date</span>()
+        <span class="pl-c"># prefix:user:id:ranking:2012:5</span>
+        <span class="pl-s"><span class="pl-pds">"</span>ranking:<span class="pl-s1"><span class="pl-pse">#{</span>d.getFullYear()<span class="pl-pse">}</span></span>:<span class="pl-s1"><span class="pl-pse">#{</span>d.getMonth()<span class="pl-k">+</span><span class="pl-c1">1</span><span class="pl-pse">}</span></span><span class="pl-pds">"</span></span>
 
-<span class="nv">user = </span><span class="nx">User</span><span class="p">.</span><span class="nx">create</span><span class="p">()</span>
-<span class="nx">user</span><span class="p">(</span><span class="s">'jackson'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">monthly_ranking</span><span class="p">.</span><span class="nx">incrby</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">'Midnight Oil - The Dead Heart'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">exec</span> <span class="o">-&gt;</span>
-    <span class="nx">res</span><span class="p">.</span><span class="nx">json</span> <span class="nv">status: </span><span class="mi">200</span>
-</pre></div>
+<span class="pl-v"><span class="pl-v">user <span class="pl-k">=</span></span></span> User.create()
+user(<span class="pl-s"><span class="pl-pds">'</span>jackson<span class="pl-pds">'</span></span>)
+  .monthly_ranking.incrby(<span class="pl-c1">1</span>, <span class="pl-s"><span class="pl-pds">'</span>Midnight Oil - The Dead Heart<span class="pl-pds">'</span></span>)
+  .exec <span class="pl-k">-&gt;</span>
+    res.json <span class="pl-v"><span class="pl-v">status:</span></span> <span class="pl-c1">200</span></pre></div>
 
 <p>Using arguments in dyanmic keys is easy:</p>
 
-<div class="highlight"><pre><span class="nx">@zset</span> <span class="s">'monthly_ranking'</span>
-  <span class="nv">key: </span><span class="nf">(year, month) -&gt;</span>
-    <span class="s">"ranking:</span><span class="si">#{</span><span class="nx">year</span> <span class="o">||</span> <span class="nx">d</span><span class="p">.</span><span class="nx">getFullYear</span><span class="p">()</span><span class="si">}</span><span class="s">:</span><span class="si">#{</span><span class="nx">month</span> <span class="o">||</span> <span class="nx">d</span><span class="p">.</span><span class="nx">getMonth</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s">"</span>
+<div class="highlight highlight-coffee"><pre><span class="pl-smi">@zset</span> <span class="pl-s"><span class="pl-pds">'</span>monthly_ranking<span class="pl-pds">'</span></span>
+  <span class="pl-en">key</span><span class="pl-k">:</span><span class="pl-smi"> <span class="pl-smi">(year, month)</span></span> <span class="pl-k"><span class="pl-k">-&gt;</span></span>
+    <span class="pl-s"><span class="pl-pds">"</span>ranking:<span class="pl-s1"><span class="pl-pse">#{</span>year <span class="pl-k">||</span> d.getFullYear()<span class="pl-pse">}</span></span>:<span class="pl-s1"><span class="pl-pse">#{</span>month <span class="pl-k">||</span> d.getMonth()<span class="pl-k">+</span><span class="pl-c1">1</span><span class="pl-pse">}</span></span><span class="pl-pds">"</span></span>
 
-<span class="c1"># later on, in a far away place...</span>
-<span class="nx">user</span><span class="p">(</span><span class="s">'bean'</span><span class="p">)</span>
-  <span class="p">.</span><span class="nx">monthly_ranking</span><span class="p">.</span><span class="nx">incrby</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">'Stoned Jesus - I'</span><span class="nx">m</span> <span class="nx">The</span> <span class="nx">Mountain</span><span class="s">', key: [2012, 12])</span>
-</pre></div>
+<span class="pl-c"># later on, in a far away place...</span>
+user(<span class="pl-s"><span class="pl-pds">'</span>bean<span class="pl-pds">'</span></span>)
+  .monthly_ranking.incrby(<span class="pl-c1">1</span>, <span class="pl-s"><span class="pl-pds">'</span>Stoned Jesus - I<span class="pl-pds">'</span></span>m The Mountain<span class="pl-s"><span class="pl-pds">'</span>, key: [2012, 12])</span></pre></div>
 
 <p>Everything inside <code>key</code> will be passed to the dynamic key function.</p>
 
-<h2>One to One Maps</h2>
+<h2>
+<a id="one-to-one-maps" class="anchor" href="#one-to-one-maps" aria-hidden="true"><span class="octicon octicon-link"></span></a>One to One Maps</h2>
 
 <p>Maps are used to map between a unique attribute of the model and the model ID.</p>
 
@@ -315,56 +308,58 @@ set:
 
 <p>This example uses the excellent <a href="passportjs.org">PassportJS</a>.</p>
 
-<div class="highlight"><pre><span class="nv">fb_connect = </span><span class="nf">(req, res, next) -&gt;</span>
-  <span class="nv">fb = </span><span class="nx">req</span><span class="p">.</span><span class="nx">account</span>
-  <span class="nv">fb_details =</span>
-    <span class="nv">fb_id: </span>   <span class="nx">fb</span><span class="p">.</span><span class="nx">id</span>
-    <span class="nv">fb_name: </span> <span class="nx">fb</span><span class="p">.</span><span class="nx">displayName</span>
-    <span class="nv">fb_token: </span><span class="nx">fb</span><span class="p">.</span><span class="nx">token</span>
-    <span class="nv">fb_gener: </span><span class="nx">fb</span><span class="p">.</span><span class="nx">gender</span>
-    <span class="nv">fb_url: </span>  <span class="nx">fb</span><span class="p">.</span><span class="nx">profileUrl</span>
+<div class="highlight highlight-coffee"><pre><span class="pl-en">fb_connect </span><span class="pl-k">=</span><span class="pl-smi"> <span class="pl-smi">(req, res, next)</span></span> <span class="pl-k"><span class="pl-k">-&gt;</span></span>
+  <span class="pl-v"><span class="pl-v">fb <span class="pl-k">=</span></span></span> req.account
+  <span class="pl-v"><span class="pl-v">fb_details <span class="pl-k">=</span></span></span>
+    <span class="pl-v"><span class="pl-v">fb_id:</span></span>    fb.id
+    <span class="pl-v"><span class="pl-v">fb_name:</span></span>  fb.displayName
+    <span class="pl-v"><span class="pl-v">fb_token:</span></span> fb.token
+    <span class="pl-v"><span class="pl-v">fb_gener:</span></span> fb.gender
+    <span class="pl-v"><span class="pl-v">fb_url:</span></span>   fb.profileUrl
 
-  <span class="nv">id = </span><span class="k">if</span> <span class="nx">req</span><span class="p">.</span><span class="nx">user</span> <span class="k">then</span> <span class="nx">req</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">id</span> <span class="k">else</span> <span class="nv">fb_id: </span><span class="nx">fb</span><span class="p">.</span><span class="nx">id</span>
-  <span class="nx">player</span> <span class="nx">id</span><span class="p">,</span> <span class="nf">(err, player, is_new) -&gt;</span>
-    <span class="nx">next</span> <span class="nx">err</span> <span class="k">if</span> <span class="nx">err</span>
-    <span class="c1"># That's it, we just handled autorization,</span>
-    <span class="c1"># new users and authentication in one go</span>
-    <span class="nx">player</span>
-      <span class="p">.</span><span class="nx">set</span><span class="p">(</span><span class="nx">fb_details</span><span class="p">)</span>
-      <span class="p">.</span><span class="nx">exec</span> <span class="nf">(err, res, user_id) -&gt;</span>
-        <span class="nv">req.session.passport.user = </span><span class="nx">user_id</span> <span class="k">if</span> <span class="nx">user_id</span>
-        <span class="nx">next</span> <span class="nx">err</span>
-</pre></div>
+  <span class="pl-v"><span class="pl-v">id <span class="pl-k">=</span></span></span> <span class="pl-k">if</span> req.user <span class="pl-k">then</span> req.user.id <span class="pl-k">else</span> <span class="pl-v"><span class="pl-v">fb_id:</span></span> fb.id
+  player id, <span class="pl-smi">(err, player, is_new)</span> <span class="pl-k">-&gt;</span>
+    next err <span class="pl-k">if</span> err
+    <span class="pl-c"># That's it, we just handled autorization,</span>
+    <span class="pl-c"># new users and authentication in one go</span>
+    player
+      .set(fb_details)
+      .exec <span class="pl-smi">(err, res, user_id)</span> <span class="pl-k">-&gt;</span>
+        <span class="pl-v"><span class="pl-v">req.session.passport.user <span class="pl-k">=</span></span></span> user_id <span class="pl-k">if</span> user_id
+        next err</pre></div>
 
-<h4>What Just Happened?</h4>
+<h4>
+<a id="what-just-happened" class="anchor" href="#what-just-happened" aria-hidden="true"><span class="octicon octicon-link"></span></a>What Just Happened?</h4>
 
 <p>There are two scenarios:</p>
 
 <ol>
 <li><p><strong>Authentication</strong>: <code>req.user</code> is undefined, so the user is not logged in. We create an object <code>{fb_id: fb.id}</code> to use in the map. Orpheus requests <code>hget prefix:users:map:fb_ids fb_id</code>. If a match is found we continue as usual. Otherwise a new user is created. In both cases, the user's Facebook information is updated.</p></li>
 <li><p><strong>Authorization</strong>: <code>req.user</code> is defined. The anonymous function is called right away and the user's Facebook information is updated.</p></li>
-</ol><h2>Validations</h2>
+</ol>
+
+<h2>
+<a id="validations" class="anchor" href="#validations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Validations</h2>
 
 <p>Validations are based on the input, not on the object itself. For example, <code>hincrby 5</code> will validate the number 5 itself, not the accumulated value in the object.</p>
 
 <p>Validations run synchronously.</p>
 
-<div class="highlight"><pre><span class="k">class</span> <span class="nx">User</span> <span class="k">extends</span> <span class="nx">Orpheus</span>
-  <span class="nv">constructor: </span><span class="o">-&gt;</span>
-    <span class="nx">@str</span> <span class="s">'name'</span>
-    <span class="nx">@validate</span> <span class="s">'name'</span><span class="p">,</span> <span class="nf">(s) -&gt;</span> <span class="k">if</span> <span class="nx">s</span> <span class="o">is</span> <span class="s">'something'</span> <span class="k">then</span> <span class="kc">true</span> <span class="k">else</span> <span class="s">'name should be "something".'</span>
+<div class="highlight highlight-coffee"><pre><span class="pl-k">class</span> <span class="pl-en">User</span> <span class="pl-k">extends</span> <span class="pl-e">Orpheus</span>
+  <span class="pl-en">constructor</span><span class="pl-k">:</span> <span class="pl-k"><span class="pl-k">-&gt;</span></span>
+    <span class="pl-smi">@str</span> <span class="pl-s"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>
+    <span class="pl-smi">@validate</span> <span class="pl-s"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>, <span class="pl-smi">(s)</span> <span class="pl-k">-&gt;</span> <span class="pl-k">if</span> s <span class="pl-k">is</span> <span class="pl-s"><span class="pl-pds">'</span>something<span class="pl-pds">'</span></span> <span class="pl-k">then</span> <span class="pl-c1">true</span> <span class="pl-k">else</span> <span class="pl-s"><span class="pl-pds">'</span>name should be "something".<span class="pl-pds">'</span></span>
 
-<span class="nv">player = </span><span class="nx">Player</span><span class="p">.</span><span class="nx">create</span><span class="p">()</span>
-<span class="nx">player</span><span class="p">(</span><span class="s">'james'</span><span class="p">).</span><span class="nx">set</span>
-  <span class="nv">name: </span><span class="s">'james!!!'</span>
-<span class="p">.</span><span class="nx">err</span> <span class="nf">(err) -&gt;</span>
-  <span class="k">if</span> <span class="nx">err</span><span class="p">.</span><span class="nx">type</span> <span class="o">is</span> <span class="s">'validation'</span>
-    <span class="nx">log</span> <span class="nx">err</span> <span class="c1"># &lt;OrpheusValidationErrors&gt;</span>
-  <span class="k">else</span>
-    <span class="c1"># something is wrong with redis</span>
-<span class="p">.</span><span class="nx">exec</span> <span class="nf">(res) -&gt;</span>
-  <span class="c1"># Never ever land</span>
-</pre></div>
+<span class="pl-v"><span class="pl-v">player <span class="pl-k">=</span></span></span> Player.create()
+player(<span class="pl-s"><span class="pl-pds">'</span>james<span class="pl-pds">'</span></span>).set
+  <span class="pl-v"><span class="pl-v">name:</span></span> <span class="pl-s"><span class="pl-pds">'</span>james!!!<span class="pl-pds">'</span></span>
+.err <span class="pl-smi">(err)</span> <span class="pl-k">-&gt;</span>
+  <span class="pl-k">if</span> err.type <span class="pl-k">is</span> <span class="pl-s"><span class="pl-pds">'</span>validation<span class="pl-pds">'</span></span>
+    log err <span class="pl-c"># &lt;OrpheusValidationErrors&gt;</span>
+  <span class="pl-k">else</span>
+    <span class="pl-c"># something is wrong with redis</span>
+.exec <span class="pl-smi">(res)</span> <span class="pl-k">-&gt;</span>
+  <span class="pl-c"># Never ever land</span></pre></div>
 
 <p><strong>OrpheusValidationErrors</strong> has a few convenience functions:</p>
 
@@ -375,57 +370,57 @@ set:
 <strong>empty</strong>: clears the errors</li>
 <li>
 <strong>toResponse</strong>: returns a JSON:</li>
-</ul><div class="highlight"><pre><span class="p">{</span>
-  <span class="nv">status: </span><span class="mi">400</span><span class="p">,</span> <span class="c1"># Bad Request</span>
-  <span class="nv">errors:</span>
-    <span class="nv">name: </span><span class="p">[</span><span class="s">'name should be "something".'</span><span class="p">]</span>
-<span class="p">}</span>
-</pre></div>
+</ul>
+
+<div class="highlight highlight-coffee"><pre>{
+  <span class="pl-v"><span class="pl-v">status:</span></span> <span class="pl-c1">400</span>, <span class="pl-c"># Bad Request</span>
+  <span class="pl-v"><span class="pl-v">errors:</span></span>
+    <span class="pl-v"><span class="pl-v">name:</span></span> [<span class="pl-s"><span class="pl-pds">'</span>name should be "something".<span class="pl-pds">'</span></span>]
+}</pre></div>
 
 <p><code>errors</code> contains the actual error objects:</p>
 
-<div class="highlight"><pre><span class="p">{</span>
-  <span class="nv">name: </span><span class="p">[</span>
-    <span class="nv">msg: </span><span class="s">'name should be "something".'</span><span class="p">,</span>
-    <span class="nv">command: </span><span class="s">'hset'</span><span class="p">,</span>
-    <span class="nv">args: </span><span class="p">[</span><span class="s">'james!!!'</span><span class="p">],</span>
-    <span class="nv">value: </span><span class="s">'james!!!'</span><span class="p">,</span>
-    <span class="nv">date: </span><span class="mi">1338936463054</span> <span class="c1"># new Date().getTime()</span>
-  <span class="p">],</span>
-  <span class="c1"># ...</span>
-<span class="p">}</span>
-</pre></div>
+<div class="highlight highlight-coffee"><pre>{
+  <span class="pl-v"><span class="pl-v">name:</span></span> [
+    <span class="pl-v"><span class="pl-v">msg:</span></span> <span class="pl-s"><span class="pl-pds">'</span>name should be "something".<span class="pl-pds">'</span></span>,
+    <span class="pl-v"><span class="pl-v">command:</span></span> <span class="pl-s"><span class="pl-pds">'</span>hset<span class="pl-pds">'</span></span>,
+    <span class="pl-v"><span class="pl-v">args:</span></span> [<span class="pl-s"><span class="pl-pds">'</span>james!!!<span class="pl-pds">'</span></span>],
+    <span class="pl-v"><span class="pl-v">value:</span></span> <span class="pl-s"><span class="pl-pds">'</span>james!!!<span class="pl-pds">'</span></span>,
+    <span class="pl-v"><span class="pl-v">date:</span></span> <span class="pl-c1">1338936463054</span> <span class="pl-c"># new Date().getTime()</span>
+  ],
+  <span class="pl-c"># ...</span>
+}</pre></div>
 
-<h3>Customizing Message</h3>
+<h3>
+<a id="customizing-message" class="anchor" href="#customizing-message" aria-hidden="true"><span class="octicon octicon-link"></span></a>Customizing Message</h3>
 
-<div class="highlight"><pre><span class="nx">@validate</span> <span class="s">'legacy_code'</span><span class="p">,</span>
-    <span class="nv">format: </span><span class="sr">/^[a-zA-Z]+$/</span>
-    <span class="nv">message: </span><span class="nf">(val) -&gt;</span> <span class="s">"</span><span class="si">#{</span><span class="nx">val</span><span class="si">}</span><span class="s"> must be only A-Za-z"</span>
-</pre></div>
+<div class="highlight highlight-coffee"><pre><span class="pl-smi">@validate</span> <span class="pl-s"><span class="pl-pds">'</span>legacy_code<span class="pl-pds">'</span></span>,
+    <span class="pl-v"><span class="pl-v">format:</span></span> <span class="pl-sr"><span class="pl-pds">/</span><span class="pl-k">^</span><span class="pl-c1">[<span class="pl-c1">a-zA-Z</span>]</span><span class="pl-k">+</span><span class="pl-k">$</span><span class="pl-pds">/</span></span>
+    <span class="pl-en">message</span><span class="pl-k">:</span><span class="pl-smi"> <span class="pl-smi">(val)</span></span> <span class="pl-k"><span class="pl-k">-&gt;</span></span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-s1"><span class="pl-pse">#{</span>val<span class="pl-pse">}</span></span> must be only A-Za-z<span class="pl-pds">"</span></span></pre></div>
 
 <p>Will do the trick. Number validations do not support customized messages yet.</p>
 
-<h3>Custom Validations</h3>
+<h3>
+<a id="custom-validations" class="anchor" href="#custom-validations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Custom Validations</h3>
 
-<div class="highlight"><pre><span class="k">class</span> <span class="nx">Player</span> <span class="k">extends</span> <span class="nx">Orpheus</span>
-    <span class="nv">constructor: </span><span class="o">-&gt;</span>
-        <span class="nx">@str</span> <span class="s">'name'</span>
-        <span class="nx">@validate</span> <span class="s">'name'</span><span class="p">,</span> <span class="nf">(s) -&gt;</span> <span class="k">if</span> <span class="nx">s</span> <span class="o">is</span> <span class="s">'babomb'</span> <span class="k">then</span> <span class="kc">true</span> <span class="k">else</span> <span class="s">'String should be babomb.'</span>
-</pre></div>
+<div class="highlight highlight-coffee"><pre><span class="pl-k">class</span> <span class="pl-en">Player</span> <span class="pl-k">extends</span> <span class="pl-e">Orpheus</span>
+    <span class="pl-en">constructor</span><span class="pl-k">:</span> <span class="pl-k"><span class="pl-k">-&gt;</span></span>
+        <span class="pl-smi">@str</span> <span class="pl-s"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>
+        <span class="pl-smi">@validate</span> <span class="pl-s"><span class="pl-pds">'</span>name<span class="pl-pds">'</span></span>, <span class="pl-smi">(s)</span> <span class="pl-k">-&gt;</span> <span class="pl-k">if</span> s <span class="pl-k">is</span> <span class="pl-s"><span class="pl-pds">'</span>babomb<span class="pl-pds">'</span></span> <span class="pl-k">then</span> <span class="pl-c1">true</span> <span class="pl-k">else</span> <span class="pl-s"><span class="pl-pds">'</span>String should be babomb.<span class="pl-pds">'</span></span></pre></div>
 
-<h3>Number Validations</h3>
+<h3>
+<a id="number-validations" class="anchor" href="#number-validations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Number Validations</h3>
 
-<div class="highlight"><pre><span class="nx">@num</span> <span class="s">'points'</span>
+<div class="highlight highlight-coffee"><pre><span class="pl-smi">@num</span> <span class="pl-s"><span class="pl-pds">'</span>points<span class="pl-pds">'</span></span>
 
-<span class="nx">@validate</span> <span class="s">'points'</span><span class="p">,</span>
-    <span class="nv">numericality:</span>
-        <span class="nv">only_integer: </span><span class="kc">true</span>
-        <span class="nv">greater_than: </span><span class="mi">3</span>
-        <span class="nv">greater_than_or_equal_to: </span><span class="mi">3</span>
-        <span class="nv">equal_to: </span><span class="mi">3</span>
-        <span class="nv">less_than_or_equal_to: </span><span class="mi">3</span>
-        <span class="nv">odd: </span><span class="kc">true</span>
-</pre></div>
+<span class="pl-smi">@validate</span> <span class="pl-s"><span class="pl-pds">'</span>points<span class="pl-pds">'</span></span>,
+    <span class="pl-v"><span class="pl-v">numericality:</span></span>
+        <span class="pl-v"><span class="pl-v">only_integer:</span></span> <span class="pl-c1">true</span>
+        <span class="pl-v"><span class="pl-v">greater_than:</span></span> <span class="pl-c1">3</span>
+        <span class="pl-v"><span class="pl-v">greater_than_or_equal_to:</span></span> <span class="pl-c1">3</span>
+        <span class="pl-v"><span class="pl-v">equal_to:</span></span> <span class="pl-c1">3</span>
+        <span class="pl-v"><span class="pl-v">less_than_or_equal_to:</span></span> <span class="pl-c1">3</span>
+        <span class="pl-v"><span class="pl-v">odd:</span></span> <span class="pl-c1">true</span></pre></div>
 
 <p>Options:</p>
 
@@ -454,27 +449,29 @@ set:
 <li>
 <strong>even</strong>: <code>"#{a} must be even."</code>
 </li>
-</ul><h3>Exclusion and Inclusion Validations</h3>
+</ul>
 
-<div class="highlight"><pre><span class="nx">@str</span> <span class="s">'subdomain'</span>
-<span class="nx">@str</span> <span class="s">'size'</span>
-<span class="nx">@validate</span> <span class="s">'subdomain'</span><span class="p">,</span>
-    <span class="nv">exclusion: </span><span class="p">[</span><span class="s">'www'</span><span class="p">,</span> <span class="s">'us'</span><span class="p">,</span> <span class="s">'ca'</span><span class="p">,</span> <span class="s">'jp'</span><span class="p">]</span>
-<span class="nx">@validate</span> <span class="s">'size'</span><span class="p">,</span>
-    <span class="nv">inclusion: </span><span class="p">[</span><span class="s">'small'</span><span class="p">,</span> <span class="s">'medium'</span><span class="p">,</span> <span class="s">'large'</span><span class="p">]</span>
-</pre></div>
+<h3>
+<a id="exclusion-and-inclusion-validations" class="anchor" href="#exclusion-and-inclusion-validations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Exclusion and Inclusion Validations</h3>
 
-<h3>Size</h3>
+<div class="highlight highlight-coffee"><pre><span class="pl-smi">@str</span> <span class="pl-s"><span class="pl-pds">'</span>subdomain<span class="pl-pds">'</span></span>
+<span class="pl-smi">@str</span> <span class="pl-s"><span class="pl-pds">'</span>size<span class="pl-pds">'</span></span>
+<span class="pl-smi">@validate</span> <span class="pl-s"><span class="pl-pds">'</span>subdomain<span class="pl-pds">'</span></span>,
+    <span class="pl-v"><span class="pl-v">exclusion:</span></span> [<span class="pl-s"><span class="pl-pds">'</span>www<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>us<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>ca<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>jp<span class="pl-pds">'</span></span>]
+<span class="pl-smi">@validate</span> <span class="pl-s"><span class="pl-pds">'</span>size<span class="pl-pds">'</span></span>,
+    <span class="pl-v"><span class="pl-v">inclusion:</span></span> [<span class="pl-s"><span class="pl-pds">'</span>small<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>medium<span class="pl-pds">'</span></span>, <span class="pl-s"><span class="pl-pds">'</span>large<span class="pl-pds">'</span></span>]</pre></div>
 
-<div class="highlight"><pre><span class="nx">@str</span> <span class="s">'content'</span>
-<span class="nx">@validate</span> <span class="s">'content'</span>
-    <span class="nv">size:</span>
-        <span class="nv">tokenizer: </span><span class="nf">(s) -&gt;</span> <span class="nx">s</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/\w+/g</span><span class="p">).</span><span class="nx">length</span>
-        <span class="o">is:</span> <span class="mi">5</span>
-        <span class="nv">minimum: </span><span class="mi">5</span>
-        <span class="nv">maximum: </span><span class="mi">5</span>
-        <span class="k">in</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">]</span>
-</pre></div>
+<h3>
+<a id="size" class="anchor" href="#size" aria-hidden="true"><span class="octicon octicon-link"></span></a>Size</h3>
+
+<div class="highlight highlight-coffee"><pre><span class="pl-smi">@str</span> <span class="pl-s"><span class="pl-pds">'</span>content<span class="pl-pds">'</span></span>
+<span class="pl-smi">@validate</span> <span class="pl-s"><span class="pl-pds">'</span>content<span class="pl-pds">'</span></span>
+    <span class="pl-v"><span class="pl-v">size:</span></span>
+        <span class="pl-en">tokenizer</span><span class="pl-k">:</span><span class="pl-smi"> <span class="pl-smi">(s)</span></span> <span class="pl-k"><span class="pl-k">-&gt;</span></span> s.match(<span class="pl-sr"><span class="pl-pds">/</span><span class="pl-c1">\w</span><span class="pl-k">+</span><span class="pl-pds">/</span>g</span>).length
+        <span class="pl-v"><span class="pl-v">is:</span></span> <span class="pl-c1">5</span>
+        <span class="pl-v"><span class="pl-v">minimum:</span></span> <span class="pl-c1">5</span>
+        <span class="pl-v"><span class="pl-v">maximum:</span></span> <span class="pl-c1">5</span>
+        <span class="pl-v"><span class="pl-v">in:</span></span> [<span class="pl-c1">1</span>,<span class="pl-c1">5</span>]</pre></div>
 
 <p>Options:</p>
 
@@ -493,57 +490,65 @@ set:
 </li>
 <li>
 <strong>tokenizer</strong>: useful for splitting the field in different ways. The default is <code>field.length</code>.</li>
-</ul><h2>Regex Validations</h2>
+</ul>
 
-<div class="highlight"><pre><span class="k">class</span> <span class="nx">Player</span> <span class="k">extends</span> <span class="nx">Orpheus</span>
-    <span class="nv">constructor: </span><span class="o">-&gt;</span>
-        <span class="nx">@str</span> <span class="s">'legacy_code'</span>
-        <span class="nx">@validate</span> <span class="s">'legacy_code'</span><span class="p">,</span> <span class="nv">format: </span><span class="sr">/^[a-zA-Z]+$/</span>
-</pre></div>
+<h2>
+<a id="regex-validations" class="anchor" href="#regex-validations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Regex Validations</h2>
 
-<h2>Error Handling</h2>
+<div class="highlight highlight-coffee"><pre><span class="pl-k">class</span> <span class="pl-en">Player</span> <span class="pl-k">extends</span> <span class="pl-e">Orpheus</span>
+    <span class="pl-en">constructor</span><span class="pl-k">:</span> <span class="pl-k"><span class="pl-k">-&gt;</span></span>
+        <span class="pl-smi">@str</span> <span class="pl-s"><span class="pl-pds">'</span>legacy_code<span class="pl-pds">'</span></span>
+        <span class="pl-smi">@validate</span> <span class="pl-s"><span class="pl-pds">'</span>legacy_code<span class="pl-pds">'</span></span>, <span class="pl-v"><span class="pl-v">format:</span></span> <span class="pl-sr"><span class="pl-pds">/</span><span class="pl-k">^</span><span class="pl-c1">[<span class="pl-c1">a-zA-Z</span>]</span><span class="pl-k">+</span><span class="pl-k">$</span><span class="pl-pds">/</span></span></pre></div>
+
+<h2>
+<a id="error-handling" class="anchor" href="#error-handling" aria-hidden="true"><span class="octicon octicon-link"></span></a>Error Handling</h2>
 
 <ul>
 <li>
 <strong>Undefined Attributes</strong>: Using <code>set</code>, <code>add</code> and <code>del</code> on undefined attributes will throw an error <code>"Orpheus :: No Such Model Attribute: #{k}"</code>. Trying to <code>no_such_attribute.incrby(1)</code> will result in <code>TypeError: Object #&lt;Object&gt; has no method 'incrby'</code>. The call stack will directly tell you where the misbehaving attribute sits.</li>
-</ul><h2>Remove a Relationship</h2>
+</ul>
+
+<h2>
+<a id="remove-a-relationship" class="anchor" href="#remove-a-relationship" aria-hidden="true"><span class="octicon octicon-link"></span></a>Remove a Relationship</h2>
 
 <p>A dynamic function, called <code>"un#{relationship}"()</code>, is available for removing already declared relationships. For example, a user with a books relationship will have an <code>unbook()</code> function available.</p>
 
 <p>This is helpful when trying to abstract away common queries that happen in a lot of requests and denormalize data across relations. Think: points, counters.</p>
 
-<div class="highlight"><pre><span class="k">class</span> <span class="nx">User</span> <span class="k">extends</span> <span class="nx">Orpheus</span>
-      <span class="nv">constructor: </span><span class="o">-&gt;</span>
-        <span class="nx">@has</span> <span class="s">'issue'</span>
-        <span class="nx">@num</span> <span class="s">'comments'</span>
-        <span class="nx">@num</span> <span class="s">'email_replies'</span>
+<div class="highlight highlight-coffee"><pre><span class="pl-k">class</span> <span class="pl-en">User</span> <span class="pl-k">extends</span> <span class="pl-e">Orpheus</span>
+      <span class="pl-en">constructor</span><span class="pl-k">:</span> <span class="pl-k"><span class="pl-k">-&gt;</span></span>
+        <span class="pl-smi">@has</span> <span class="pl-s"><span class="pl-pds">'</span>issue<span class="pl-pds">'</span></span>
+        <span class="pl-smi">@num</span> <span class="pl-s"><span class="pl-pds">'</span>comments<span class="pl-pds">'</span></span>
+        <span class="pl-smi">@num</span> <span class="pl-s"><span class="pl-pds">'</span>email_replies<span class="pl-pds">'</span></span>
 
-      <span class="nv">add_comment: </span><span class="nf">(issue_id) -&gt;</span>
-        <span class="nx">@comments</span><span class="p">.</span><span class="nx">incrby</span> <span class="mi">1</span>
-        <span class="nx">@issue</span><span class="p">(</span><span class="nx">issue_id</span><span class="p">)</span>
-        <span class="nx">@comments</span><span class="p">.</span><span class="nx">incrby</span> <span class="mi">1</span>
-        <span class="nx">@unissue</span><span class="p">()</span>
+      <span class="pl-en">add_comment</span><span class="pl-k">:</span><span class="pl-smi"> <span class="pl-smi">(issue_id)</span></span> <span class="pl-k"><span class="pl-k">-&gt;</span></span>
+        <span class="pl-smi">@comments</span>.incrby <span class="pl-c1">1</span>
+        <span class="pl-smi">@issue</span>(issue_id)
+        <span class="pl-smi">@comments</span>.incrby <span class="pl-c1">1</span>
+        <span class="pl-smi">@unissue</span>()
 
 
-      <span class="nv">add_email_reply: </span><span class="nf">(issue_id, fn) -&gt;</span>
-        <span class="nx">@add_comment</span> <span class="nx">issue_id</span>
-        <span class="nx">@email_replies</span><span class="p">.</span><span class="nx">incrby</span> <span class="mi">1</span>
-        <span class="nx">@issue</span><span class="p">(</span><span class="nx">issue_id</span><span class="p">)</span>
-        <span class="nx">@email_replies</span><span class="p">.</span><span class="nx">incrby</span> <span class="mi">1</span>
-        <span class="nx">@exec</span> <span class="nx">fn</span>
+      <span class="pl-en">add_email_reply</span><span class="pl-k">:</span><span class="pl-smi"> <span class="pl-smi">(issue_id, fn)</span></span> <span class="pl-k"><span class="pl-k">-&gt;</span></span>
+        <span class="pl-smi">@add_comment</span> issue_id
+        <span class="pl-smi">@email_replies</span>.incrby <span class="pl-c1">1</span>
+        <span class="pl-smi">@issue</span>(issue_id)
+        <span class="pl-smi">@email_replies</span>.incrby <span class="pl-c1">1</span>
+        <span class="pl-smi">@exec</span> fn
 
-    <span class="nv">user = </span><span class="nx">User</span><span class="p">.</span><span class="nx">create</span><span class="p">()</span>
-    <span class="nx">user</span><span class="p">(</span><span class="s">'rada'</span><span class="p">).</span><span class="nx">add_email_reply</span> <span class="s">'#142'</span><span class="p">,</span> <span class="o">-&gt;</span>
-      <span class="c1"># everything went better than expected...</span>
-</pre></div>
+    <span class="pl-v"><span class="pl-v">user <span class="pl-k">=</span></span></span> User.create()
+    user(<span class="pl-s"><span class="pl-pds">'</span>rada<span class="pl-pds">'</span></span>).add_email_reply <span class="pl-s"><span class="pl-pds">'</span>#142<span class="pl-pds">'</span></span>, <span class="pl-k">-&gt;</span>
+      <span class="pl-c"># everything went better than expected...</span></pre></div>
 
-<h2>Development</h2>
+<h2>
+<a id="development" class="anchor" href="#development" aria-hidden="true"><span class="octicon octicon-link"></span></a>Development</h2>
 
-<h3>Test</h3>
+<h3>
+<a id="test" class="anchor" href="#test" aria-hidden="true"><span class="octicon octicon-link"></span></a>Test</h3>
 
 <p><code>cake test</code></p>
 
-<h3>Contribute</h3>
+<h3>
+<a id="contribute" class="anchor" href="#contribute" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contribute</h3>
 
 <ul>
 <li><code>cake dev</code></li>
@@ -551,10 +556,16 @@ set:
 <li>Do your thing.</li>
 <li><code>cake dev</code></li>
 </ul>
-      </section>
-    </div>
 
-              <script type="text/javascript">
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/Radagaisus/Orpheus">Orpheus</a> is maintained by <a href="https://github.com/Radagaisus">Radagaisus</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+            <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
@@ -567,3 +578,4 @@ set:
 
   </body>
 </html>
+
