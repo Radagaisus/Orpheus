@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.4
+
+- Update the redis package dependency.
+
 ## 0.6.3
 
 - Added node.js 0.12 and io.js to the CI.
