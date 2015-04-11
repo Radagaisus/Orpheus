@@ -1,14 +1,14 @@
 {
 	"name": "orpheus",
 	"description": "Redis Object Model for CoffeeScript",
-	"version": "0.6.3",
+	"version": "0.6.4",
 	"url": "https://github.com/Radagaisus/Orpheus",
 	"author": "Almog Melamed <radagaisus@gmail.com",
 	"main": "./index",
 	"devDependencies": {
 		"jasmine-node": "latest",
 		"metrics": "0.1.6",
-		"redis": "0.10.0"
+		"redis": "0.12.1"
 	},
 	"dependencies": {
 		"async": "0.1.22",

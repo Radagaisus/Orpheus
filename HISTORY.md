@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.4
+
+- Updated `node_redis` dependency to 0.12.1.
+
 ## 0.6.3
 
 - Added node.js 0.12 and io.js to the CI.
