@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.6.5
+
+- Updated Orpheus to support all the latest and greatest Redis commands:
+
+    - New getters commands: `zlexcount`, `zrangebylex`, `zrevrangebylex`, `hstrlen`.
+
+    - New key commands: `dump`, `restore`, `sort`, `scan`.
+
+    - New zset commands: `zlexcount`, `zrangebylex`, `zrevrangebylex`, `zremrangebylex`, `zscan`.
+
+    - New set command, `sscan`.
+
+    - New number and string command, `hstrlen`.
+
 ## 0.6.4
 
 - Updated `node_redis` dependency to 0.12.1.
