@@ -1,31 +1,25 @@
 # Redis Commands
-#-------------------------------------#
+# ------------------------------------------------------------------------------------
 module.exports = 
 	validations:
 		# String
 		hsetnx:       true
 		hset:         true
-		
 		# Number
 		hincrby:      true
 		hincrbyfloat: true
-		
 		# List
 		lpush:        true # several values, 1
 		lpushx:       true
 		rpush:        true # several values, 1
 		rpushx:       true
-		
 		# Set
 		sadd:         true # several values, 1
-		
 		# Zset
 		zadd:         true # several values, reverted, 2
 		zincrby:      true # reverted
-		
 		# Hash
 		hmset:        true # several values, 2
-		
 		# Validations does not support:
 		# - zinterstore
 		# - zunionstore
@@ -38,48 +32,50 @@ module.exports =
 		# - brpoplpush and friends
 	
 	getters: [
-
 		# List
 		'lrange',
 		'llen',
-		
 		# Set
 		'smembers',
 		'scard',
-		
 		# Zset
+		'zcard',
+		'zcount',
+		'zlexcount',
 		'zrange',
+		'zrangebylex',
+		'zrevrangebylex',
 		'zrangebyscore',
+		'zrank',
 		'zrevrange',
 		'zrevrangebyscore',
-		'zscore',
-		'zrank',
 		'zrevrank',
-		'zcount',
-		'zcard',
-		
+		'zscore',
 		# Hash, String, Number
 		'hget',
 		'hgetall',
-		'hmget'
+		'hmget',
+		'hstrlen'
 	]
 	
 	str: [
 		'hdel',
 		'hexists',
 		'hget',
+		'hset',
 		'hsetnx',
-		'hset'
+		'hstrlen'
 	]
 	
 	num: [
 		'hdel',
 		'hexists',
 		'hget',
-		'hsetnx',
-		'hset',
 		'hincrby',
-		'hincrbyfloat'
+		'hincrbyfloat',
+		'hset',
+		'hsetnx',
+		'hstrlen'
 	]
 	
 	list: [
@@ -116,7 +112,8 @@ module.exports =
 		'srandmember',
 		'srem',
 		'sunion',
-		'sunionstore'
+		'sunionstore',
+		'sscan'
 	]
 	
 	zset: [
@@ -125,17 +122,22 @@ module.exports =
 		'zcount',
 		'zincrby',
 		'zinterstore',
+		'zlexcount',
 		'zrange',
+		'zrangebylex',
+		'zrevrangebylex',
 		'zrangebyscore',
 		'zrank',
 		'zrem',
+		'zremrangebylex',
 		'zremrangebyrank',
 		'zremrangebyscore',
 		'zrevrange',
 		'zrevrangebyscore',
 		'zrevrank',
 		'zscore',
-		'zunionstore'
+		'zunionstore',
+		'zscan'
 	]
 	
 	hash: [
@@ -156,16 +158,20 @@ module.exports =
 
 	# Operations that can be called on zset, set, hash and list attributes
 	keys: [
-		'type'
-		'ttl'
+		'del'
+		'dump'
+		'exists'
+		'expire'
+		'expireat'
+		'persist'
 		'pexpire'
 		'pexpireat'
 		'pttl'
-		'persist'
-		'expireat'
-		'expire'
-		'exists'
-		'del'
+		'restore'
+		'sort'
+		'ttl'
+		'type'
+		'scan'
 	]
 	
 	shorthands:
@@ -176,14 +182,12 @@ module.exports =
 		zset: 'z'
 		hash: 'h'
 	
-	# This maps commands for the add(),
-	# set() and delete() functions.
-	# Adding in a set results in sadd,
-	# deleting a num is hdel, etc.
+	# This maps commands for the `add()`, `set()` and `delete()` functions. Adding in a set
+	# results in `sadd`, deleting a number is `hdel`, etc.
 	command_map:
 		add:
 			num: 'hincrby'
-			str: 'hset'      # we don't 'optimize' with hmset
+			str: 'hset'      # We don't 'optimize' with hmset
 			set: 'sadd'
 			zset: 'zincrby'
 			list: 'lpush'
@@ -194,3 +198,4 @@ module.exports =
 			set: 'sadd'
 			zset: 'zadd'
 			list: 'lpush'
+
