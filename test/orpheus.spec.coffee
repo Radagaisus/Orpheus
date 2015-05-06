@@ -78,7 +78,7 @@ describe 'Error Handling', ->
 # --------------------------------------------------------------------------
 describe 'Raw Responses', ->
 
-	it 'returns a raw response', (done) ->
+	it 'Returns a raw response', (done) ->
 		class App extends Orpheus
 			constructor: ->
 				@zset 'leaderboard'
@@ -102,7 +102,7 @@ describe 'Raw Responses', ->
 # ------------------------------------------------------------------------------
 describe 'Schema', ->
 
-	it 'can call the different models using the schema', (done) ->
+	it 'Can call the different models using the schema', (done) ->
 		class Hello extends Orpheus
 			constructor: ->
 				@str 'name'
