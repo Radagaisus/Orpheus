@@ -3,6 +3,9 @@ node_js:
     - "0.10"
     - "0.12"
     - "iojs"
+    - "4.0"
+    - "4.1"
+    - "4.2"
 before_script:
     - "npm i -g jasmine-node"
 services:
