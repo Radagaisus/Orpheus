@@ -1,7 +1,7 @@
 {
 	"name": "orpheus",
 	"description": "Redis Object Model for CoffeeScript",
-	"version": "0.6.5",
+	"version": "0.7",
 	"url": "https://github.com/Radagaisus/Orpheus",
 	"author": "Almog Melamed <radagaisus@gmail.com",
 	"main": "./index",

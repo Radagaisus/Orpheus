@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.0
+
+- Update the underlying redis driver, `node-redis` from 0.10.2 to 2.3.0. This does not change any behavior for Orpheus, but the driver itself has some breaking changes.
+- Added node.js version `4.0`, `4.1`, `4.2` to the CI.
+
 ## 0.6.5
 
 - Updated Orpheus to support all the latest and greatest Redis commands:
